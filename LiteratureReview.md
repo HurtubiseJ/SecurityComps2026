@@ -57,3 +57,42 @@ Comments: A common problem in this research area is simulating real world DDoS a
 https://pmc.ncbi.nlm.nih.gov/articles/PMC9202629/
 
 Comments: This paper focuses on ML based detection systems in cloud computing contexts. Through this analysis the researchers explore various features which are important in detecting attacks in real time while giving limitations of features/approaches.
+
+--
+## Beshir Said 
+
+### Detecting transport/network-layer DDos flooding attacks in real time (Q2)
+https://pmc.ncbi.nlm.nih.gov/articles/PMC9202629/#sec5 
+
+Comments: Presents a viable ML pipeline for real-time detection of network/transport flooding attacks. The study trains and compares various algorithms on their DDoS-2020 dataset, reporting a very high detection accuracy in cloud testing
+
+Use for our project: This would give us a concrete model for what our dashboard should show such as packet-rate/ flow rate over short windows, detection confidence, etc. It also confirms that simple streamable features can be enough to detect volumetric floods.
+
+Limitations: Focuses on detection, not on mitigation effectiveness or interaction between L3/L4/L7 defenses. Cloud and ML-centric and also accuracy may not translate directly to our specific traffic or attack tooling.
+
+
+### How can ddos attacks be detected in real time with minimal packet-level information (Q2)
+https://www.sciencedirect.com/science/article/pii/S2215098622000842 
+
+Comments: Compares multiple models for detecting flooding DDos in Software-Defined Networking (SDN) using lightweight, easily collected features( packets in/flow fluctuation over time slots). Validates results and a SDN test.
+
+Use for our project: This would be a good baseline for real-time observability and feature selection as it supports our plan to log metrics and visualize early-warning indicators.
+
+Limitation: SDN-specific and detection centric.Does not address mitigation strategies or deployment in non-SDN architectures.
+
+### How DDos attacks can be detected accurately and quickly in real time using minimal packet-level information (Q2)
+https://www.computer.org/csdl/journal/su/2025/02/10549828/1Xx5uwIPKcU 
+
+Comments: Shows that DDos attacks can be detected accurately using simple real time metrics such as packet/ flow counts over short time windows. Detection in offline and online datasets with an ~99% accuracy. Validated in real testbeds.
+
+Use for our project: supports the use of easily observable metrics. Good baseline to check mitigator and supports early-warning detection.
+
+Limitations: Focuses solely on detection, not mitigation. SDN-centric. mainly effective for flooding/volumetric attacks.
+
+
+
+
+
+
+
+--
