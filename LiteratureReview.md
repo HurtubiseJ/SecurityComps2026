@@ -1,5 +1,5 @@
 # DDoS Mitigation Literature Review
-John Hurtubise - Beshir Said - Feraidon AdbulRahimzai
+John Hurtubise - Beshir Said - Feraidon AbdulRahimzai
 
 ## John Hurtubise
 
