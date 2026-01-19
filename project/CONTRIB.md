@@ -12,6 +12,7 @@ Configuration files exists in project root. Application logic is within app/ fol
 **SEE `/nodes/target1/`** 
 
 - `MASTER_CONFIG.json` contains the configuration for a given node. 
+- `README.md` Explains node functionality/important notes
 - `.env.<node>` environment file for node
 - `requirements.txt` Node requirements
 - `dependencies.txt` Outlines external dependencies for the NODE. Ex. PostgresQL (target) NGinx (proxy) 
