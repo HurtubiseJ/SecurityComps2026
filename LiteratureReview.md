@@ -3,7 +3,7 @@ John Hurtubise - Beshir Said - Feraidon AbdulRahimzai
 
 ## John Hurtubise
 
-## Important Implimentation Question
+## Important Implimentation Questions
 Can we use a single virtualized machine to accurately simulate DDoS mitigations and attacks? 
 
 ### Use in project
@@ -25,7 +25,7 @@ Current research currently focuses on one mitigation technique at time. In pract
 ### Citations and relavent papers
 #### Mechanics in DDoS: A Study of Layer 4 and Layer 7 Threat Vectors
 
-[https://www.scitepress.org/Papers/2025/135932/135932.pdf](https://www.scitepress.org/Papers/2025/135932/135932.pdf#:~:text=impact%20on%20network%20latency%2C%20downtime%2C,each%20attack%20type%2C%20providing%20valuable)
+[https://www.scitepress.org/Papers/2025/135932/135932.pdf](https://www.scitepress.org/Papers/2025/135932/135932.pdf)
 
 Comments: While this paper employs a number of mitigation techniques: Rate limiting/Traffic Shaping, AI-Based intrusion Detection, Load balancers and CDN utilization, and behavioral traffic analysis, attack types are tested in isolated setups but mitigations are used together. While they use multiple mitigation techniques together the paper fails to evaluate different mitigation combinations or interactions within systems. The paper takes a broad approach focusing on attack types and overall system affects.  
 

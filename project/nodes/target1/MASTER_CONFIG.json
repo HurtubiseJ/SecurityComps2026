@@ -1,0 +1,18 @@
+{
+    "id": "<uuid>",
+    "enabled": true,
+    "forward_host": "10.0.0.1",
+    "forward_port": "8001",
+    "monitoring": {
+        "enabled": true,
+        "metrics": [
+            "attack_requests_sent_total",
+            "attack_packets_sent_total",
+            "attack_requests_per_second",
+            "attack_bytes_sent_total"
+        ]
+    },
+    "custom_config": {
+
+    }
+}
