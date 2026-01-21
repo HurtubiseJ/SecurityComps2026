@@ -2,7 +2,21 @@ import { useState } from "react";
 import { Resizer } from "./Resizer";
 import { useDragResize } from "../hooks/useDragResize";
 
-export default function DashboardLayout() {
+export type DashboardLayoutProps = {
+    left: React.ReactElement,
+    right: React.ReactElement,
+    termLeft: React.ReactElement,
+    termRight: React.ReactElement,
+    center: React.ReactElement
+}
+
+export default function DashboardLayout({
+    left,
+    right,
+    termLeft,
+    termRight,
+    center
+} : DashboardLayoutProps) {
   const [leftWidth, setLeftWidth] = useState(240);
   const [rightWidth, setRightWidth] = useState(280);
   const [bottomHeight, setBottomHeight] = useState(220);
@@ -27,7 +41,7 @@ export default function DashboardLayout() {
         style={{ width: leftWidth }}
       >
         <div className="h-full pb-[220px] p-4">
-          Left
+          {left}
         </div>
         <div className="absolute top-0 right-0 h-full">
           <Resizer direction="vertical" onMouseDown={leftResize.onMouseDown} />
@@ -37,7 +51,7 @@ export default function DashboardLayout() {
       {/* CENTER */}
       <div className="flex-1 relative bg-zinc-900">
         <div className="h-full p-4">
-          Main
+          {center}
         </div>
       </div>
 
@@ -47,7 +61,7 @@ export default function DashboardLayout() {
         style={{ width: rightWidth }}
       >
         <div className="h-full p-4">
-          Right
+          {right}
         </div>
         <div className="flex absolute top-0 left-0 h-full">
           <Resizer direction="vertical" onMouseDown={rightResize.onMouseDown} />
@@ -68,7 +82,7 @@ export default function DashboardLayout() {
             className="p-3 border-r border-zinc-700"
             style={{ width: bottomLeftWidth }}
           >
-            Left
+            {termLeft}
           </div>
 
           <Resizer
@@ -77,7 +91,7 @@ export default function DashboardLayout() {
           />
 
           <div className="flex-1 p-3">
-            Right
+            {termRight}
           </div>
         </div>
       </div>
