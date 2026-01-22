@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Resizer } from "./Resizer";
-import { useDragResize } from "../hooks/useDragResize";
+import { Resizer } from "../Resizer";
+import { useDragResize } from "../../hooks/useDragResize";
 
 export type DashboardLayoutProps = {
     left: React.ReactElement,
@@ -17,7 +17,7 @@ export default function DashboardLayout({
     termRight,
     center
 } : DashboardLayoutProps) {
-  const [leftWidth, setLeftWidth] = useState(240);
+  const [leftWidth, setLeftWidth] = useState(190);
   const [rightWidth, setRightWidth] = useState(280);
   const [bottomHeight, setBottomHeight] = useState(220);
   const [bottomLeftWidth, setBottomLeftWidth] = useState(200)
@@ -40,7 +40,7 @@ export default function DashboardLayout({
         className="flex relative bg-zinc-800 border-r border-zinc-700"
         style={{ width: leftWidth }}
       >
-        <div className="h-full pb-[220px] p-4">
+        <div className="flex-1 h-full w-full pb-[220px] p-4">
           {left}
         </div>
         <div className="absolute top-0 right-0 h-full">
@@ -60,7 +60,7 @@ export default function DashboardLayout({
         className="flex relative bg-zinc-800 z-10 border-l border-zinc-700"
         style={{ width: rightWidth }}
       >
-        <div className="h-full p-4">
+        <div className="h-full w-full">
           {right}
         </div>
         <div className="flex absolute top-0 left-0 h-full">

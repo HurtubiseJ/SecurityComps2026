@@ -1,21 +1,25 @@
-import DashboardLayout from "../components/DashboardLayout";
+import DashboardLayout from "../components/Dashboard/DashboardLayout";
 
-import DashboardTermLeft from "../components/DashboardTermLeft";
-import DashboardTermRight from "../components/DashboardTermRight";
-import DashboardRight from "../components/DashboardRight";
-import DashboardLeft from "../components/DashboardLeft";
-import DashboardCenter from "../components/DashboardCenter";
+import DashboardTermLeft from "../components/Dashboard/DashboardTermLeft";
+import DashboardTermRight from "../components/Dashboard/DashboardTermRight";
+import DashboardRight from "../components/Dashboard/DashboardRight";
+import DashboardLeft from "../components/Dashboard/DashboardLeft";
+import DashboardCenter from "../components/Dashboard/DashboardCenter";
+import useNodeManager from "../hooks/useNodeManager";
 
 
 export default function Dashboard() {
 
+    const manager = useNodeManager(); 
+    console.log(manager.nodes.current)
+
     return (
         <DashboardLayout 
-            left={DashboardLeft()}
-            right={DashboardRight()}
-            center={DashboardCenter()}
-            termLeft={DashboardTermLeft()}
-            termRight={DashboardTermRight()}       
+            left={<DashboardLeft />}
+            right={<DashboardRight baseConfig={manager.activeNode.current} />}
+            center={<DashboardCenter />}
+            termLeft={<DashboardTermLeft />}
+            termRight={<DashboardTermRight />}       
         />
     )   
 }
