@@ -60,7 +60,7 @@ export default function DashboardLayout({
         className="flex relative bg-zinc-800 z-10 border-l border-zinc-700"
         style={{ width: rightWidth }}
       >
-        <div className="h-full w-full">
+        <div className="h-full w-full overflow-y-auto">
           {right}
         </div>
         <div className="flex absolute top-0 left-0 h-full">
@@ -79,7 +79,7 @@ export default function DashboardLayout({
 
         <div className="flex h-full">
           <div
-            className="p-3 border-r border-zinc-700"
+            className="border-r border-zinc-700"
             style={{ width: bottomLeftWidth }}
           >
             {termLeft}
@@ -90,7 +90,7 @@ export default function DashboardLayout({
             onMouseDown={bottomLeftResize.onMouseDown}
           />
 
-          <div className="flex-1 p-3">
+          <div className="flex-1">
             {termRight}
           </div>
         </div>

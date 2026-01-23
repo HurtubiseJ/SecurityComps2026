@@ -76,6 +76,7 @@ export class BaseConfig {
         }
     }
 
+    // Layout functions
     configRow(
         title: string,
         key: string,
@@ -98,7 +99,7 @@ export class BaseConfig {
                         onChange={onChange}
                         value={value}
                         size={Math.min(this.id.length + 2 || 1, 80)}
-                        className="max-w-full bg-slate-600 text-black"
+                        className="max-w-full bg-slate-600 text-gray-300"
                     />
                 </div>
             </div>
@@ -112,13 +113,13 @@ export class BaseConfig {
                     <h3 className="text-lg text-white">Base</h3>
 
                     {this.configRow("UUID", "id", "text", <TextItalicIcon weight="bold" />,() => {}, this.id)}
-                    {this.configRow("Node name", "name", "text", <LetterCircleHIcon weight="bold" />, () => {}, this.id)}
-                    {this.configRow("Node Type", "type", "checkbox", <TextItalicIcon weight="bold" />, () => {}, this.id)}
-                    {this.configRow("Enabled", "enabled", "checkbox", <TextItalicIcon weight="bold" />,() => {}, this.id)}
-                    {this.configRow("Host", "host", "text", <TextItalicIcon weight="bold" />,() => {}, this.id)}
-                    {this.configRow("Port", "port", "text", <TextItalicIcon weight="bold" />,() => {}, this.id)}
-                    {this.configRow("Forward Host", "forward_host", "text", <TextItalicIcon weight="bold" />,() => {}, this.id)}
-                    {this.configRow("Forward Port", "forward_port", "text", <TextItalicIcon weight="bold" />,() => {}, this.id)}
+                    {this.configRow("Node name", "name", "text", <LetterCircleHIcon weight="bold" />, () => {}, this.name)}
+                    {this.configRow("Node Type", "type", "checkbox", <TextItalicIcon weight="bold" />, () => {}, this.type)}
+                    {this.configRow("Enabled", "enabled", "checkbox", <TextItalicIcon weight="bold" />,() => {}, this.enabled ? "Enabled" : "Disabled")}
+                    {this.configRow("Host", "host", "text", <TextItalicIcon weight="bold" />,() => {}, this.host)}
+                    {this.configRow("Port", "port", "text", <TextItalicIcon weight="bold" />,() => {}, this.port)}
+                    {this.configRow("Forward Host", "forward_host", "text", <TextItalicIcon weight="bold" />,() => {}, this.forward_host)}
+                    {this.configRow("Forward Port", "forward_port", "text", <TextItalicIcon weight="bold" />,() => {}, this.forward_port)}
 
                 </div>
 

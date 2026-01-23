@@ -1,13 +1,17 @@
+import type { Logger } from "../../types/Logger"
 
 
-
-
-export default function DashboardTermRight() {
+export default function DashboardTermRight({
+    logger
+} : {
+    logger: Logger
+    }
+) {
 
 
     return (
-        <div>
-            <p>child term right</p>
-        </div>
+        <>
+            {logger.renderLogs()}
+        </>
     )
 }

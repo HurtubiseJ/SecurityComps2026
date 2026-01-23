@@ -6,11 +6,13 @@ import DashboardRight from "../components/Dashboard/DashboardRight";
 import DashboardLeft from "../components/Dashboard/DashboardLeft";
 import DashboardCenter from "../components/Dashboard/DashboardCenter";
 import useNodeManager from "../hooks/useNodeManager";
+import { Logger } from "../types/Logger";
 
 
 export default function Dashboard() {
 
     const manager = useNodeManager(); 
+    const logger = new Logger()
     console.log(manager.nodes.current)
 
     return (
@@ -19,7 +21,7 @@ export default function Dashboard() {
             right={<DashboardRight baseConfig={manager.activeNode.current} />}
             center={<DashboardCenter />}
             termLeft={<DashboardTermLeft />}
-            termRight={<DashboardTermRight />}       
+            termRight={<DashboardTermRight logger={logger} />}       
         />
     )   
 }
