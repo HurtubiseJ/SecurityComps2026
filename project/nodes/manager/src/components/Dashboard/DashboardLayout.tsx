@@ -20,7 +20,7 @@ export default function DashboardLayout({
   const [leftWidth, setLeftWidth] = useState(190);
   const [rightWidth, setRightWidth] = useState(280);
   const [bottomHeight, setBottomHeight] = useState(220);
-  const [bottomLeftWidth, setBottomLeftWidth] = useState(200)
+  const [bottomLeftWidth, setBottomLeftWidth] = useState(190)
 
   const leftResize = useDragResize(dx => setLeftWidth(w => Math.max(160, w + dx)));
   const rightResize = useDragResize(dx => setRightWidth(w => Math.min(500, Math.max(10, w - dx))));
