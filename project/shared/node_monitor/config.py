@@ -14,11 +14,13 @@ class Config:
 
             assert hasattr(config, "enabled")
             assert hasattr(config, "metrics")
+            assert hasattr(config, "interval")
         except:
             raise Exception("Configuration JSON file must contain fields 'enabled' and 'metrics'")
 
 
         self.enabled = config.enabled
+        self.interval = config.interval
         self.metrics = config.metrics
 
 configuration = Config()
