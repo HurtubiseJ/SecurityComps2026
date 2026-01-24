@@ -111,15 +111,12 @@ class NetworkMonitor:
         inc_if_positive(self.network_drop_total, 'sent', netCounts.dropout - self._last_net_counts.dropout)
         inc_if_positive(self.network_drop_total, 'recv', netCounts.dropin - self._last_net_counts.dropin)
 
-    def _process_net_connections(self):
+    def _process_net_connections(self, protocol="tcp"):
+        try:
+            netCon = psutil.net_connections(kind=protocol)
+        except:
+            logging.exception("_process_net_connections Failed")
 
-        def inc_tcp_udp(type: str, isTcp: bool):
-            if isTcp:
-                self.network_tcp_count.labels(type).inc()
-            else: 
-                self.network_udp_count.labels(type).inc()
-            return
-        
         established = 0
         syns = 0
         synr = 0
@@ -133,50 +130,59 @@ class NetworkMonitor:
         closing = 0
         none = 0
 
-        for b in [0, 1]:
-            try:
-                kind = "tcp" if b else "udp"
-                netCon = psutil.net_connections(kind="")
-            except:
-                logging.exception("_process_net_connections Failed")
-                    
-            for conn in netCon:
-                match conn.status:
-                    case psutil.CONN_CLOSE:
-                        inc_tcp_udp(psutil.CONN_CLOSE, True)
-                        continue
-                    case psutil.CONN_CLOSE_WAIT:
-                        inc_tcp_udp(psutil.CONN_CLOSE_WAIT, True)
-                        continue
-                    case psutil.CONN_CLOSING:
-                        inc_tcp_udp(psutil.CONN_CLOSING, True)
-                        continue
-                    case psutil.CONN_ESTABLISHED:
-                        inc_tcp_udp(psutil.CONN_CLOSING, True)
-                        continue
-                    case psutil.CONN_FIN_WAIT1:
-                        inc_tcp_udp(psutil.CONN_FIN_WAIT1, True)
-                        continue
-                    case psutil.CONN_FIN_WAIT2:
-                        inc_tcp_udp(psutil.CONN_FIN_WAIT2, True)
-                        continue
-                    case psutil.CONN_LAST_ACK:
-                        inc_tcp_udp(psutil.CONN_LAST_ACK, True)
-                        continue
-                    case psutil.CONN_LISTEN:
-                        inc_tcp_udp(psutil.CONN_LISTEN, True)
-                        continue
-                    case psutil.CONN_SYN_RECV:
-                        inc_tcp_udp(psutil.CONN_SYN_RECV, True)
-                        continue
-                    case psutil.CONN_SYN_SENT:
-                        inc_tcp_udp(psutil.CONN_SYN_SENT, True)
-                        continue
-                    case psutil.CONN_TIME_WAIT:
-                        inc_tcp_udp(psutil.CONN_TIME_WAIT, True)
-                        continue
-                    case psutil.CONN_NONE:
-                        inc_tcp_udp(psutil.CONN_NONE, True)
-                        continue
-                    case _:
-                        continue
+        def inc_counter():
+            counter = self.network_tcp_count if protocol == "tcp" else self.network_udp_count
+            counter.labels(psutil.CONN_CLOSE).set(close)
+            counter.labels(psutil.CONN_CLOSE_WAIT).set(closewait)
+            counter.labels(psutil.CONN_CLOSING).set(closing)
+            counter.labels(psutil.CONN_ESTABLISHED).set(established)
+            counter.labels(psutil.CONN_FIN_WAIT1).set(finw1)
+            counter.labels(psutil.CONN_FIN_WAIT2).set(finw2)
+            counter.labels(psutil.CONN_LAST_ACK).set(lastack)
+            counter.labels(psutil.CONN_LISTEN).set(listen)
+            counter.labels(psutil.CONN_SYN_RECV).set(synr)
+            counter.labels(psutil.CONN_SYN_SENT).set(syns)
+            counter.labels(psutil.CONN_TIME_WAIT).set(timewait)
+            counter.labels(psutil.CONN_NONE).set(none)
+
+        for conn in netCon:
+            match conn.status:
+                case psutil.CONN_CLOSE:
+                    close += 1
+                    continue
+                case psutil.CONN_CLOSE_WAIT:
+                    closewait += 1
+                    continue
+                case psutil.CONN_CLOSING:
+                    closing += 1
+                    continue
+                case psutil.CONN_ESTABLISHED:
+                    established += 1
+                    continue
+                case psutil.CONN_FIN_WAIT1:
+                    finw1 += 1
+                    continue
+                case psutil.CONN_FIN_WAIT2:
+                    finw2 += 1
+                    continue
+                case psutil.CONN_LAST_ACK:
+                    lastack += 1
+                    continue
+                case psutil.CONN_LISTEN:
+                    listen += 1
+                    continue
+                case psutil.CONN_SYN_RECV:
+                    synr += 1
+                    continue
+                case psutil.CONN_SYN_SENT:
+                    syns += 1
+                    continue
+                case psutil.CONN_TIME_WAIT:
+                    timewait += 1
+                    continue
+                case psutil.CONN_NONE:
+                    none += 1
+                    continue
+                case _:
+                    continue
+        inc_counter()
