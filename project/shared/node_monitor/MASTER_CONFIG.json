@@ -1,0 +1,9 @@
+{
+    "monitor": {
+        "enabled": true,
+        "metrics": [
+            "test",
+            "test2"
+        ]
+    }
+}

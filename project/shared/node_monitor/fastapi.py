@@ -1,0 +1,13 @@
+# Bind to node's fastapi application
+
+from prometheus_fastapi_instrumentator import Instrumentator
+from fastapi import FastAPI
+import logging
+
+def BindPrometheus(app: FastAPI) -> bool:
+    try:
+        Instrumentator.instrument(app=app).expose(app, "/metrics")
+        return True
+    except:
+        logging.exception("Failed to bind prometheus to fastAPI app")
+        return False
