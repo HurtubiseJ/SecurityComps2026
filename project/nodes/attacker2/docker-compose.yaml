@@ -1,0 +1,14 @@
+services:
+  attacker:
+    container_name: attacker1
+    build: .
+    ports:
+      - "8000:8000"
+    volumes: 
+      - .:/app
+    networks: 
+      - ddos-shared
+    
+networks:
+  ddos-shared:
+    external: true
