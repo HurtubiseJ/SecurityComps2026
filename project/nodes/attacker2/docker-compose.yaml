@@ -1,11 +1,13 @@
 services:
   attacker:
     container_name: attacker1
-    build: .
+    build: 
+      context: ../../
+      dockerfile: nodes/attacker2/Dockerfile
     ports:
       - "8000:8000"
     volumes: 
-      - .:/app
+      - ./app:/app
     networks: 
       - ddos-shared
     

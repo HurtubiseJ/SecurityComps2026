@@ -2,28 +2,36 @@
 import os 
 import json
 
-class Config:
+import os
+import json
 
+class MonitorConfig:
     def __init__(self):
-        self.configPath = os.getenv("CONFIG_FILE_PATH", "./MASTER_CONFIG.json")
+        self.configPath = os.getenv("CONFIG_FILE_PATH", "/MASTER_CONFIG.json")
 
-        try:    
+        try:
             with open(self.configPath, "r") as f:
                 config = json.load(f)
 
+            monitor_config = config.get("monitor", {})
 
-            assert hasattr(config, "enabled")
-            assert hasattr(config, "metrics")
-            assert hasattr(config, "interval")
-        except:
-            raise Exception("Configuration JSON file must contain fields 'enabled' and 'metrics'")
+            for key in ["enabled", "metrics", "interval"]:
+                if key not in monitor_config:
+                    raise ValueError(f"Configuration must contain '{key}'")
+
+            self.enabled = monitor_config["enabled"]
+            self.metrics = monitor_config["metrics"]
+            self.interval = monitor_config["interval"]
+
+        except FileNotFoundError:
+            raise FileNotFoundError(f"Configuration file not found: {self.configPath}")
+        except json.JSONDecodeError:
+            raise ValueError(f"Invalid JSON in configuration file: {self.configPath}")
+        except Exception as e:
+            raise Exception(f"Error loading configuration: {e}")
 
 
-        self.enabled = config.enabled
-        self.interval = config.interval
-        self.metrics = config.metrics
-
-configuration = Config()
+configuration = MonitorConfig()
 
 
 # METRICS LIST

@@ -1,0 +1,13 @@
+{
+    "monitor": {
+        "enabled": true,
+        "metrics": {
+            "cpu": true,
+            "memory": true,
+            "disk": true,
+            "network": true, 
+            "fastapi": true
+        },
+        "interval": 1
+    }
+}

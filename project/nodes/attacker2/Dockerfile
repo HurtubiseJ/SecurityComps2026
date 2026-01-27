@@ -4,23 +4,36 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
+# Install system dependencies
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         python3 \
+        python3-venv \
         python3-pip \
         hping3 \
         ca-certificates && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Make `python` available as `python`
-RUN ln -s /usr/bin/python3 /usr/bin/python
+# Create virtual environment
+RUN python3 -m venv /venv
 
-ENV PYTHONPATH=/app
+# Activate venv
+ENV PATH="/venv/bin:$PATH"
 
-COPY requirements.txt .
-RUN pip install -r requirements.txt
+# Upgrade tooling INSIDE venv
+RUN pip install --upgrade pip setuptools wheel
+
+# Copy and install shared library 
+COPY shared/node_monitor /opt/node_monitor
+RUN pip install -e /opt/node_monitor
+
+# Copy application (Note CONFIG copy)
+COPY nodes/attacker2/app /app
+COPY nodes/attacker2/requirements.txt /app/requirements.txt
+COPY nodes/attacker2/MASTER_CONFIG.json . 
+RUN pip install -r /app/requirements.txt
 
 WORKDIR /app
 
-CMD ["uvicorn", "app.main:app", "--port", "8000", "--host", "0.0.0.0"]
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
