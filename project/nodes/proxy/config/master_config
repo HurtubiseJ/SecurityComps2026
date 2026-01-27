@@ -1,0 +1,45 @@
+//Proxy 1: This Proxy Layer will essientially act as a relay and foward data from internal server to client. 
+//
+// We will use NGinx which will serve as a reverse proxy to listen for incoming requests on the configured port and address. 
+//
+//Mitigation: Rate Limiting, Connection Timing, SYN Backlog, Request queuing, Behavioral Filtering.
+
+
+//Configured for:
+// - Grape00(target), 
+// - Grape01(proxy), 
+// - Grape02(client)
+
+//MASTER CONFIG
+{
+    // Config present on all nodes
+    “id”: proxy-grape01, 
+    “enabled”: true,
+    // Where to send data (target~grape00)
+    “forward_host”: str, (137.22.4.153) 
+    “forward_port”: str, (8000)
+
+    // Where to receive data (proxy~grape01)
+    “port”: str, (8000)
+    “host”: str, (137.22.4.154)
+
+
+    “monitoring”: {  // Config for monitoring module on given node
+        “enabled”: true,
+        “metrics”: [
+             “<list_of_metrics>”,
+        ]
+    }, 
+
+    //Node specific configuration ;; I need rate limiting/ connection limits/ 
+    “custom_config”: {
+    "rate_limit": {
+      "enabled": false,
+      "requests_per_second": 5,
+      "burst": 20,
+      "nodelay": true,
+      "paths": ["/"]
+    }
+    }
+}
+
