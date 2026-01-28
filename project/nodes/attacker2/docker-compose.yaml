@@ -1,5 +1,5 @@
 services:
-  attacker:
+  attacker2:
     container_name: attacker2
     build: 
       context: ../../

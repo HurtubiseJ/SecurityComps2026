@@ -5,4 +5,10 @@ services:
       dockerfile: Dockerfile
     container_name: target1
     ports:
-      - "8000:8000"
+      - "8002:8000"
+    networks:
+      - ddos-shared
+
+networks:
+  ddos-shared:
+    external: True

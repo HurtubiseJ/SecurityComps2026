@@ -26,4 +26,6 @@ async def stop():
         "status": "stopped"
     }
 
-
+@router.get("/test")
+async def test():
+    return {"status": "ok"}
