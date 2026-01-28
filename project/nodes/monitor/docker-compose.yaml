@@ -9,6 +9,9 @@ services:
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
     restart: always
+    
+    networks:
+      - ddos-shared
   grafana:
     image: grafana/grafana
     ports:
@@ -16,8 +19,16 @@ services:
     depends_on:
       - prometheus
     restart: always
+    networks:
+      - ddos-shared
   web_server:
     image: httpd:2.4
     ports:
       - '80:80'
     restart: always
+    networks:
+      - ddos-shared
+
+networks:
+  ddos-shared:
+    external: True

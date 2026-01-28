@@ -1,5 +1,9 @@
 from fastapi import APIRouter, HTTPException
 from processes import start_hping3, stop_hping3
+import requests
+import logging
+
+logger = logging.getLogger("attacker2")
 
 
 router = APIRouter()
@@ -28,4 +32,7 @@ async def stop():
 
 @router.get("/test")
 async def test():
-    return {"status": "ok"}
+    resp = requests.get("http://proxy:8000/config")
+    logger.info(resp.content)
+
+    return {"status": "ok", "status_code": resp.status_code}

