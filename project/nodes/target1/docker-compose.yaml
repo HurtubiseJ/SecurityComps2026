@@ -1,0 +1,8 @@
+services:
+  target1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: target1
+    ports:
+      - "8000:8000"

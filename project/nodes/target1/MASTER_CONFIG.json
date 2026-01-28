@@ -2,7 +2,7 @@
     "id": "<uuid>",
     "enabled": true,
     "forward_host": "10.0.0.1",
-    "forward_port": "8001",
+    "forward_port": "8000",
     "monitoring": {
         "enabled": true,
         "metrics": [

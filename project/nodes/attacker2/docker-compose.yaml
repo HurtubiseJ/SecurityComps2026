@@ -1,6 +1,6 @@
 services:
   attacker:
-    container_name: attacker1
+    container_name: attacker2
     build: 
       context: ../../
       dockerfile: nodes/attacker2/Dockerfile
