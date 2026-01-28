@@ -83,6 +83,8 @@ class NetworkMonitor:
         pass
 
     def collect(self):
+        self._process_net_connections()
+        self._process_net_io_counters()
         pass
 
     def _process_net_io_counters(self):

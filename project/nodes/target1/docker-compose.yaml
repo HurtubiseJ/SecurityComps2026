@@ -1,8 +1,8 @@
 services:
   target1:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ../../
+      dockerfile: nodes/target1/Dockerfile
     container_name: target1
     ports:
       - "8002:8000"

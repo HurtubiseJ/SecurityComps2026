@@ -4,8 +4,12 @@ from prometheus_client import Counter, Histogram, Gauge, generate_latest
 from pathlib import Path
 import json
 import time, random, threading
+from node_monitor import Registry
 
 app = FastAPI()
+
+registry = Registry()
+registry.registerFastAPIApp(app=app)
 
 MASTER_CONFIG_PATH = Path(__file__).resolve().parent.parent / "MASTER_CONFIG.json"
 
