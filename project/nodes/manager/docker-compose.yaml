@@ -1,0 +1,17 @@
+services:
+  manager:
+    container_name: manager
+    build: 
+      context: ../../
+      dockerfile: nodes/manager/Dockerfile
+    ports:
+      - "5173:8000"
+    volumes:
+      - .:/app      # Mount the host directory to the container for live reloading
+      - /app/node_modules 
+    networks: 
+      - ddos-shared
+    
+networks:
+  ddos-shared:
+    external: true

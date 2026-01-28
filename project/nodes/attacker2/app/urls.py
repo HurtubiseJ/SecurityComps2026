@@ -2,6 +2,8 @@ from fastapi import APIRouter, HTTPException
 from processes import start_hping3, stop_hping3
 import requests
 import logging
+import json
+import subprocess
 
 logger = logging.getLogger("attacker2")
 
@@ -36,3 +38,14 @@ async def test():
     logger.info(resp.content)
 
     return {"status": "ok", "status_code": resp.status_code}
+
+@router.get("/config")
+async def config():
+    subprocess.run(["ls"])
+    with open("../MASTER_CONFIG.json", "r") as f:
+        config = json.load(f)
+    
+    if config is None:
+        raise HTTPException("Failed to load config")
+    
+    return config

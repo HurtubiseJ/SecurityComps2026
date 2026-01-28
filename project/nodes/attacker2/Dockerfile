@@ -31,7 +31,7 @@ RUN pip install -e /opt/node_monitor
 # Copy application (Note CONFIG copy)
 COPY nodes/attacker2/app /app
 COPY nodes/attacker2/requirements.txt /app/requirements.txt
-COPY nodes/attacker2/MASTER_CONFIG.json . 
+COPY nodes/attacker2/MASTER_CONFIG.json .
 RUN pip install -r /app/requirements.txt
 
 WORKDIR /app 
