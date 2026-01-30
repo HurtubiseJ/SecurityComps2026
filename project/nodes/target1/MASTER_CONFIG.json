@@ -1,5 +1,6 @@
 {
     "id": "<uuid>",
+    "name": "target1", 
     "enabled": true,
     "forward_host": "10.0.0.1",
     "forward_port": "8000",

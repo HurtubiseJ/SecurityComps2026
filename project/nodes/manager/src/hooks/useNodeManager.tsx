@@ -1,24 +1,26 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { BaseConfig } from "../types/BaseConfig"
-import { NODE_IP_MAP } from "../constants/NodeIp"
+import { LOCAL_NODE_IP_MAP } from "../constants/NodeIp"
+import { type NodeType } from "../types/configs"
 
 const InitDefaultNodes = async (): Promise<BaseConfig[]> => {
-    const list: BaseConfig[] = [
-        new BaseConfig("Attacker 1", "attacker"),
-        new BaseConfig("Proxy 1", "proxy"),
-        new BaseConfig("Target 1", "target"),
-    ]
+    const list: BaseConfig[] = []
 
-    const attackerConfig = await initAttacker2Config()
+    const attackerConfig = await initAttacker2Config(LOCAL_NODE_IP_MAP['attacker2'], "attacker")
     if (attackerConfig) {
         list.push(attackerConfig)
     }
+    const targetConfig = await initAttacker2Config(LOCAL_NODE_IP_MAP['target1'], "target")
+    if (targetConfig) {
+        list.push(targetConfig)
+    }
+
+    list.push(new BaseConfig("Proxy 1", "proxy"))
 
     return list
 }
 
-const initAttacker2Config = async (): Promise<BaseConfig | null> => {
-    const url = NODE_IP_MAP["attacker2"]
+const initAttacker2Config = async (url: string, type: NodeType): Promise<BaseConfig | null> => {
     const configUrl = `${url}config`
 
     try {
@@ -28,8 +30,8 @@ const initAttacker2Config = async (): Promise<BaseConfig | null> => {
         }
 
         const res = await resp.json()
-        console.log("Attacker2 config json: ", res)
-        return new BaseConfig(res.name, "attacker")
+        console.log(type, " config json: ", res)
+        return new BaseConfig(res.name, type, res.enabled, res.forward_host, res.forward_port, res.host, res.port)
     } catch {
         return null
     }

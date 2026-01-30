@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request, BackgroundTasks, HTTPException
 from fastapi.responses import HTMLResponse, PlainTextResponse, JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from prometheus_client import Counter, Histogram, Gauge, generate_latest
 from pathlib import Path
 import json
@@ -7,6 +8,14 @@ import time, random, threading
 from node_monitor import Registry
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 registry = Registry()
 registry.registerFastAPIApp(app=app)

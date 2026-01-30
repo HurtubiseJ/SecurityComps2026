@@ -5,3 +5,4 @@ include:
   - nodes/proxy/docker-compose.yaml
   - nodes/target1/docker-compose.yaml
   - nodes/monitor/docker-compose.yaml
+  - nodes/manager/docker-compose.yaml
