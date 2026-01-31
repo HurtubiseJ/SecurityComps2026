@@ -19,7 +19,7 @@ export default function Dashboard() {
     return (
         <DashboardLayout 
             left={<DashboardLeft />}
-            right={<DashboardRight baseConfig={manager.activeNode} />}
+            right={<DashboardRight baseConfig={manager.activeNode} updateNode={manager.updateNode} />}
             center={<DashboardCenter nodeManager={manager} />}
             termLeft={<DashboardTermLeft />}
             termRight={<DashboardTermRight logger={logger} />}       

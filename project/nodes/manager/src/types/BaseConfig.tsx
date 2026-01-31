@@ -29,8 +29,7 @@ export class BaseMonitor {
             metrics: this.metrics
         }
     }
-
-
+      
     configRow(
         title: string,
         key: string,
@@ -38,6 +37,7 @@ export class BaseMonitor {
         icon: React.ReactElement,
         onChange: (v: any) => void,
         value: string | boolean,
+        updateNode: (nodeJson: any) => void
     ){
         return (
             <div className="flex flex-col w-full overflow-hidden min-w-0 pr-4">
@@ -51,7 +51,7 @@ export class BaseMonitor {
                     {inputType === "checkbox" ? (
                         <input
                             type={inputType}
-                            onChange={onChange}
+                            onChange={() => {onChange; updateNode(this.getConfig())}}
                             name={key}
                             checked={value as boolean}
                             size={Math.min(30 + 2 || 1, 80)}
@@ -72,39 +72,44 @@ export class BaseMonitor {
         )
     }
 
-    configLayout() {
+    configLayout(updateNode: (nodeStr: string) => void) {
         return (
           <div className="flex flex-col w-full gap-y-2 mt-2 pb-2 border-b border-zinc-700">
             <h3 className="text-lg text-white">Monitoring</h3>
       
             {this.configRow("Enabled", "enabled", "checkbox",
               <TextItalicIcon weight="bold" />,
-              (v) => (this.enabled = v),
-              this.enabled
+              (v) => (this.enabled = v.target),
+              this.enabled, 
+              updateNode
             )}
       
             {this.configRow("CPU", "cpu", "checkbox",
               <LetterCircleHIcon weight="bold" />,
-              (v) => (this.metrics.cpu = v),
-              this.metrics.cpu
+              (v) => {this.metrics.cpu = v.target.checked; console.log("onChange CPU", v, this)},
+              this.metrics.cpu, 
+              updateNode
             )}
       
             {this.configRow("Disk", "disk", "checkbox",
               <TextItalicIcon weight="bold" />,
               (v) => (this.metrics.disk = v),
-              this.metrics.disk
+              this.metrics.disk, 
+              updateNode
             )}
       
             {this.configRow("Network", "network", "checkbox",
               <TextItalicIcon weight="bold" />,
               (v) => (this.metrics.network = v),
-              this.metrics.network
+              this.metrics.network, 
+              updateNode
             )}
       
             {this.configRow("FastAPI", "fastapi", "checkbox",
               <TextItalicIcon weight="bold" />,
               (v) => (this.metrics.fastapi = v),
-              this.metrics.fastapi
+              this.metrics.fastapi, 
+              (nodeStr: any) => updateNode(nodeStr)
             )}
           </div>
         )
@@ -147,6 +152,7 @@ export class BaseConfig {
     }
 
     applyConfigActiveNode = async () => {
+        console.log(JSON.stringify(this.getConfig()))
         // @ts-ignore
         const response = await fetch(`${LOCAL_NODE_IP_MAP[this.name]}config`, {
             method: 'POST',
@@ -243,6 +249,7 @@ export class BaseConfig {
         icon: React.ReactElement,
         onChange: () => void,
         value: string,
+        updateNode: (nodeStr: any) => void
     ){
         return (
             <div className="flex flex-col w-full overflow-hidden min-w-0 pr-4">
@@ -255,7 +262,7 @@ export class BaseConfig {
                     {icon}
                     <input
                         type={inputType}
-                        onChange={onChange}
+                        onChange={() => {onChange; updateNode(this.getConfig())}}
                         value={value}
                         size={Math.min(this.id.length + 2 || 1, 80)}
                         className="max-w-full bg-slate-600 text-gray-300"
@@ -265,26 +272,26 @@ export class BaseConfig {
         )
     }
 
-    configLayout() {
+    configLayout(updateNode: (nodeStr: any) => void) {
         return (
             <div className="flex flex-col w-full items-start justify-start gap-y-2 min-w-0 mt-2">
                 {this.getApplyRestart()}
                 <div className="flex flex-col w-full items-start justify-start gap-y-2 min-w-0 pb-4 border-b border-zinc-700">
                     <h3 className="text-lg text-white">Base</h3>
 
-                    {this.configRow("UUID", "id", "text", <TextItalicIcon weight="bold" />,() => {}, this.id)}
-                    {this.configRow("Node name", "name", "text", <LetterCircleHIcon weight="bold" />, () => {}, this.name)}
-                    {this.configRow("Node Type", "type", "checkbox", <TextItalicIcon weight="bold" />, () => {}, this.type)}
-                    {this.configRow("Enabled", "enabled", "checkbox", <TextItalicIcon weight="bold" />,() => {}, this.enabled ? "Enabled" : "Disabled")}
-                    {this.configRow("Host", "host", "text", <TextItalicIcon weight="bold" />,() => {}, this.host)}
-                    {this.configRow("Port", "port", "text", <TextItalicIcon weight="bold" />,() => {}, this.port)}
-                    {this.configRow("Forward Host", "forward_host", "text", <TextItalicIcon weight="bold" />,() => {}, this.forward_host)}
-                    {this.configRow("Forward Port", "forward_port", "text", <TextItalicIcon weight="bold" />,() => {}, this.forward_port)}
+                    {this.configRow("UUID", "id", "text", <TextItalicIcon weight="bold" />,() => {}, this.id, (nodeStr: any) => updateNode(nodeStr))}
+                    {this.configRow("Node name", "name", "text", <LetterCircleHIcon weight="bold" />, () => {}, this.name, (nodeStr: any) => updateNode(nodeStr))}
+                    {this.configRow("Node Type", "type", "checkbox", <TextItalicIcon weight="bold" />, () => {}, this.type, (nodeStr: any) => updateNode(nodeStr))}
+                    {this.configRow("Enabled", "enabled", "checkbox", <TextItalicIcon weight="bold" />,() => {}, this.enabled ? "Enabled" : "Disabled", (nodeStr: any) => updateNode(nodeStr))}
+                    {this.configRow("Host", "host", "text", <TextItalicIcon weight="bold" />,() => {}, this.host, (nodeStr: any) => updateNode(nodeStr))}
+                    {this.configRow("Port", "port", "text", <TextItalicIcon weight="bold" />,() => {}, this.port, (nodeStr: any) => updateNode(nodeStr))}
+                    {this.configRow("Forward Host", "forward_host", "text", <TextItalicIcon weight="bold" />,() => {}, this.forward_host, (nodeStr: any) => updateNode(nodeStr))}
+                    {this.configRow("Forward Port", "forward_port", "text", <TextItalicIcon weight="bold" />,() => {}, this.forward_port, (nodeStr: any) => updateNode(nodeStr))}
                 </div>
 
                 {this.monitor !== null && (
                     <>
-                        {this.monitor.configLayout()}
+                        {this.monitor.configLayout(updateNode)}
                     </>
                 )}
             </div>

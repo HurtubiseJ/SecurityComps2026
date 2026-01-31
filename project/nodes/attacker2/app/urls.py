@@ -4,21 +4,33 @@ import requests
 import logging
 import json
 import subprocess
+from typing import Optional
 from pydantic import BaseModel
 
 logger = logging.getLogger("attacker2")
 
 
-class Monitor(BaseModel):
+class Metrics(BaseModel):
     cpu: bool
     disk: bool
     network: bool
     fastapi: bool
     memory: bool
 
-class Config(BaseModel):
+class Monitor(BaseModel):
     enabled: bool
-    interval: int
+    interval: Optional[int] = None
+    metrics: Metrics
+
+class Config(BaseModel):
+    id: str
+    name: str
+    type: str
+    enabled: bool
+    forward_host: str
+    forward_port: str
+    host: str
+    port: str
     metrics: Monitor
 
 
@@ -66,8 +78,12 @@ async def config():
 
 @router.post("/config")
 async def modifyConfig(config: Config):
-    with open("../MASTER_CONFIG.json", "+w") as f:
-        config.model_dump_json()
+    logger.info(config)
+    with open("../MASTER_CONFIG.json", "w") as f:
+        f.write(
+            config.model_dump_json(indent=2)
+        )
+
     
     return {"status": "ok", "message": "Config file modified. GET /restart to apply changes."}
 

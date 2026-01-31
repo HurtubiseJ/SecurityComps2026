@@ -3,10 +3,12 @@ import type { BaseConfig } from "../../types/BaseConfig"
 
 type DashboardLeftProps = {
     baseConfig: BaseConfig | null
+    updateNode: (nodeStr: any) => void
 }
 
 export default function DashboardRight({
-    baseConfig
+    baseConfig, 
+    updateNode
 } : DashboardLeftProps) {
 
     if (!baseConfig) {
@@ -26,7 +28,7 @@ export default function DashboardRight({
             </div>
 
 
-            {baseConfig.configLayout()}
+            {baseConfig.configLayout(updateNode)}
 
 
             

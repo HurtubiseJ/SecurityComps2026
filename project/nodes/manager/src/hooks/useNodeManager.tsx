@@ -72,17 +72,35 @@ export default function useNodeManager() {
     }, [])
 
     const changeActiveNode = (id: string) => {
-        setActiveNode(prev => {
-            const node = nodes.find(n => n.id === id)
-            return node ?? prev
-        })
+        setActiveNode(nodes.find(n => n.id === id) ?? null)
     }
 
+    const updateNode = (node: any) => {
+        const metrics: metrics = {
+            cpu: node.monitor?.metrics?.cpu,
+            memory: node.monitor?.metrics?.memory,
+            disk: node.monitor?.metrics?.disk,
+            network: node.monitor?.metrics?.network,
+            fastapi: node.monitor?.metrics?.fastapi
+        }
+        const monitorConfig = node.monitor ? new BaseMonitor(node.monitor.enabled, metrics) : null
+        const config = new BaseConfig(node.name, node.type, node.enabled, node.forward_host, node.forward_port, node.host, node.port, monitorConfig)
+        console.log("INPUT NODE: ", config)
+
+        setNodes(nodes.map((currNode: BaseConfig) => {
+            if (currNode.id === config.id) {
+                return config
+            } else {
+                return currNode
+            }
+        }))
+    }
 
     return {
         nodes,
         activeNode,
         loading,
         changeActiveNode,
+        updateNode
     }
 }
