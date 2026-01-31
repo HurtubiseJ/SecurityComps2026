@@ -14,6 +14,8 @@ services:
       - ddos-shared
   grafana:
     image: grafana/grafana
+    logging:
+      driver: none
     ports:
       - '3000:3000'
     depends_on:
@@ -21,13 +23,13 @@ services:
     restart: always
     networks:
       - ddos-shared
-  web_server:
-    image: httpd:2.4
-    ports:
-      - '80:80'
-    restart: always
-    networks:
-      - ddos-shared
+  # web_server:
+  #   image: httpd:2.4
+  #   ports:
+  #     - '80:80'
+  #   restart: always
+  #   networks:
+  #     - ddos-shared
 
 networks:
   ddos-shared:

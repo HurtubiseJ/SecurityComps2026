@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react"
-import { BaseConfig } from "../types/BaseConfig"
+import { BaseConfig, BaseMonitor } from "../types/BaseConfig"
 import { LOCAL_NODE_IP_MAP } from "../constants/NodeIp"
 import { type NodeType } from "../types/configs"
+import { type metrics } from "../types/BaseConfig"
 
 const InitDefaultNodes = async (): Promise<BaseConfig[]> => {
     const list: BaseConfig[] = []
@@ -31,7 +32,16 @@ const initAttacker2Config = async (url: string, type: NodeType): Promise<BaseCon
 
         const res = await resp.json()
         console.log(type, " config json: ", res)
-        return new BaseConfig(res.name, type, res.enabled, res.forward_host, res.forward_port, res.host, res.port)
+
+        const metrics: metrics = {
+            cpu: res.monitor?.metrics?.cpu,
+            memory: res.monitor?.metrics?.memory,
+            disk: res.monitor?.metrics?.disk,
+            network: res.monitor?.metrics?.network,
+            fastapi: res.monitor?.metrics?.fastapi
+        }
+        const monitorConfig = res.monitor ? new BaseMonitor(res.monitor.enabled, metrics) : null
+        return new BaseConfig(res.name, type, res.enabled, res.forward_host, res.forward_port, res.host, res.port, monitorConfig)
     } catch {
         return null
     }
@@ -67,6 +77,7 @@ export default function useNodeManager() {
             return node ?? prev
         })
     }
+
 
     return {
         nodes,

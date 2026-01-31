@@ -1,14 +1,23 @@
 import { v4 as uuidv4 } from "uuid"
 import type { NodeType } from "./configs";
 import { LetterCircleHIcon, TextItalicIcon } from "@phosphor-icons/react";
+import { LOCAL_NODE_IP_MAP } from "../constants/NodeIp";
 
-class BaseMonitor {
+export type metrics = {
+    cpu: boolean;
+    memory: boolean;
+    disk: boolean;
+    network: boolean;
+    fastapi: boolean;
+};
+
+export class BaseMonitor {
     public enabled: boolean;
-    public metrics: string[];
+    public metrics: metrics
 
     public constructor(
         enabled: boolean = false,
-        metrics: string[] = []
+        metrics: metrics,
     ) {
         this.enabled = enabled;
         this.metrics = metrics;
@@ -21,11 +30,86 @@ class BaseMonitor {
         }
     }
 
-    configLayout() {
+
+    configRow(
+        title: string,
+        key: string,
+        inputType: string,
+        icon: React.ReactElement,
+        onChange: (v: any) => void,
+        value: string | boolean,
+    ){
         return (
-            <div></div>
+            <div className="flex flex-col w-full overflow-hidden min-w-0 pr-4">
+                <div className="flex w-full flex-row justify-between items-start pr-1">
+                    <h4 className="font-light text-gray-300">{title}</h4>
+                    <p className="text-gray-500">{key}</p>
+                </div>
+
+                <div className="flex items-center gap-x-2 rounded-md overflow-hidden bg-slate-600 p-1 min-w-0">
+                    {icon}
+                    {inputType === "checkbox" ? (
+                        <input
+                            type={inputType}
+                            onChange={onChange}
+                            name={key}
+                            checked={value as boolean}
+                            size={Math.min(30 + 2 || 1, 80)}
+                            className="max-w-full bg-slate-600 text-gray-300"
+                        />    
+                    ) : (
+                        <input
+                            type={inputType}
+                            onChange={onChange}
+                            name={key}
+                            value={value as string}
+                            size={Math.min(30 + 2 || 1, 80)}
+                            className="max-w-full bg-slate-600 text-gray-300"
+                        />
+                    )}
+                </div>
+            </div>
         )
     }
+
+    configLayout() {
+        return (
+          <div className="flex flex-col w-full gap-y-2 mt-2 pb-2 border-b border-zinc-700">
+            <h3 className="text-lg text-white">Monitoring</h3>
+      
+            {this.configRow("Enabled", "enabled", "checkbox",
+              <TextItalicIcon weight="bold" />,
+              (v) => (this.enabled = v),
+              this.enabled
+            )}
+      
+            {this.configRow("CPU", "cpu", "checkbox",
+              <LetterCircleHIcon weight="bold" />,
+              (v) => (this.metrics.cpu = v),
+              this.metrics.cpu
+            )}
+      
+            {this.configRow("Disk", "disk", "checkbox",
+              <TextItalicIcon weight="bold" />,
+              (v) => (this.metrics.disk = v),
+              this.metrics.disk
+            )}
+      
+            {this.configRow("Network", "network", "checkbox",
+              <TextItalicIcon weight="bold" />,
+              (v) => (this.metrics.network = v),
+              this.metrics.network
+            )}
+      
+            {this.configRow("FastAPI", "fastapi", "checkbox",
+              <TextItalicIcon weight="bold" />,
+              (v) => (this.metrics.fastapi = v),
+              this.metrics.fastapi
+            )}
+          </div>
+        )
+      }
+      
 }
 
 export class BaseConfig {
@@ -38,7 +122,7 @@ export class BaseConfig {
     public port: string;
     public host: string;
 
-    public monitor: BaseMonitor; 
+    public monitor: BaseMonitor | null;
 
     public constructor(
         name: string,
@@ -47,7 +131,8 @@ export class BaseConfig {
         forward_host: string = "10.0.0.0",
         forward_port: string = "8000",
         host: string = "10.0.0.1",
-        port: string = "8000"
+        port: string = "8000",
+        monitor: BaseMonitor | null = null
     ) {
         this.id = uuidv4();
         this.name = name;
@@ -58,9 +143,31 @@ export class BaseConfig {
         this.port = port;
         this.host = host;
 
-        this.monitor = new BaseMonitor();
+        this.monitor = monitor
     }
 
+    applyConfigActiveNode = async () => {
+        // @ts-ignore
+        const response = await fetch(`${LOCAL_NODE_IP_MAP[this.name]}config`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(this.getConfig())
+        })
+
+        if (!response.ok) {
+            throw new Error("Could apply config")
+        }
+
+        return true
+    }
+
+    restartConfigActiveNode = async () => {
+        // @ts-ignore
+        const response = await fetch(`${LOCAL_NODE_IP_MAP[this.name]}restart`)
+    }
+    
     getConfig() {
         return {
             id: this.id,
@@ -71,12 +178,64 @@ export class BaseConfig {
             forward_port: this.forward_port,
             host: this.host,
             port: this.port,
-
-            metrics: this.monitor.getConfig(), 
+            
+            metrics: this.monitor?.getConfig(), 
         }
     }
 
+    getApplyRestart() {
+        return (
+            <div className="flex flex-1 flex-row items-start justify-between">
+                <a className="flex bg-yellow-200" onClick={async () => {console.log("APPLY"); await this.applyConfigActiveNode()}}>
+                    <p className="text-black">Apply Config</p>
+                </a>
+                <a className="flex bg-blue-200" onClick={async () => {console.log("RESTART"); await this.restartConfigActiveNode()}}>
+                    <p className="text-black">Resart Config</p>
+                </a>
+
+            </div>
+        )
+    }
+    
     // Layout functions
+    getDashboardNode({
+        onClick
+    } : {
+        onClick: () => void
+    }) {
+        return (
+            <div className="flex flex-col gap-y-2 min-w-[140px]">
+                <p className="text-sm font-medium text-purple-400">
+                {this.name}
+                </p>
+        
+                <button
+                onClick={() => {console.log("CLICK"); onClick()}}
+                className="
+                    flex flex-col gap-y-1
+                    w-full min-h-[120px]
+                    rounded-lg
+                    bg-gray-700
+                    p-3
+                    text-left
+                    hover:bg-gray-600
+                    active:bg-gray-500
+                    transition
+                    cursor-pointer
+                "
+                >
+                    <p className="text-xs text-purple-300">Enabled: {this.enabled}</p>
+                    <p className="text-xs text-purple-300">IP: {this.host}</p>
+                    <p className="text-xs text-purple-300">Port: {this.port}</p>
+                    <p className="text-xs text-purple-300">Role: {this.type}</p>
+                    <p className="text-xs text-purple-300">Forward IP: {this.forward_host}</p>
+                    <p className="text-xs text-purple-300">Forward Port: {this.forward_port}</p>
+                </button>
+            </div>
+        )
+    }
+
+
     configRow(
         title: string,
         key: string,
@@ -109,6 +268,7 @@ export class BaseConfig {
     configLayout() {
         return (
             <div className="flex flex-col w-full items-start justify-start gap-y-2 min-w-0 mt-2">
+                {this.getApplyRestart()}
                 <div className="flex flex-col w-full items-start justify-start gap-y-2 min-w-0 pb-4 border-b border-zinc-700">
                     <h3 className="text-lg text-white">Base</h3>
 
@@ -120,35 +280,13 @@ export class BaseConfig {
                     {this.configRow("Port", "port", "text", <TextItalicIcon weight="bold" />,() => {}, this.port)}
                     {this.configRow("Forward Host", "forward_host", "text", <TextItalicIcon weight="bold" />,() => {}, this.forward_host)}
                     {this.configRow("Forward Port", "forward_port", "text", <TextItalicIcon weight="bold" />,() => {}, this.forward_port)}
-
                 </div>
 
-                <div className="flex flex-col w-full items-start justify-start gap-y-2 min-w-0 mt-2 pb-2 border-b border-zinc-700">
-                    <h3 className="text-lg text-white">Monitoring</h3>
-
-                    {this.configRow("UUID", "id", "text", <TextItalicIcon weight="bold" />,() => {}, this.id)}
-                    {this.configRow("Node name", "name", "text", <LetterCircleHIcon weight="bold" />, () => {}, this.id)}
-                    {this.configRow("Node Type", "type", "checkbox", <TextItalicIcon weight="bold" />, () => {}, this.id)}
-                    {this.configRow("Enabled", "enabled", "checkbox", <TextItalicIcon weight="bold" />,() => {}, this.id)}
-                    {this.configRow("Host", "host", "text", <TextItalicIcon weight="bold" />,() => {}, this.id)}
-                    {this.configRow("Port", "port", "text", <TextItalicIcon weight="bold" />,() => {}, this.id)}
-                    {this.configRow("Forward Host", "forward_host", "text", <TextItalicIcon weight="bold" />,() => {}, this.id)}
-                    {this.configRow("Forward Port", "forward_port", "text", <TextItalicIcon weight="bold" />,() => {}, this.id)}
-
-                </div>
-
-                <div className="flex flex-col w-full items-start justify-start gap-y-2 min-w-0 mt-2 pb-2 border-b border-zinc-700">
-                    <h3 className="text-lg text-white">Monitoring</h3>
-
-                    {this.configRow("UUID", "id", "text", <TextItalicIcon weight="bold" />,() => {}, this.id)}
-                    {this.configRow("Node name", "name", "text", <LetterCircleHIcon weight="bold" />, () => {}, this.id)}
-                    {this.configRow("Node Type", "type", "checkbox", <TextItalicIcon weight="bold" />, () => {}, this.id)}
-                    {this.configRow("Enabled", "enabled", "checkbox", <TextItalicIcon weight="bold" />,() => {}, this.id)}
-                    {this.configRow("Host", "host", "text", <TextItalicIcon weight="bold" />,() => {}, this.id)}
-                    {this.configRow("Port", "port", "text", <TextItalicIcon weight="bold" />,() => {}, this.id)}
-                    {this.configRow("Forward Host", "forward_host", "text", <TextItalicIcon weight="bold" />,() => {}, this.id)}
-                    {this.configRow("Forward Port", "forward_port", "text", <TextItalicIcon weight="bold" />,() => {}, this.id)}
-                </div>
+                {this.monitor !== null && (
+                    <>
+                        {this.monitor.configLayout()}
+                    </>
+                )}
             </div>
         )
     }

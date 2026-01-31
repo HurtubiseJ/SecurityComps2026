@@ -4,8 +4,22 @@ import requests
 import logging
 import json
 import subprocess
+from pydantic import BaseModel
 
 logger = logging.getLogger("attacker2")
+
+
+class Monitor(BaseModel):
+    cpu: bool
+    disk: bool
+    network: bool
+    fastapi: bool
+    memory: bool
+
+class Config(BaseModel):
+    enabled: bool
+    interval: int
+    metrics: Monitor
 
 
 router = APIRouter()
@@ -49,3 +63,16 @@ async def config():
         raise HTTPException("Failed to load config")
     
     return config
+
+@router.post("/config")
+async def modifyConfig(config: Config):
+    with open("../MASTER_CONFIG.json", "+w") as f:
+        config.model_dump_json()
+    
+    return {"status": "ok", "message": "Config file modified. GET /restart to apply changes."}
+
+@router.get("/restart")
+async def restart():
+    from main import restartApplication
+    restartApplication()
+    pass

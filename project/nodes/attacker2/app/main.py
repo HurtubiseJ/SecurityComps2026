@@ -4,18 +4,32 @@ from node_monitor import Registry
 from urls import router
 
 
-app = FastAPI()
+app = None
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+def initApplication():
+    global app
 
-app.include_router(router=router, prefix="")
+    app = FastAPI()
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["http://localhost:5173"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
-registry = Registry()
-registry.registerFastAPIApp(app=app)
+    app.include_router(router=router, prefix="")
+
+    registry = Registry()
+    registry.registerFastAPIApp(app=app)
+
+def restartApplication():
+    # SHOULD NOT ALLOW RESTART IF CONFIG NOT MODIFIED. 
+    global app 
+    app = None 
+    initApplication()
+
+
+initApplication()
+
 
