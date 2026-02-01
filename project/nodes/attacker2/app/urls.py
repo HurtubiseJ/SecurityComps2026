@@ -7,8 +7,7 @@ import subprocess
 from typing import Optional
 from pydantic import BaseModel
 
-logger = logging.getLogger("attacker2")
-
+logger = logging.getLogger()
 
 class Metrics(BaseModel):
     cpu: bool
@@ -31,7 +30,7 @@ class Config(BaseModel):
     forward_port: str
     host: str
     port: str
-    metrics: Monitor
+    monitor: Monitor
 
 
 router = APIRouter()
@@ -83,7 +82,12 @@ async def modifyConfig(config: Config):
         f.write(
             config.model_dump_json(indent=2)
         )
+        f.close()
 
+    with open("../MASTER_CONFIG.json", "r") as f:
+        c = json.load(f)
+        print(c)
+        logger.warning(c)
     
     return {"status": "ok", "message": "Config file modified. GET /restart to apply changes."}
 

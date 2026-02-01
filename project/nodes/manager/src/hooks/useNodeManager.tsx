@@ -76,14 +76,16 @@ export default function useNodeManager() {
     }
 
     const updateNode = (node: any) => {
+        console.log("UPDATE: ", node)
         const metrics: metrics = {
             cpu: node.monitor?.metrics?.cpu,
-            memory: node.monitor?.metrics?.memory,
-            disk: node.monitor?.metrics?.disk,
-            network: node.monitor?.metrics?.network,
-            fastapi: node.monitor?.metrics?.fastapi
+            memory: node?.monitor?.metrics?.memory,
+            disk: node?.monitor?.metrics?.disk,
+            network: node?.monitor?.metrics?.network,
+            fastapi: node?.monitor?.metrics?.fastapi
         }
-        const monitorConfig = node.monitor ? new BaseMonitor(node.monitor.enabled, metrics) : null
+        const monitorConfig = new BaseMonitor(node.monitor.enabled, metrics)
+        console.log("MONITOR: ", monitorConfig)
         const config = new BaseConfig(node.name, node.type, node.enabled, node.forward_host, node.forward_port, node.host, node.port, monitorConfig)
         console.log("INPUT NODE: ", config)
 
