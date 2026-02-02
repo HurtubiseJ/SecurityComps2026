@@ -6,6 +6,9 @@ services:
     container_name: target1
     ports:
       - "8002:8000"
+    volumes:
+      - ./app:/app/app
+      - ./MASTER_CONFIG.json:/app/MASTER_CONFIG.json
     networks:
       - ddos-shared
 
