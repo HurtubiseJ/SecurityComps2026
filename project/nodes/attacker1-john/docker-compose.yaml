@@ -1,9 +1,9 @@
 services:
-  attacker1:
-    container_name: attacker1
+  attacker1-john:
+    container_name: attacker1-john
     build: 
       context: ../../
-      dockerfile: nodes/attacker1/Dockerfile
+      dockerfile: nodes/attacker1-john/Dockerfile
     ports:
       - "8010:8000"
     volumes: 

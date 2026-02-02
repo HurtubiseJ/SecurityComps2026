@@ -1,5 +1,5 @@
 {
-    "name": "attacker1",
+    "name": "attacker1-john",
     "type": "attacker",
     "enabled": true,
     "forward_host": "localhost",
