@@ -6,3 +6,4 @@ scrape_configs:
       - targets: ['attacker2:8000']
       - targets: ['target1:8000']
       - targets: ['attacker1:8000']
+      - targets: ['attacker1-john:8000']

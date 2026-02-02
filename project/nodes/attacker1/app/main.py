@@ -14,6 +14,7 @@ API Endpoints:
 
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from prometheus_client import Counter, Gauge, generate_latest
 from node_monitor import Registry
 from pathlib import Path
@@ -25,6 +26,14 @@ import threading
 from typing import Dict, List
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # ============================================================================
 # Configuration Loading
@@ -291,10 +300,11 @@ async def get_config():
     """Get current master config and parsed attack config."""
     try:
         attack_config = get_attack_config()
-        return {
-            "master_config": MASTER_CONFIG,
-            "attack_config": attack_config
-        }
+        # return {
+        #     "master_config": MASTER_CONFIG,
+        #     "attack_config": attack_config
+        # }
+        return MASTER_CONFIG
     except Exception as e:
         return JSONResponse(
             status_code=500,
@@ -302,7 +312,7 @@ async def get_config():
         )
 
 
-@app.post("/attack/start")
+@app.post("/start")
 async def start_attack_endpoint():
     """Start HTTP flood attack using MASTER_CONFIG.json settings."""
     try:
@@ -313,7 +323,7 @@ async def start_attack_endpoint():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.post("/attack/stop")
+@app.post("/stop")
 async def stop_attack_endpoint():
     """Stop all running attack processes."""
     try:
@@ -322,7 +332,7 @@ async def stop_attack_endpoint():
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/attack/status")
+@app.get("/status")
 async def get_attack_status():
     """Get current attack status and info about running processes."""
     with attack_lock:
@@ -345,10 +355,10 @@ async def get_attack_status():
         }
 
 
-@app.get("/metrics")
-def metrics():
-    """Prometheus metrics endpoint."""
-    return generate_latest()
+# @app.get("/metrics")
+# def metrics():
+#     """Prometheus metrics endpoint."""
+#     return generate_latest()
 
 
 @app.get("/")

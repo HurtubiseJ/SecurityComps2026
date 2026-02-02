@@ -1,4 +1,11 @@
 {
+    "name": "attacker1",
+    "type": "attacker",
+    "enabled": true,
+    "forward_host": "localhost",
+    "forward_port": "8001",
+    "port": "8020",
+    "host": "localhost",
     "monitor": {
         "enabled": true,
         "metrics": {

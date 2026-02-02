@@ -22,6 +22,12 @@ const InitDefaultNodes = async (): Promise<BaseConfig[]> => {
         list.push(attacker1Config)
     }
 
+    const attacker1JohnConfig = await initAttacker2Config(LOCAL_NODE_IP_MAP['attacker1-john'], 'attacker')
+    console.log("ATTACKER1, ", attacker1JohnConfig)
+    if (attacker1JohnConfig) {
+        list.push(attacker1JohnConfig)
+    }
+
     list.push(new BaseConfig("Proxy 1", "proxy"))
 
     return list
