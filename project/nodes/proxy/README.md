@@ -1,189 +1,63 @@
 # Proxy Node
 
-This node acts as a proxy between clients/attackers and the target service.
+Proxy between clients/attackers and the target. Forwards traffic with **rate limiting** and **connection limiting** (Nginx).
 
-Traffic path: `client/attacker -> proxy -> target`
+## RUNNING
 
-## Current Mode: Basic Forwarding
+From the proxy node folder:
 
-The proxy is currently configured for **basic forwarding only**. It simply forwards requests to the upstream target.
-
-### Quick Commands
-**Using Docker Compose (Recommended):**
 ```bash
 cd project/nodes/proxy
-docker-compose up
+docker compose up -d
 ```
 
-**Using Docker:**
-```bash
-cd project/nodes/proxy
-docker build -t proxy .
-docker run -d -p 8000:8000 --name proxy proxy
-```
+This starts:
 
-**Using Local Nginx:**
-```bash
-cd project/nodes/proxy
-sudo nginx -t -c $(pwd)/nginx/nginx.conf
-sudo nginx -c $(pwd)/nginx/nginx.conf
-```
-
-**Test:**
-```bash
-curl http://localhost:8000/proxy-health
-curl http://localhost:8000/
-```
-
-### Using Python Proxy (Alternative)
-
-If you want to use the Python FastAPI proxy instead:
-
-1. Install dependencies:
-```bash
-cd python
-pip install -r requirements.txt
-```
-
-2. Run the proxy:
-```bash
-python proxy.py
-```
-
-## Nginx Configuration
-
-The nginx configuration is in `nginx/nginx.conf`. This proxy acts as a relay and forwards data from the internal server to the client.
-
-### What It Does
-
-- Listens on port 8000 for incoming requests
-- Forwards all requests to upstream target (137.22.4.153:8000)
-- Provides health check endpoint at `/proxy-health`
-- Sets proper proxy headers (X-Real-IP, X-Forwarded-For, X-Forwarded-Proto)
-- Handles connection timeouts (5s connect, 30s read/send)
-
-### Configuration Details
-
-The nginx config uses an `upstream` block to define the target server:
-
-```nginx
-upstream target_upstream {
-  server 137.22.4.153:8000;  # target (grape00)
-}
-```
-
-All requests hitting the proxy on port 8000 get forwarded to this upstream. The proxy preserves:
-- Original request method (GET, POST, etc.)
-- Request path and query parameters
-- Request body
-- Most request headers (filters out hop-by-hop headers)
-
-### Request Flow
-
-```
-Client Request → Proxy (port 8000) → Upstream (137.22.4.153:8000) → Response → Client
-```
-
-The proxy is transparent - it doesn't modify request/response content, just forwards it through.
-
-### Headers Added by Proxy
-
-The proxy automatically adds these headers to help the upstream server identify the original client:
-
-- `X-Real-IP`: Original client IP address
-- `X-Forwarded-For`: Client IP (or chain of proxies)
-- `X-Forwarded-Proto`: Original protocol (http/https)
-- `Host`: Original host header from client
-
-
-### Health Check Endpoint
-
-The `/proxy-health` endpoint returns immediately without forwarding:
-
-```bash
-curl http://localhost:8000/proxy-health
-# Returns: proxy ok
-```
-
-
-
-## Python Proxy Configuration (Alternative)
-
-If using the Python proxy, configuration is loaded from `MASTER_CONFIG.json`.
-
-## API Endpoints
-
-### Health Check
-- `GET /proxy-health` - Simple health check
-
-### Status & Management
-- `GET /proxy/status` - Get proxy status and configuration
-- `POST /proxy/config` - Update configuration
-- `POST /proxy/apply` - Apply current configuration (reload mitigations)
-- `POST /proxy/reset` - Reset proxy state (clear rate limit buckets, connection counts)
-
-### Metrics
-- `GET /metrics` - Prometheus metrics endpoint (exposed via node_monitor)
-- `POST /metrics/set-log-level` - Set logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-
-### Request Forwarding
-- All other requests are forwarded to the upstream target configured in `MASTER_CONFIG.json`
+- **nginx-proxy** — listens on ports 8000 and 8001 (8001 for attacker traffic), forwards to backend. **Rate limit:** 10 req/s per IP, burst 20 (429 when exceeded). **Connection limit:** max 10 concurrent connections per IP (503 when exceeded).
+- **upstream-nginx** — local test backend (Python http.server on 9000). Used when the real target is unreachable.
 
 ## Testing
 
-### Health Check
-Test if the proxy is running:
+**Basic (proxy is up):**
 ```bash
-curl http://localhost:8000/proxy-health
-# Expected: proxy ok
+curl http://localhost:8000/proxy-health   # proxy ok
+curl http://localhost:8000/               # forwards to backend (200 if backend up)
 ```
 
-### Forwarding Test
-Test if requests are being forwarded to upstream:
+## Attaching attacker and target
+
+**Flow:** Attacker → Proxy → Target
+
+1. **Attacker → Proxy**  
+   Attacker (e.g. `attacker1-john`) uses `forward_host` / `forward_port` to send traffic to the proxy. With `forward_host: "localhost"` and `forward_port: "8001"`, the proxy must listen on **8001**. This repo’s proxy listens on both **8000** and **8001**, so no attacker config change is needed.
+
+2. **Proxy → Target**  
+   The proxy forwards to the host/port defined in `nginx/nginx.conf` in the `upstream target_upstream` block. By default it uses the local test backend (`upstream:9000`). To use the real target (e.g. target1):
+   - In `nginx/nginx.conf`, set the upstream to the target’s address (e.g. `server 137.22.4.153:8000;` for target1 on that host, or `server target1:8000;` if both are on the same Docker network).
+   - Restart: `docker compose restart nginx`.
+
+
+## Configuration
+
+- **Backend:** Edit `nginx/nginx.conf`. Default is `upstream:9000` (local). For real target uncomment `server 137.22.4.153:8000;` and comment `server upstream:9000;`, then `docker compose restart nginx`.
+- **Rate limit:** In `nginx/nginx.conf`, adjust `rate=` and `burst=` in `limit_req_zone` and `limit_req`. `/proxy-health` is not rate limited.
+- **Connection limit:** In `nginx/nginx.conf`, adjust `limit_conn conn_limit N;` (default 10). Stops one IP from opening too many concurrent connections.
+
+## Testing connection limit
+
+Max 10 concurrent connections per IP; extra get **503**. Run many requests at once (e.g. 15 in parallel):
+
 ```bash
-curl http://localhost:8000/
-# This forwards to 137.22.4.153:8000
+cd project/nodes/proxy
+for i in $(seq 1 15); do curl -s -o /dev/null -w "%{http_code}\n" http://localhost:8000/ & done; wait
 ```
 
+You should see some **503** (connection limit) in addition to **200**. If all are 200, connections are finishing too quickly—503 appears when more than 10 are *open at once* (i.e many slow or long-lived requests). Rate limiting can also produce **429** if you send too many requests per second.
 
+## Layout
 
-
-- **Proxy listens on:** Port 8000 (all interfaces: 0.0.0.0)
-- **Proxy forwards to:** 137.22.4.153:8000
-- **Health check:** Available on same port 8000 at `/proxy-health`
-
-### Testing Network Connectivity
-
-From proxy machine, test if target is reachable:
-```bash
-curl http://137.22.4.153:8000/
-ping 137.22.4.153
-telnet 137.22.4.153 8000
-```
-
-From client machine, test if proxy is reachable:
-```bash
-curl http://137.22.4.154:8000/proxy-health
-```
-
-
-## Forwarding Behavior
-
-### What Gets Forwarded
-
-The proxy forwards:
-- All HTTP methods (GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS)
-- All request paths and query strings
-- Request bodies (for POST, PUT, PATCH)
-- Most request headers
-- All response data from upstream
-
-## Notes
-
-- Currently using nginx for basic forwarding - no mitigations active
-- Python proxy code exists in `python/` directory but is not being used
-- Rate limiting uses a token bucket algorithm (when enabled via Python proxy)
--Docker sudo permissions off in pi's
-- Connection limiting tracks active connections per IP or globally (when enabled)
-- The proxy integrates with the shared `node_monitor` package for system-level metrics (Python proxy only)
-- Configuration changes via API are persisted to `MASTER_CONFIG.json` (Python proxy only)
+- `nginx/nginx.conf` — Nginx config (upstream, rate limit, connection limit, proxy).
+- `docker-compose.yaml` — Nginx + upstream services.
+- `Dockerfile` — Nginx image.
+- `MASTER_CONFIG.json` — Node config
+- `app/` — FastAPI app (config, rate-limit middleware); not used by current compose.
