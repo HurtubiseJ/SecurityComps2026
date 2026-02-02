@@ -1,0 +1,17 @@
+services:
+  attacker1:
+    container_name: attacker1
+    build: 
+      context: ../../
+      dockerfile: nodes/attacker1/Dockerfile
+    ports:
+      - "8010:8000"
+    volumes: 
+      - ./app:/app
+      - ./control:/control # Pass through for systemd service
+    networks: 
+      - ddos-shared
+    
+networks:
+  ddos-shared:
+    external: true

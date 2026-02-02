@@ -7,13 +7,19 @@ import { type metrics } from "../types/BaseConfig"
 const InitDefaultNodes = async (): Promise<BaseConfig[]> => {
     const list: BaseConfig[] = []
 
-    const attackerConfig = await initAttacker2Config(LOCAL_NODE_IP_MAP['attacker2'], "attacker")
-    if (attackerConfig) {
-        list.push(attackerConfig)
+    const attacker2Config = await initAttacker2Config(LOCAL_NODE_IP_MAP['attacker2'], "attacker")
+    if (attacker2Config) {
+        list.push(attacker2Config)
     }
     const targetConfig = await initAttacker2Config(LOCAL_NODE_IP_MAP['target1'], "target")
     if (targetConfig) {
         list.push(targetConfig)
+    }
+
+    const attacker1Config = await initAttacker2Config(LOCAL_NODE_IP_MAP['attacker1'], 'attacker')
+    console.log("ATTACKER1, ", attacker1Config)
+    if (attacker1Config) {
+        list.push(attacker1Config)
     }
 
     list.push(new BaseConfig("Proxy 1", "proxy"))
@@ -27,7 +33,7 @@ const initAttacker2Config = async (url: string, type: NodeType): Promise<BaseCon
     try {
         const resp = await fetch(configUrl)
         if (!resp.ok) {
-            throw new Error("Could not get config from attacker2")
+            throw new Error(`Could not get config for ${configUrl}`)
         }
 
         const res = await resp.json()

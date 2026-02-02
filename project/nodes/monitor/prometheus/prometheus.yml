@@ -1,7 +1,8 @@
 global:
   scrape_interval: 3s
 scrape_configs:
-  - job_name: 'attacker2'
+  - job_name: 'DDOS'
     static_configs:
       - targets: ['attacker2:8000']
       - targets: ['target1:8000']
+      - targets: ['attacker1:8000']
