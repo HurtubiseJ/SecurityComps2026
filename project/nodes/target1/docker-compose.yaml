@@ -1,0 +1,15 @@
+services:
+  target1:
+    container_name: target1
+    build: .
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./app:/app/app
+      - ./MASTER_CONFIG.json:/app/MASTER_CONFIG.json
+    networks:
+      - ddos-shared
+
+networks:
+  ddos-shared:
+    external: true

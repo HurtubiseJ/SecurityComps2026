@@ -1,0 +1,51 @@
+FROM ubuntu:22.04
+
+# Install dependencies
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    build-essential \
+    libreadline-dev \
+    curl \
+    unzip \
+    git \
+    libssl-dev \
+    libz-dev \
+    wget
+
+# Install Lua 5.3
+# (Note: wrk2 uses its own embedded LuaJIT, so this system Lua is only for your own scripts)
+RUN wget https://www.lua.org/ftp/lua-5.3.5.tar.gz && \
+    tar -zxf lua-5.3.5.tar.gz && \
+    cd lua-5.3.5 && \
+    make linux test && \
+    make install
+
+# Install LuaRocks
+RUN curl -R -O https://luarocks.github.io/luarocks/releases/luarocks-3.5.0.tar.gz && \
+    tar -xzvf luarocks-3.5.0.tar.gz && \
+    cd luarocks-3.5.0 && \
+    ./configure && \
+    make bootstrap
+
+# Clone wrk2, apply 3 patches for Apple Silicon (ARM64), and build
+RUN git clone --depth 1 https://github.com/giltene/wrk2.git && \
+    cd wrk2 && \
+    # Patch 1: SAFE FIX. Only rename 'struct luaL_reg', NOT 'luaL_register'
+    sed -i 's/struct luaL_reg/struct luaL_Reg/g' src/script.c && \
+    # Patch 2: Remove Intel-specific header that crashes ARM builds
+    sed -i 's/#include <x86intrin.h>//g' src/hdr_histogram.c && \
+    # Patch 3: Swap old LuaJIT for v2.1 which supports M1/M2 chips
+    rm -rf deps/luajit && \
+    git clone --depth=1 --branch=v2.1 https://github.com/LuaJIT/LuaJIT.git deps/luajit && \
+    # Build and install
+    make && \
+    cp wrk /usr/local/bin/ && \
+    cd / && \
+    rm -rf wrk2
+
+# Set working directory
+WORKDIR /project/nodes/attacker1
+
+# Set entrypoint
+ENTRYPOINT ["wrk"]
+CMD ["--version"]
