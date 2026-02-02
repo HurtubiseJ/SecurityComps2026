@@ -49,8 +49,6 @@ class MemoryMonitor:
             ['type']
         )
 
-        pass
-
     def collect(self):
         self._process_virtual_memory()
         self._process_swap_memory()

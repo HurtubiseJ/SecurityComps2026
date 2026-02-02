@@ -186,6 +186,27 @@ export class BaseConfig {
         console.log("RESSSS", res)
         return res
     }
+
+    startActiveNode = async () => {
+        // @ts-ignore
+        const response = await fetch(`${LOCAL_NODE_IP_MAP[this.name]}start`, {
+            method: 'POST'
+        })
+        const res = await response.json()
+        console.log("START: ", res)
+        return res
+    }
+
+    stopActiveNode = async () => {
+        // @ts-ignore
+        const response = await fetch(`${LOCAL_NODE_IP_MAP[this.name]}stop`, {
+            method: 'POST'
+        })
+
+        const res = await response.json()
+        console.log("STOP: ", res);
+        return res
+    }
     
     getConfig() {
         return {
@@ -204,13 +225,26 @@ export class BaseConfig {
 
     getApplyRestart() {
         return (
-            <div className="flex flex-1 flex-row items-start justify-between gap-x-4">
-                <a className="flex bg-yellow-200 rounded-md px-4 py-2" onClick={async () => {console.log("APPLY"); await this.applyConfigActiveNode()}}>
-                    <p className="text-black text-sm">Apply Config</p>
-                </a>
-                <a className="flex bg-blue-200 rounded-md px-4 py-2" onClick={async () => {console.log("RESTART"); await this.restartConfigActiveNode()}}>
-                    <p className="text-black text-sm">Resart Config</p>
-                </a>
+            <div className="flex flex-1 flex-col items-start justify-center gap-y-2">
+
+                <div className="flex flex-1 flex-row gap-x-4 items-start justify-between">
+                    <a className="flex bg-yellow-200 rounded-md px-4 py-2" onClick={async () => {console.log("APPLY"); await this.applyConfigActiveNode()}}>
+                        <p className="text-black text-sm">Apply Config</p>
+                    </a>
+                    <a className="flex bg-blue-200 rounded-md px-4 py-2" onClick={async () => {console.log("RESTART"); await this.restartConfigActiveNode()}}>
+                        <p className="text-black text-sm">Resart Config</p>
+                    </a>
+                </div>
+                <div className="flex flex-1 flex-row gap-x-4 items-start justify-between">
+                    <a className="flex bg-green-500 rounded-md px-4 py-2" onClick={async () => {console.log("START"); await this.startActiveNode()}}>
+                        <p className="text-black text-sm">START</p>
+                    </a>
+                    <a className="flex bg-red-500 rounded-md px-4 py-2" onClick={async () => {console.log("STOP"); await this.stopActiveNode()}}>
+                        <p className="text-black text-sm">STOP</p>
+                    </a>
+                </div>
+
+
                 {/* <a className="flex bg-blue-200" onClick={async () => {this.getConfigActiveNodeConfig()}}>
                     <p className="text-black">Resart Config</p>
                 </a> */}

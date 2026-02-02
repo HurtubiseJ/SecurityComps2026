@@ -42,7 +42,6 @@ async def status():
 
 @router.post("/start")
 async def start():
-    
     success = start_hping3()
     if not success:
         raise HTTPException("Process already running")
