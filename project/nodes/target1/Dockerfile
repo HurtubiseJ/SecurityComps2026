@@ -16,6 +16,7 @@ RUN apt-get update && \
 
 RUN python3 -m venv venv
 ENV PATH="/venv/bin:$PATH"
+ENV CONFIG_FILE_PATH="/MASTER_CONFIG.json"
 
 RUN pip install --upgrade pip setuptools wheel
 

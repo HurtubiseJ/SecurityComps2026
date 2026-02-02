@@ -8,6 +8,7 @@ services:
       - "8000:8000"
     volumes: 
       - ./app:/app
+      - ./control:/control # Pass through for systemd service
     networks: 
       - ddos-shared
     

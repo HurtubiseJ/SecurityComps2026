@@ -21,6 +21,9 @@ RUN python3 -m venv /venv
 # Activate venv
 ENV PATH="/venv/bin:$PATH"
 
+# env config for node_monitor
+ENV CONFIG_FILE_PATH="/MASTER_CONFIG.json"
+
 # Upgrade tooling INSIDE venv
 RUN pip install --upgrade pip setuptools wheel
 

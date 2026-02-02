@@ -204,17 +204,16 @@ export class BaseConfig {
 
     getApplyRestart() {
         return (
-            <div className="flex flex-1 flex-row items-start justify-between">
-                <a className="flex bg-yellow-200" onClick={async () => {console.log("APPLY"); await this.applyConfigActiveNode()}}>
-                    <p className="text-black">Apply Config</p>
+            <div className="flex flex-1 flex-row items-start justify-between gap-x-4">
+                <a className="flex bg-yellow-200 rounded-md px-4 py-2" onClick={async () => {console.log("APPLY"); await this.applyConfigActiveNode()}}>
+                    <p className="text-black text-sm">Apply Config</p>
                 </a>
-                <a className="flex bg-blue-200" onClick={async () => {console.log("RESTART"); await this.restartConfigActiveNode()}}>
+                <a className="flex bg-blue-200 rounded-md px-4 py-2" onClick={async () => {console.log("RESTART"); await this.restartConfigActiveNode()}}>
+                    <p className="text-black text-sm">Resart Config</p>
+                </a>
+                {/* <a className="flex bg-blue-200" onClick={async () => {this.getConfigActiveNodeConfig()}}>
                     <p className="text-black">Resart Config</p>
-                </a>
-                <a className="flex bg-blue-200" onClick={async () => {this.getConfigActiveNodeConfig()}}>
-                    <p className="text-black">Resart Config</p>
-                </a>
-
+                </a> */}
             </div>
         )
     }

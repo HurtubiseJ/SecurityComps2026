@@ -6,6 +6,7 @@ import json
 import subprocess
 from typing import Optional
 from pydantic import BaseModel
+from pathlib import Path
 
 logger = logging.getLogger()
 
@@ -93,6 +94,5 @@ async def modifyConfig(config: Config):
 
 @router.get("/restart")
 async def restart():
-    from main import restartApplication
-    restartApplication()
-    pass
+    Path("/control/restart_required").touch()
+    return {"status": "ok", "message": "Awaiting docker restart via systemd service"}
