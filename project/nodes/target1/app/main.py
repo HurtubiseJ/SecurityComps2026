@@ -83,8 +83,8 @@ async def show_config():
     return MASTER_CONFIG
 
 #Prometheus endpoint
-@app.get("/metrics")
-def metrics():
-    return generate_latest()
+# @app.get("/metrics")
+# def metrics():
+#     return generate_latest()
 
 
