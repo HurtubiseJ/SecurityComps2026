@@ -1,0 +1,37 @@
+{
+    "name": "attacker1",
+    "type": "attacker",
+    "enabled": true,
+    "forward_host": "proxy",
+    "forward_port": "8000",
+    "port": "8020",
+    "host": "localhost",
+    "monitor": {
+        "enabled": true,
+        "metrics": {
+            "cpu": true,
+            "memory": true,
+            "disk": true,
+            "network": true,
+            "fastapi": true
+        },
+        "interval": 1
+    },
+    "custom_config": {
+        "attack": {
+            "attack_type": "http_flood",
+            "threads": 4,
+            "connections": 200,
+            "rate_rps": 5000,
+            "method": "GET",
+            "paths": ["/api/test", "/health"],
+            "path_ratios": [0.8, 0.2],
+            "headers": {
+                "User-Agent": "wrk"
+            },
+            "keep_alive": true,
+            "target_host": "proxy",
+            "target_port": 8000
+        }
+    }
+}

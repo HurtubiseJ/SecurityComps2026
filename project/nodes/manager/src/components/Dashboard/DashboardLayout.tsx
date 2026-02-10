@@ -17,20 +17,21 @@ export default function DashboardLayout({
     termRight,
     center
 } : DashboardLayoutProps) {
-  const [leftWidth, setLeftWidth] = useState(190);
-  const [rightWidth, setRightWidth] = useState(280);
-  const [bottomHeight, setBottomHeight] = useState(220);
-  const [bottomLeftWidth, setBottomLeftWidth] = useState(190)
+    const height = window.innerHeight;
+    const [leftWidth, setLeftWidth] = useState(190);
+    const [rightWidth, setRightWidth] = useState(280);
+    const [bottomHeight, setBottomHeight] = useState(220);
+    const [bottomLeftWidth, setBottomLeftWidth] = useState(190)
 
-  const leftResize = useDragResize(dx => setLeftWidth(w => Math.max(160, w + dx)));
-  const rightResize = useDragResize(dx => setRightWidth(w => Math.min(500, Math.max(10, w - dx))));
-  const bottomResize = useDragResize((_, dy) =>
-    setBottomHeight(h => Math.max(120, h - dy))
-  );
+    const leftResize = useDragResize(dx => setLeftWidth(w => Math.max(160, w + dx)));
+    const rightResize = useDragResize(dx => setRightWidth(w => Math.min(500, Math.max(10, w - dx))));
+    const bottomResize = useDragResize((_, dy) =>
+        setBottomHeight(h => Math.max(120, h - dy))
+    );
 
-  const bottomLeftResize = useDragResize(dx => 
-    setBottomLeftWidth(w => Math.max(leftWidth, Math.min(750, w + dx )))
-  );
+    const bottomLeftResize = useDragResize(dx => 
+        setBottomLeftWidth(w => Math.max(leftWidth, Math.min(750, w + dx )))
+    );
 
   return (
     <div className="h-screen w-screen flex bg-zinc-900 text-zinc-100 overflow-hidden">
@@ -50,7 +51,7 @@ export default function DashboardLayout({
 
       {/* CENTER */}
       <div className="flex-1 relative bg-zinc-900">
-        <div className="h-full p-4">
+        <div style={{maxHeight: height - bottomHeight}} className="flex h-full">
           {center}
         </div>
       </div>

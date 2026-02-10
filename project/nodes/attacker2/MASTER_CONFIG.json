@@ -1,0 +1,20 @@
+{
+    "name": "attacker2",
+    "type": "attacker",
+    "enabled": true,
+    "forward_host": "localhost",
+    "forward_port": "8001",
+    "port": "8000",
+    "host": "localhost",
+    "monitor": {
+        "enabled": true,
+        "metrics": {
+            "cpu": true,
+            "memory": true,
+            "disk": true,
+            "network": true, 
+            "fastapi": true
+        },
+        "interval": 1
+    }
+}

@@ -31,7 +31,7 @@ export default function DashboardLeft() {
         <div className="flex flex-1 h-full w-full flex-col p-2 items-start justify-start gap-y-4">
             <NavBarItem icon={<LineSegmentIcon color={"orange"}/>} text="Docs" link="/docs"/>
             <NavBarItem icon={<LineSegmentIcon color={"green"}/>} text="Dashboard" link="/" />
-            <NavBarItem icon={<LineSegmentIcon color={"blue"}/>} text="Metrics" link="/metrics" />
+            <NavBarItem icon={<LineSegmentIcon color={"blue"}/>} text="Metrics" link="http://localhost:3000/" />
         </div>
     )
 }

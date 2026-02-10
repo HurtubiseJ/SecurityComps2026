@@ -13,13 +13,14 @@ export default function Dashboard() {
 
     const manager = useNodeManager(); 
     const logger = new Logger()
-    console.log(manager.nodes.current)
+    console.log(manager.nodes)
+    console.log(manager.activeNode)
 
     return (
         <DashboardLayout 
             left={<DashboardLeft />}
-            right={<DashboardRight baseConfig={manager.activeNode.current} />}
-            center={<DashboardCenter />}
+            right={<DashboardRight baseConfig={manager.activeNode} updateNode={manager.updateNode} />}
+            center={<DashboardCenter nodeManager={manager} />}
             termLeft={<DashboardTermLeft />}
             termRight={<DashboardTermRight logger={logger} />}       
         />

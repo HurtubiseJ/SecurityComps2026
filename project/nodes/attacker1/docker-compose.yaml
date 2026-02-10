@@ -1,0 +1,21 @@
+# Attacker 1 - Docker Compose
+# Prerequisites: docker network create ddos-shared
+
+services:
+  attacker1:
+    container_name: attacker1
+    platform: linux/arm64  # For Apple Silicon (M1/M2/M3)
+    build: 
+      context: ../../  # Project root (needs access to shared/)
+      dockerfile: nodes/attacker1/Dockerfile
+    ports:
+      - "8020:8000"  # FastAPI control server
+    volumes: 
+      - ./app:/app  # Live code reload
+      - ./MASTER_CONFIG.json:/MASTER_CONFIG.json  # Config (restart to reload)
+    networks: 
+      - ddos-shared
+
+networks:
+  ddos-shared:
+    external: true  # Must create manually: docker network create ddos-shared

@@ -1,0 +1,8 @@
+[Unit]
+Description=Restarts attacker2 API service following /restart file creation.
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/docker restart attacker2
+ExecStartPost=/bin/sleep 2 
+ExecStartPost=/bin/rm -f /opt/attacker2/control/restart_required

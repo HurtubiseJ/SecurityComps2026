@@ -1,6 +1,6 @@
 import psutil
 import logging
-from prometheus_client import Counter
+from prometheus_client import Counter, Gauge
 
 logger = logging.getLogger(__name__)
 
@@ -15,6 +15,12 @@ class CPUMonitor:
             ["mode"],
         )
 
+        self.cpu_time_pct = Gauge(
+            "node_cpu_time_pct",
+            "Percent values for CPU usage",
+            ['mode']
+        )
+
         self.cpu_stats_total = Counter(
             "node_cpu_stats_total",
             "CPU statistics",
@@ -23,6 +29,7 @@ class CPUMonitor:
 
     def collect(self):
         self._collect_cpu_time()
+        self._collect_cpu_time_pct()
         self._collect_cpu_stats()
 
     def _collect_cpu_time(self):
@@ -55,6 +62,25 @@ class CPUMonitor:
 
         self._last_cpu_times = cpu
 
+    def _collect_cpu_time_pct(self):
+        try:
+            cpu = psutil.cpu_times_percent()
+        except Exception:
+            logger.exception("Failed to read _cpu_time_pct")
+
+        self.cpu_time_pct.labels("user").set(cpu.user)
+        self.cpu_time_pct.labels("system").set(cpu.system)
+        self.cpu_time_pct.labels("idle").set(cpu.idle)
+        if hasattr(cpu, 'iowait'):
+            self.cpu_time_pct.labels("iowait").set(cpu.iowait)
+        if hasattr(cpu, 'irq'):
+            self.cpu_time_pct.labels("irq").set(cpu.iowait)
+        if hasattr(cpu, 'softirq'):
+            self.cpu_time_pct.labels("softirq").set(cpu.iowait)
+        if hasattr(cpu, 'steal'):
+            self.cpu_time_pct.labels("steal").set(cpu.iowait)
+        
+        
     def _collect_cpu_stats(self):
         try:
             stats = psutil.cpu_stats()

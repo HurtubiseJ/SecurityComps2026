@@ -1,7 +1,7 @@
 # HOW TO USE
 
 ## MASTER_CONFIG.json
-The `node_monitor` uses the ENV variable `CONFIG_FILE_PATH` to locate the `MASTER_CONFIG.json` file. Defaults to `./MASTER_CONFIG.json` if not provided. **MASTER CONFIG FILE IS REQUIRED**. See FIGMA for vaild JSON structure. 
+The library looks for `./MASTER_CONFIG.json`. In your dockerfile make sure to copy the config into the app root. **MASTER CONFIG FILE IS REQUIRED**. Look at attacker1/MASTER_CONFIG.json for correct structure.
 
 ## Functionality
 You must do the following to use the monitoring package. 
@@ -15,11 +15,14 @@ After adding the package prometheus will automatically export enabled metrics fr
 Ex. Usage
 \\\
 from fastapi import FastAPI
-from shared.node_monitor.registry import Registry
+from node_monitor import Registry
 
 app = FastAPI() // FastAPI Instance
 registry = Registry() // Registry Class
 
 registry.registerFastAPIApp(app=app) // Bind prometheus to FastAPI instance (exposes /metrics)
 \\\
+
+3. 
+4. LOOK AT `nodes/attacker2/Dockerfile` `nodes/attacker2/docker-compose.yaml` and `nodes/attacker2/MASTER_CONFIG.json`. Note the build root is /project/ **NOT** /attacker2 (See docker-compose context: ../../). This is so docker can access `shared/node_monitor`. The `Dockerfile` copies the node_monitor lib and downloads it to be used as a pip installed library. You will need to imcorperate this into each nodes dockerfiles. 
 

@@ -1,0 +1,5 @@
+[Path]
+PathExists=/opt/attacker2/control/restart_required
+
+[Install]
+WantedBy=multi-user.target

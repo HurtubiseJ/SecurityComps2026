@@ -2,13 +2,22 @@ import type { BaseConfig } from "../../types/BaseConfig"
 
 
 type DashboardLeftProps = {
-    baseConfig: BaseConfig
+    baseConfig: BaseConfig | null
+    updateNode: (nodeStr: any) => void
 }
 
 export default function DashboardRight({
-    baseConfig
+    baseConfig, 
+    updateNode
 } : DashboardLeftProps) {
 
+    if (!baseConfig) {
+        return (
+            <div>
+                No active node
+            </div>
+        )
+    }
 
     return (
         <div className="flex flex-1 flex-col pt-4 pl-4 pb-4 overflow-y-auto">
@@ -19,7 +28,7 @@ export default function DashboardRight({
             </div>
 
 
-            {baseConfig.configLayout()}
+            {baseConfig.configLayout(updateNode)}
 
 
             

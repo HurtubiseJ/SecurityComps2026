@@ -1,0 +1,50 @@
+{
+    "id": "<uuid>",
+    "enabled": true,
+    "forward_host": "10.0.0.1",
+    "forward_port": "8002",
+    "monitoring": {
+        "enabled": true,
+        "metrics": [
+            "attack_requests_sent_total",
+            "attack_packets_sent_total",
+            "attack_requests_per_second",
+            "attack_bytes_sent_total"
+        ]
+    },
+
+
+    "custom_config": {
+
+    },
+
+    "caching": {
+    "enabled": true,
+    "static_cache": true,
+    "dynamic_cache": false,
+    "cache_ttl_seconds": 300,
+    "cache_vary_headers": ["Accept-Encoding"],
+    "cache_bypass_on_headers": ["Authorization"]
+  }, 
+
+  "rate_limit": {
+    "enabled": true,
+    "requests_per_ip_per_minute": 300,
+    "burst": 50,
+    "enforce_on_paths": ["/api"],
+    "exclude_paths": ["/health"]
+  }, 
+  
+  "database": {
+    "host": "postgres",
+    "port": 5432,
+    "name": "target2_db",
+    "user": "target2_user",
+    "password": "target2_password",
+    "max_connections": 20,
+    "connection_timeout_ms": 1000,
+    "query_timeout_ms": 2000,
+    "retry_enabled": false
+  }
+}
+

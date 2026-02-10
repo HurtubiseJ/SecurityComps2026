@@ -1,14 +1,14 @@
 
 #Pulls and configures collectors based on pulled Node config.
-from config import configuration
+from .config import configuration
 import functools
 import asyncio
 import logging
 from fastapi import FastAPI
-from collectors.cpu import CPUMonitor
-from collectors.memory import MemoryMonitor
-from collectors.network import NetworkMonitor
-from collectors.disk import DiskMonitor
+from .collectors.cpu import CPUMonitor
+from .collectors.memory import MemoryMonitor
+from .collectors.network import NetworkMonitor
+from .collectors.disk import DiskMonitor
 from .fastapi import BindPrometheus
 
 class Registry:
@@ -83,10 +83,10 @@ class Registry:
         if not self.config.enabled:
             logging.warning("Monioring disabled via config JSON")
             return
-        self._register(CPUMonitor, self.config.metrics.cpu)
-        self._register(DiskMonitor, self.config.metrics.disk)
-        self._register(MemoryMonitor, self.config.metrics.memory)
-        self._register(NetworkMonitor, self.config.metrics.network)
+        self._register(CPUMonitor, self.config.metrics['cpu'])
+        self._register(DiskMonitor, self.config.metrics['disk'])
+        self._register(MemoryMonitor, self.config.metrics['memory'])
+        self._register(NetworkMonitor, self.config.metrics['network'])
 
     def _register(self, cls, enabled: bool):
         if enabled:

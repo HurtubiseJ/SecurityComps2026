@@ -1,0 +1,14 @@
+services:
+  manager:
+    container_name: manager
+    build: 
+      context: ../../
+      dockerfile: nodes/manager/Dockerfile
+    ports:
+      - "5173:80"
+    networks: 
+      - ddos-shared
+    
+networks:
+  ddos-shared:
+    external: true

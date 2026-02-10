@@ -3,14 +3,14 @@
 from prometheus_fastapi_instrumentator import Instrumentator
 from fastapi import FastAPI
 import logging
-from config import configuration
+from .config import configuration
 
 def BindPrometheus(app: FastAPI) -> bool:
     try:
         Instrumentator(    
             should_group_status_codes=True,
             should_ignore_untemplated=True,
-            instrument_http=configuration.metrics.fastapi,
+            # instrument_http=configuration.metrics['fastapi'],
             excluded_handlers=["/metrics"],
         ).instrument(app=app).expose(app, "/metrics")
         return True
