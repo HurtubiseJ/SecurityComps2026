@@ -1,6 +1,5 @@
 """
 FastAPI Proxy Application
-Main entry point for the proxy service with DDoS mitigation capabilities
 (NGINX alternative) 
 """
 import os
@@ -112,7 +111,6 @@ class ConfigUpdateRequest(BaseModel):
 
 
 # API Routes
-
 @app.get("/proxy-health")
 async def health_check():
     """Health check endpoint"""
@@ -269,7 +267,7 @@ async def forward_request(request: Request, path: str):
     if request.url.query:
         target_url += f"?{request.url.query}"
     
-    # Prepare headers (exclude hop-by-hop headers)
+    # Prepare headers 
     headers = {}
     excluded_headers = {
         "host", "connection", "keep-alive", "proxy-authenticate",
@@ -280,7 +278,6 @@ async def forward_request(request: Request, path: str):
         if key.lower() not in excluded_headers:
             headers[key] = value
     
-    # Add X-Forwarded-For if not present
     if "X-Forwarded-For" not in headers:
         client_ip = request.client.host if request.client else "unknown"
         headers["X-Forwarded-For"] = client_ip
