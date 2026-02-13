@@ -113,11 +113,15 @@ class NetworkMonitor:
         inc_if_positive(self.network_drop_total, 'sent', netCounts.dropout - self._last_net_counts.dropout)
         inc_if_positive(self.network_drop_total, 'recv', netCounts.dropin - self._last_net_counts.dropin)
 
+        self._last_net_counts = netCounts
+
+
     def _process_net_connections(self, protocol="tcp"):
         try:
             netCon = psutil.net_connections(kind=protocol)
         except:
             logging.exception("_process_net_connections Failed")
+            return
 
         established = 0
         syns = 0

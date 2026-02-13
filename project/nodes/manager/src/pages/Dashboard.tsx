@@ -11,10 +11,8 @@ import { Logger } from "../types/Logger";
 
 export default function Dashboard() {
 
-    const manager = useNodeManager(); 
     const logger = new Logger()
-    console.log(manager.nodes)
-    console.log(manager.activeNode)
+    const manager = useNodeManager(logger); 
 
     return (
         <DashboardLayout 

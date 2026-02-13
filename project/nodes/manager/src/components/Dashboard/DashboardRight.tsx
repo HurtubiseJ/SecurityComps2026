@@ -30,8 +30,6 @@ export default function DashboardRight({
 
             {baseConfig.configLayout(updateNode)}
 
-
-            
         </div>
     )
 }

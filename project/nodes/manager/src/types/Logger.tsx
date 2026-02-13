@@ -1,6 +1,6 @@
 
 
-type Message = {
+export type Message = {
     id: string;
     owner: string; 
     color: string; // Hex?

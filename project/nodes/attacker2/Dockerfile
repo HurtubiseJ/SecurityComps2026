@@ -20,6 +20,7 @@ RUN python3 -m venv /venv
 
 # Activate venv
 ENV PATH="/venv/bin:$PATH"
+ENV LOCAL=True
 
 # env config for node_monitor
 ENV CONFIG_FILE_PATH="/MASTER_CONFIG.json"

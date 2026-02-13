@@ -75,7 +75,7 @@ async def health():
 
 @app.get("/api/{func}")
 async def api_func(func: str):
-    time.sleep(0.05)
+    time.sleep(0.001)
     return {"function": func, "result": random.randint(1, 100)}
 
 @app.get("/config")

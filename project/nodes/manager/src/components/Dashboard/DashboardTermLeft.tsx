@@ -2,7 +2,7 @@
 
 
 
-export default function DashabordTermLeft() {
+export default function DashboardTermLeft() {
 
     return (
         <div>

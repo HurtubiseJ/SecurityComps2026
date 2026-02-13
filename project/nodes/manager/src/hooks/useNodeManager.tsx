@@ -3,26 +3,27 @@ import { BaseConfig, BaseMonitor } from "../types/BaseConfig"
 import { LOCAL_NODE_IP_MAP } from "../constants/NodeIp"
 import { type NodeType } from "../types/configs"
 import { type metrics } from "../types/BaseConfig"
+import { type Logger } from "../types/Logger"
 
-const InitDefaultNodes = async (): Promise<BaseConfig[]> => {
+const InitDefaultNodes = async (logger: Logger): Promise<BaseConfig[]> => {
     const list: BaseConfig[] = []
 
-    const attacker2Config = await initAttacker2Config(LOCAL_NODE_IP_MAP['attacker2'], "attacker")
+    const attacker2Config = await initAttacker2Config(LOCAL_NODE_IP_MAP['attacker2'], "attacker", logger)
     if (attacker2Config) {
         list.push(attacker2Config)
     }
-    const targetConfig = await initAttacker2Config(LOCAL_NODE_IP_MAP['target1'], "target")
+    const targetConfig = await initAttacker2Config(LOCAL_NODE_IP_MAP['target1'], "target", logger)
     if (targetConfig) {
         list.push(targetConfig)
     }
 
-    const attacker1Config = await initAttacker2Config(LOCAL_NODE_IP_MAP['attacker1'], 'attacker')
+    const attacker1Config = await initAttacker2Config(LOCAL_NODE_IP_MAP['attacker1'], 'attacker', logger)
     console.log("ATTACKER1, ", attacker1Config)
     if (attacker1Config) {
         list.push(attacker1Config)
     }
 
-    const attacker1JohnConfig = await initAttacker2Config(LOCAL_NODE_IP_MAP['attacker1-john'], 'attacker')
+    const attacker1JohnConfig = await initAttacker2Config(LOCAL_NODE_IP_MAP['attacker1-john'], 'attacker', logger)
     console.log("ATTACKER1, ", attacker1JohnConfig)
     if (attacker1JohnConfig) {
         list.push(attacker1JohnConfig)
@@ -33,7 +34,7 @@ const InitDefaultNodes = async (): Promise<BaseConfig[]> => {
     return list
 }
 
-const initAttacker2Config = async (url: string, type: NodeType): Promise<BaseConfig | null> => {
+const initAttacker2Config = async (url: string, type: NodeType, logger: Logger): Promise<BaseConfig | null> => {
     const configUrl = `${url}config`
 
     try {
@@ -53,13 +54,13 @@ const initAttacker2Config = async (url: string, type: NodeType): Promise<BaseCon
             fastapi: res.monitor?.metrics?.fastapi
         }
         const monitorConfig = res.monitor ? new BaseMonitor(res.monitor.enabled, metrics) : null
-        return new BaseConfig(res.name, type, res.enabled, res.forward_host, res.forward_port, res.host, res.port, monitorConfig)
+        return new BaseConfig(res.name, type, res.enabled, res.forward_host, res.forward_port, res.host, res.port, monitorConfig, logger)
     } catch {
         return null
     }
 }
 
-export default function useNodeManager() {
+export default function useNodeManager(logger: Logger) {
     const [nodes, setNodes] = useState<BaseConfig[]>([])
     const [activeNode, setActiveNode] = useState<BaseConfig | null>(null)
     const [loading, setLoading] = useState(true)
@@ -68,7 +69,7 @@ export default function useNodeManager() {
         let mounted = true
 
         const init = async () => {
-            const initialNodes = await InitDefaultNodes()
+            const initialNodes = await InitDefaultNodes(logger)
             if (!mounted) return
 
             setNodes(initialNodes)
@@ -88,7 +89,7 @@ export default function useNodeManager() {
     }
 
     const updateNode = (node: any) => {
-        console.log("UPDATE: ", node)
+        // console.log("UPDATE: ", node)
         const metrics: metrics = {
             cpu: node.monitor?.metrics?.cpu,
             memory: node?.monitor?.metrics?.memory,
@@ -97,9 +98,9 @@ export default function useNodeManager() {
             fastapi: node?.monitor?.metrics?.fastapi
         }
         const monitorConfig = new BaseMonitor(node.monitor.enabled, metrics)
-        console.log("MONITOR: ", monitorConfig)
+        // console.log("MONITOR: ", monitorConfig)
         const config = new BaseConfig(node.name, node.type, node.enabled, node.forward_host, node.forward_port, node.host, node.port, monitorConfig)
-        console.log("INPUT NODE: ", config)
+        // console.log("INPUT NODE: ", config)
 
         setNodes(nodes.map((currNode: BaseConfig) => {
             if (currNode.id === config.id) {

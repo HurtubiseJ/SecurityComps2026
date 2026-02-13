@@ -23,6 +23,7 @@ ENV PATH="/venv/bin:$PATH"
 
 # env config for node_monitor
 ENV CONFIG_FILE_PATH="/MASTER_CONFIG.json"
+ENV LOCAL=True
 
 # Upgrade tooling INSIDE venv
 RUN pip install --upgrade pip setuptools wheel

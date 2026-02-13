@@ -1,5 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from processes import start_wrk, stop_wrk
+import os
+import time
+import threading
 import requests
 import logging
 import json
@@ -7,6 +10,8 @@ import subprocess
 from typing import Optional
 from pydantic import BaseModel
 from pathlib import Path
+import subprocess
+import docker
 
 logger = logging.getLogger()
 
@@ -94,5 +99,18 @@ async def modifyConfig(config: Config):
 
 @router.get("/restart")
 async def restart():
-    Path("/control/restart_required").touch()
-    return {"status": "ok", "message": "Awaiting docker restart via systemd service"}
+    if os.getenv("LOCAL"):
+        thread = threading.Thread(
+            target=run_local_restart
+        )
+        thread.start()
+        return {"status": "ok", "message": "Awaiting docker restart via local restart command"}
+    else:
+        Path("/control/restart_required").touch()
+        return {"status": "ok", "message": "Awaiting docker restart via systemd service"}
+
+def run_local_restart():
+    time.sleep(0.5) #time for /restart to return
+    client = docker.from_env()
+    client.containers.get("attacker1-john").restart()
+    return True
