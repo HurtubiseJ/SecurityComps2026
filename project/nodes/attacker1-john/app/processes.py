@@ -36,7 +36,7 @@ def run_wrk():
     global RUNNING_PROCESS
 
     process = subprocess.Popen(
-        ['wrk', '-t12', '-c400', '-d120s', 'http://proxy:8000/api/test'],
+        ['wrk', '-t6', '-c200', '-d60s', 'http://proxy:8000/api/test'],
     )
 
     RUNNING_PROCESS = process

@@ -1,3 +1,37 @@
+# version: '3'
+# services:
+#   prometheus:
+#     image: prom/prometheus
+#     ports:
+#       - '9090:9090'
+#     volumes:
+#       - ./prometheus:/etc/prometheus
+#     command:
+#       - '--config.file=/etc/prometheus/prometheus.yml'
+#     restart: always
+    
+#     networks:
+#       - ddos-shared
+#   grafana:
+#     image: grafana/grafana
+#     logging:
+#       driver: none
+#     ports:
+#       - '3000:3000'
+#     depends_on:
+#       - prometheus
+#     command:
+#       - ''
+#     restart: always
+#     networks:
+#       - ddos-shared
+
+# networks:
+#   ddos-shared:
+#     external: True
+
+version: "3.8"
+
 services:
   prometheus:
     image: prom/prometheus
@@ -19,6 +53,11 @@ services:
       - "3000:3000"
     depends_on:
       - prometheus
+    logging:
+      driver: none
+    volumes:
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini:ro
+      - ~/grafana-data:/var/lib/grafana
     restart: always
     networks:
       - ddos-shared
@@ -26,3 +65,4 @@ services:
 networks:
   ddos-shared:
     external: true
+

@@ -1,0 +1,54 @@
+services:
+  upstream:
+    image: python:3.11-slim
+    container_name: upstream
+    command: ["python", "-m", "http.server", "9000", "--bind", "0.0.0.0"]
+    expose:
+      - "9000"
+    networks:
+      - ddos-shared
+
+  proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: proxy
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./nginx/nginx-nrl.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - upstream
+    # sysctls:
+    #   - net.ipv4.tcp_max_syn_backlog=4096
+    #   - net.ipv4.tcp_syncookies=1
+    #   - net.ipv4.tcp_synack_retries=2
+    #   - net.core.somaxconn=4096
+    networks:
+      - ddos-shared
+
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:1.4
+    container_name: nginx-exporter
+    command: ["--nginx.scrape-uri=http://proxy:8000/stub_status"]
+    depends_on:
+      - proxy
+    networks:
+      - ddos-shared
+
+  proxy-app:
+    build:
+      context: ../../
+      dockerfile: nodes/proxy/Dockerfile.app
+    container_name: proxy-app
+    ports:
+      - "8003:8000"
+    volumes:
+      - ./app:/app/app
+      - ./MASTER_CONFIG.json:/MASTER_CONFIG.json
+    networks:
+      - ddos-shared
+
+networks:
+  ddos-shared:
+    external: true

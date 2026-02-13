@@ -261,7 +261,7 @@ export class BaseConfig {
   getApplyRestart() {
     return (
       <div className="flex flex-1 flex-col items-start justify-center gap-y-2">
-        <div className="flex flex-1 w-full flex-row gap-x-4 items-start justify-between bg-red-900">
+        <div className="flex flex-1 w-full flex-row gap-x-4 items-start justify-between">
           <a
             className="flex w-full bg-yellow-200 hover:bg-yellow-100 cursor-pointer rounded-md px-4 py-2"
             onClick={async () => {
@@ -279,7 +279,7 @@ export class BaseConfig {
             <p className="text-black text-sm">Apply Config</p>
           </a>
         </div>
-        <div className="flex flex-1 w-full  flex-row gap-x-4 items-start justify-between bg-red-900">
+        <div className="flex flex-1 w-full  flex-row gap-x-4 items-start justify-between">
           <a
             className="flex w-full bg-green-500 hover:bg-green-400 cursor-pointer rounded-md px-4 py-2"
             onClick={async () => {
