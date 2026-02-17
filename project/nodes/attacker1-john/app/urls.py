@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, WebSocket
 from processes import start_wrk, stop_wrk
 import os
 import time
@@ -51,16 +51,21 @@ async def start():
 
     if not success:
         raise HTTPException("Process already running")
-    return {"status": "running"}
+    
+    return {"status": "running", "message": "Process started"}
 
 @router.post("/stop")
 async def stop():
     success = stop_wrk()
     if not success:
-        raise HTTPException("No process to stop")
+        return {
+            "status": "stopped",
+            "message": "No process to stop"
+        }
     
     return {
-        "status": "stopped"
+        "status": "stopped",
+        "message": "Stopped Process"
     }
 
 @router.get("/test")

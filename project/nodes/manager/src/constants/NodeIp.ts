@@ -1,6 +1,5 @@
 
 
-
 export const NODE_IP_MAP = {
     "attacker2": "http://attacker2:8000/", 
     "attacker1": "http://attacker1:8000/",

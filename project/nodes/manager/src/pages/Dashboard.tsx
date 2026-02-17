@@ -1,3 +1,4 @@
+import React from "react";
 import DashboardLayout from "../components/Dashboard/DashboardLayout";
 
 import DashboardTermLeft from "../components/Dashboard/DashboardTermLeft";
@@ -11,7 +12,7 @@ import { Logger } from "../types/Logger";
 
 export default function Dashboard() {
 
-    const logger = new Logger()
+    const logger = React.useMemo(() => new Logger(), [])
     const manager = useNodeManager(logger); 
 
     return (
@@ -20,7 +21,7 @@ export default function Dashboard() {
             right={<DashboardRight baseConfig={manager.activeNode} updateNode={manager.updateNode} />}
             center={<DashboardCenter nodeManager={manager} />}
             termLeft={<DashboardTermLeft />}
-            termRight={<DashboardTermRight logger={logger} />}       
+            termRight={<DashboardTermRight logger={logger} />}
         />
     )   
 }

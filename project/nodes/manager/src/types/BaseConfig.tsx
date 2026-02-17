@@ -3,6 +3,7 @@ import type { NodeType } from "./configs";
 import { LetterCircleHIcon, TextItalicIcon } from "@phosphor-icons/react";
 import { LOCAL_NODE_IP_MAP } from "../constants/NodeIp";
 import type { Logger, Message } from "./Logger";
+import { NodeColorMap } from "../constants/NodeColorMap";
 
 export type metrics = {
   cpu: boolean;
@@ -146,6 +147,7 @@ export class BaseMonitor {
 
 export class BaseConfig {
   public id: string;
+  public running: boolean;
   public name: string;
   public type: NodeType;
   public enabled: boolean;
@@ -167,7 +169,8 @@ export class BaseConfig {
     host: string = "10.0.0.1",
     port: string = "8000",
     monitor: BaseMonitor | null = null,
-    logger: Logger | null = null
+    logger: Logger | null = null,
+    running: boolean = false
   ) {
     this.id = uuidv4();
     this.name = name;
@@ -181,6 +184,26 @@ export class BaseConfig {
     this.monitor = monitor;
 
     this.logger = logger;
+
+    this.running = running; 
+
+  }
+
+  appendToLogger = (text: string, isError: boolean = false) => {
+    if (this.logger == null ) {
+        console.log("LOGGER IS NULL")
+        return
+    }
+
+    const msg: Message = {
+        id: this.id,
+        owner: this.name,
+        color: NodeColorMap[this.name],
+        message: text,
+        isError: isError
+    }
+
+    this.logger?.appendLog(msg);
   }
 
   applyConfigActiveNode = async () => {
@@ -200,14 +223,7 @@ export class BaseConfig {
 
     const content = await response.json();
 
-    if (this.logger != null) {
-      this.logger.appendLog({
-        id: "start",
-        owner: this.name,
-        color: "39c553",
-        message: JSON.stringify(content),
-      } as Message);
-    }
+    this.appendToLogger(JSON.stringify(content['message']));
 
     return true;
   };
@@ -215,11 +231,15 @@ export class BaseConfig {
   restartConfigActiveNode = async () => {
     // @ts-ignore
     const response = await fetch(`${LOCAL_NODE_IP_MAP[this.name]}restart`);
+    const res = await response.json();
+    this.appendToLogger(JSON.stringify(res['message']))
   };
   getConfigActiveNodeConfig = async () => {
     // @ts-ignore
-    const response = await fetch(`${LOCAL_NODE_IP_MAP[this.name]}config`);
+    const response = await fetch(`${LOCAL_NODE_IP_MAP[this.jname]}config`);
     const res = await response.json();
+
+    this.appendToLogger(`Successfully fetched Node Config`)
     return res;
   };
 
@@ -229,6 +249,9 @@ export class BaseConfig {
       method: "POST",
     });
     const res = await response.json();
+
+    this.appendToLogger(JSON.stringify(res['message']));
+
     return res;
   };
 
@@ -239,7 +262,8 @@ export class BaseConfig {
     });
 
     const res = await response.json();
-    console.log("STOP: ", res);
+
+    this.appendToLogger(JSON.stringify(res['message']))
     return res;
   };
 
@@ -307,34 +331,55 @@ export class BaseConfig {
       <div className="flex flex-col gap-y-2 min-w-[140px]">
         <p className="text-sm font-medium text-purple-400">{this.name}</p>
 
+
         <button
           onClick={() => {
-            console.log("CLICK");
-            onClick();
-          }}
+              onClick();
+            }}
           className="
-                    flex flex-col gap-y-1
-                    w-full min-h-[120px]
-                    rounded-lg
-                    bg-gray-700
-                    p-3
-                    text-left
-                    hover:bg-gray-600
-                    active:bg-gray-500
-                    transition
-                    cursor-pointer
-                "
+          relative
+          flex flex-col 
+          w-full min-h-[120px]
+          rounded-lg
+          bg-gray-700
+          text-left
+          hover:bg-gray-600
+          active:bg-gray-500
+          transition
+          cursor-pointer
+          "
         >
-          <p className="text-xs text-purple-300">Enabled: {this.enabled}</p>
-          <p className="text-xs text-purple-300">IP: {this.host}</p>
-          <p className="text-xs text-purple-300">Port: {this.port}</p>
-          <p className="text-xs text-purple-300">Role: {this.type}</p>
-          <p className="text-xs text-purple-300">
-            Forward IP: {this.forward_host}
-          </p>
-          <p className="text-xs text-purple-300">
-            Forward Port: {this.forward_port}
-          </p>
+            <div className="w-full">
+                {this.running ? (
+                    <div className="absolute right-2 top-2 rounded-full bg-green-600 h-3 w-3 min-w-1"/>
+
+                ) : (
+                    <div className="absolute right-2 top-2 rounded-full bg-gray-500 h-3 w-3 min-w-1"/>
+                )}
+            </div>
+            <div className="
+                flex flex-col gap-y-1
+                w-full min-h-[120px]
+                rounded-lg
+                bg-gray-700
+                p-3
+                text-left
+                hover:bg-gray-600
+                active:bg-gray-500
+                transition
+                cursor-pointer
+                ">
+                    <p className="text-xs text-purple-300">Enabled: {this.enabled}</p>
+                    <p className="text-xs text-purple-300">IP: {this.host}</p>
+                    <p className="text-xs text-purple-300">Port: {this.port}</p>
+                    <p className="text-xs text-purple-300">Role: {this.type}</p>
+                    <p className="text-xs text-purple-300">
+                        Forward IP: {this.forward_host}
+                    </p>
+                    <p className="text-xs text-purple-300">
+                        Forward Port: {this.forward_port}
+                    </p>
+            </div>
         </button>
       </div>
     );
