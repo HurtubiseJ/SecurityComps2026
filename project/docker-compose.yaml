@@ -1,7 +1,7 @@
 name: ddos-system-local
 
 include:
-  - nodes/proxy/docker-compose.yaml
+  - nodes/proxy/docker-compose.pn.yaml
   - nodes/monitor/docker-compose.yaml
   - nodes/target1/docker-compose.yaml
   - nodes/attacker1/docker-compose.yaml

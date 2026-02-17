@@ -17,6 +17,12 @@
     ]
   },
   "custom_config": {
+    "rate_limit_rate": "10r/s", 
+    "max_connections": 10,
+    "burst": 10,
+    "connection_timout": "10s",
+    "read_timeout": "30s",
+    "send_timeout": "30s",
     "rate_limit": {
       "enabled": false
     },

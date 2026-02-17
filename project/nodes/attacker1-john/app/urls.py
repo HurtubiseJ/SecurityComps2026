@@ -94,11 +94,6 @@ async def modifyConfig(config: Config):
             config.model_dump_json(indent=2)
         )
         f.close()
-
-    with open("../MASTER_CONFIG.json", "r") as f:
-        c = json.load(f)
-        print(c)
-        logger.warning(c)
     
     return {"status": "ok", "message": "Config file modified. GET /restart to apply changes."}
 

@@ -1,7 +1,22 @@
 FROM nginx:1.25-alpine
 
-COPY nginx/nginx.conf /etc/nginx/nginx.conf
+RUN apk add --no-cache gettext
 
-EXPOSE 8000
+COPY nginx/nginx.conf.template /etc/nginx/nginx.conf.template
 
-CMD ["nginx", "-g", "daemon off;"]
+CMD sh -c "envsubst '\
+$RATE_LIMIT \
+$RATE_LIMIT_STATUS \
+$CONN_LIMIT_STATUS \
+$UPSTREAM_HOST \
+$UPSTREAM_PORT \
+$LISTEN_PORT \
+$ALT_LISTEN_PORT \
+$DOCKER_NETWORK \
+$MAX_CONNECTIONS \
+$BURST \
+$CONNECT_TIMEOUT \
+$READ_TIMEOUT \
+$SEND_TIMEOUT \
+' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf.gen && \
+nginx -g 'daemon off;'"
