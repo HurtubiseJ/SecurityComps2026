@@ -1,5 +1,6 @@
 """Proxy node – w/ metrics and config endpoints."""
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
 import threading
@@ -11,6 +12,13 @@ import docker
 from node_monitor import Registry
 
 app = FastAPI(title="Proxy API")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 registry = Registry()
 registry.registerFastAPIApp(app=app)
@@ -65,12 +73,7 @@ async def updateConfig(config: Config):
 
     return {"status": "ok", "message": "Config successfully modified"}
 
-
-# @app.post("/apply")
-# async def apply_jconfig():
-#     return {}
-
-@app.post("/restart")
+@app.get("/restart")
 async def reset():
     if os.getenv("LOCAL"):
         process = threading.Thread(
@@ -86,8 +89,9 @@ async def reset():
 
 def run_local_restart():
     time.sleep(0.5)
-    client = docker.client()
+    client = docker.from_env()
     client.containers.get("proxy").restart()
+    client.containers.get("proxy-fastapi").restart()
     return True
 
 @app.get("/metrics")

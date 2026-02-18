@@ -1,6 +1,6 @@
 {
   "id": "proxy-grape01",
-  "name": "Proxy Node",
+  "name": "proxy",
   "type": "proxy",
   "enabled": true,
   "forward_host": "0.0.0.0",

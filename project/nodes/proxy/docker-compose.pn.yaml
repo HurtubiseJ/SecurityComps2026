@@ -25,14 +25,16 @@ services:
     networks:
       - ddos-shared
 
-  fastapi-exporter:
+  proxy-fastapi:
     build:
       context: ../../
       dockerfile: nodes/proxy/Dockerfile.python
     container_name: proxy-fastapi
     ports:
       - "8030:8000"
-    # volumes:
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock #FOR LOCAL RESTART REMOVE ON PROD, ROOT ACCESS = BAD
+
     #   - ./app:/app
     networks:
       - ddos-shared
