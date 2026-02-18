@@ -3,24 +3,27 @@
   "name": "Proxy Node",
   "type": "proxy",
   "enabled": true,
-  "forward_host": "137.22.4.153",
+  "forward_host": "0.0.0.0",
   "forward_port": "8001",
   "port": "8000",
   "host": "0.0.0.0",
-  "monitoring": {
+  "monitor": {
     "enabled": true,
-    "metrics": [
-      "fastapi",
-      "cpu",
-      "memory",
-      "network"
-    ]
+    "metrics": {
+      "cpu": true,
+      "memory": true,
+      "disk": true,
+      "network": true,
+      "fastapi": true
+    },
+    "interval": 1
   },
   "custom_config": {
-    "rate_limit_rate": "10r/s", 
+    "enabled": true,
+    "rate_limit_rate": "10r/s",
     "max_connections": 10,
     "burst": 10,
-    "connection_timout": "10s",
+    "connect_timeout": "10s",
     "read_timeout": "30s",
     "send_timeout": "30s",
     "rate_limit": {

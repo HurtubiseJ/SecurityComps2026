@@ -1,6 +1,5 @@
 """Proxy node – w/ metrics and config endpoints."""
 from fastapi import FastAPI
-from node_monitor import Registry
 from pydantic import BaseModel
 from typing import Optional
 import threading
@@ -9,11 +8,12 @@ from pathlib import Path
 import os
 import json
 import docker
+from node_monitor import Registry
 
 app = FastAPI(title="Proxy API")
 
 registry = Registry()
-registry.registerFastApiApp(app=app)
+registry.registerFastAPIApp(app=app)
 
 class Metrics(BaseModel):
     cpu: bool
@@ -57,7 +57,7 @@ async def getConfig():
     return content 
 
 @app.post("/config")
-async def update_config(config: Config):
+async def updateConfig(config: Config):
     with open("../MASTER_CONFIG.json", 'w') as f:
         f.write(config.model_dump_json(indent=2))
         f.close()    
@@ -67,7 +67,7 @@ async def update_config(config: Config):
 
 
 # @app.post("/apply")
-# async def apply_config():
+# async def apply_jconfig():
 #     return {}
 
 @app.post("/restart")

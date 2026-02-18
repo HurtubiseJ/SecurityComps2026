@@ -1,22 +1,34 @@
+# FROM nginx:1.25-alpine
+
+# RUN apk add --no-cache gettext
+
+# COPY nginx/nginx.conf.template /etc/nginx/nginx.conf.template
+
+# CMD sh -c "envsubst '\
+# $RATE_LIMIT \
+# $RATE_LIMIT_STATUS \
+# $CONN_LIMIT_STATUS \
+# $UPSTREAM_HOST \
+# $UPSTREAM_PORT \
+# $LISTEN_PORT \
+# $ALT_LISTEN_PORT \
+# $DOCKER_NETWORK \
+# $MAX_CONNECTIONS \
+# $BURST \
+# $CONNECT_TIMEOUT \
+# $READ_TIMEOUT \
+# $SEND_TIMEOUT \
+# ' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf.gen && \
+# nginx -g 'daemon off;'"
+
 FROM nginx:1.25-alpine
 
-RUN apk add --no-cache gettext
+RUN apk add --no-cache jq gettext
 
 COPY nginx/nginx.conf.template /etc/nginx/nginx.conf.template
+COPY nginx/entrypoint.sh /entrypoint.sh
+COPY MASTER_CONFIG.json .
 
-CMD sh -c "envsubst '\
-$RATE_LIMIT \
-$RATE_LIMIT_STATUS \
-$CONN_LIMIT_STATUS \
-$UPSTREAM_HOST \
-$UPSTREAM_PORT \
-$LISTEN_PORT \
-$ALT_LISTEN_PORT \
-$DOCKER_NETWORK \
-$MAX_CONNECTIONS \
-$BURST \
-$CONNECT_TIMEOUT \
-$READ_TIMEOUT \
-$SEND_TIMEOUT \
-' < /etc/nginx/nginx.conf.template > /etc/nginx/nginx.conf.gen && \
-nginx -g 'daemon off;'"
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
