@@ -12,6 +12,7 @@ from pydantic import BaseModel
 from pathlib import Path
 import subprocess
 import docker
+from processes import RUNNING_PROCESS
 
 logger = logging.getLogger()
 
@@ -38,16 +39,39 @@ class Config(BaseModel):
     port: str
     monitor: Monitor
 
+class startOptions(BaseModel):
+    forward_Host: str
+    forward_port: str
+    end_point: str
+    num_connections: int
+    num_threads: int
+    duration_seconds: int
 
 router = APIRouter()
 
+def _load_config():
+    with open(Path(os.getenv("CONFIG_FILE_PATH"), "../MASTER_CONFIG.json")) as f:
+        config = json.load(f)
+
+    if not config:
+        raise RuntimeError("Unable to load config")
+    
+    return config
+
+# config = _load_config() 
+# duration = config.duration_seconds
+
+
 @router.get("/status")
 async def status():
-    return {"status": "running"}
+    if RUNNING_PROCESS is None:
+        return {"status": "idle", "message": "Idle, no proccess running"}
+    return {"status": "running", "message": "Proccess Running"}
 
 @router.post("/start")
-async def start():
-    success = start_wrk()
+async def start(options: startOptions):
+
+    success = start_wrk(forwardHost=options.forward_host, forwardPort=options.forward_port, endPoint=options.end_point, num_threads=options.num_threads, num_connections=options.num_connections, duraition_seconds=options.duration_seconds)
 
     if not success:
         raise HTTPException("Process already running")

@@ -1,6 +1,7 @@
 services:
   attacker1-john:
     container_name: attacker1-john
+    platform: linux/arm64
     build: 
       context: ../../
       dockerfile: nodes/attacker1-john/Dockerfile

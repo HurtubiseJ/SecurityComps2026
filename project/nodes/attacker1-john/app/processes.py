@@ -6,13 +6,14 @@ import threading
 
 RUNNING_PROCESS = None
 
-def start_wrk():
+def start_wrk(forwardPort: str, forwardHost: str, endPoint: str, num_threads = 6, num_connections = 200, duraition_seconds = 60):
     global RUNNING_PROCESS
     if RUNNING_PROCESS:
         return False
     
     thread = threading.Thread(
-        target=run_wrk(),
+        target=run_wrk,
+        args=[forwardPort, forwardHost, endPoint, num_threads, num_connections, duraition_seconds]
         # daemon=True
     )
     thread.start()
@@ -32,12 +33,33 @@ def stop_wrk():
 
 
 
-def run_wrk():
+def run_wrk(forwardPort: str, forwardHost: str, endPoint: str, request_rate: int, headers = [], keep_alive = True, method = "GET", num_threads = 6, num_connections = 200, duraition_seconds = 60):
     global RUNNING_PROCESS
 
-    process = subprocess.Popen(
-        ['wrk', '-t6', '-c200', '-d60s', 'http://proxy:8000/api/test'],
-    )
+    cmd = [
+        "wrk",
+        "-t", str(num_threads),      # Thread count
+        "-c", str(num_connections),  # Connection count
+        "-R", str(request_rate),          # Rate limit (required for wrk2)
+        "-d", f"{duraition_seconds}",               
+        "--timeout", "2s",
+        "--latency"
+    ]
+
+    for key, value in headers:
+        cmd.extend(["-H", f"{key}: {value}"])
+    
+    if not keep_alive:
+        cmd.extend(["-H", "Connection: Close"])
+    
+    if method != "GET":
+        cmd.extend(["-m", method])
+    
+    cmd.append(f"http://{forwardHost}:{forwardPort}/{endPoint}")
+    return cmd
+
+    process = subprocess.Popen(cmd)
+
 
     RUNNING_PROCESS = process
     RUNNING_PROCESS.wait()

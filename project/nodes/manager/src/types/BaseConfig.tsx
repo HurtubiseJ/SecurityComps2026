@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 import type { NodeType } from "./configs";
-import { LetterCircleHIcon, TextItalicIcon } from "@phosphor-icons/react";
+import { CaretDownIcon, CaretUpIcon, LetterCircleHIcon, TextItalicIcon } from "@phosphor-icons/react";
 import { LOCAL_NODE_IP_MAP } from "../constants/NodeIp";
 import type { Logger, Message } from "./Logger";
 import { NodeColorMap } from "../constants/NodeColorMap";
@@ -43,7 +43,7 @@ export class BaseMonitor {
       <div className="flex flex-col w-full overflow-hidden min-w-0 pr-4">
         <div className="flex w-full flex-row justify-between items-start pr-1">
           <h4 className="font-light text-gray-300">{title}</h4>
-            <p className="text-gray-500">{key}</p>
+          <p className="text-gray-500">{key}</p>
         </div>
 
         <div className="flex items-center gap-x-2 rounded-md overflow-hidden bg-slate-600 p-1 min-w-0">
@@ -84,7 +84,6 @@ export class BaseMonitor {
         <h3 className="text-lg text-white">Monitoring</h3>
 
         {this.configRow(
-
           "Enabled",
           "enabled",
           "checkbox",
@@ -92,7 +91,7 @@ export class BaseMonitor {
           (v) => (this.enabled = v.target),
           this.enabled,
           updateNode,
-           parentGetConfig
+          parentGetConfig
         )}
 
         {this.configRow(
@@ -157,6 +156,7 @@ export class BaseConfig {
   public host: string;
 
   public monitor: BaseMonitor | null;
+  public attacker: AttackerConfig | null;
 
   public logger: Logger | null;
 
@@ -169,6 +169,7 @@ export class BaseConfig {
     host: string = "10.0.0.1",
     port: string = "8000",
     monitor: BaseMonitor | null = null,
+    attacker: AttackerConfig | null = null,
     logger: Logger | null = null,
     running: boolean = false
   ) {
@@ -182,29 +183,29 @@ export class BaseConfig {
     this.host = host;
 
     this.monitor = monitor;
+    this.attacker = attacker;
 
     this.logger = logger;
 
-    this.running = running; 
-
+    this.running = running;
   }
 
   appendToLogger = (text: string, isError: boolean = false) => {
-    if (this.logger == null ) {
-        console.log("LOGGER IS NULL")
-        return
+    if (this.logger == null) {
+      console.log("LOGGER IS NULL");
+      return;
     }
 
     const msg: Message = {
-        id: this.id,
-        owner: this.name,
-        color: NodeColorMap[this.name],
-        message: text,
-        isError: isError
-    }
+      id: this.id,
+      owner: this.name,
+      color: NodeColorMap[this.name],
+      message: text,
+      isError: isError,
+    };
 
     this.logger?.appendLog(msg);
-  }
+  };
 
   applyConfigActiveNode = async () => {
     console.log(JSON.stringify(this.getConfig()));
@@ -223,7 +224,7 @@ export class BaseConfig {
 
     const content = await response.json();
 
-    this.appendToLogger(JSON.stringify(content['message']));
+    this.appendToLogger(JSON.stringify(content["message"]));
 
     return true;
   };
@@ -232,14 +233,14 @@ export class BaseConfig {
     // @ts-ignore
     const response = await fetch(`${LOCAL_NODE_IP_MAP[this.name]}restart`);
     const res = await response.json();
-    this.appendToLogger(JSON.stringify(res['message']))
+    this.appendToLogger(JSON.stringify(res["message"]));
   };
   getConfigActiveNodeConfig = async () => {
     // @ts-ignore
     const response = await fetch(`${LOCAL_NODE_IP_MAP[this.jname]}config`);
     const res = await response.json();
 
-    this.appendToLogger(`Successfully fetched Node Config`)
+    this.appendToLogger(`Successfully fetched Node Config`);
     return res;
   };
 
@@ -250,7 +251,7 @@ export class BaseConfig {
     });
     const res = await response.json();
 
-    this.appendToLogger(JSON.stringify(res['message']));
+    this.appendToLogger(JSON.stringify(res["message"]));
 
     return res;
   };
@@ -263,7 +264,7 @@ export class BaseConfig {
 
     const res = await response.json();
 
-    this.appendToLogger(JSON.stringify(res['message']))
+    this.appendToLogger(JSON.stringify(res["message"]));
     return res;
   };
 
@@ -331,11 +332,10 @@ export class BaseConfig {
       <div className="flex flex-col gap-y-2 min-w-[140px]">
         <p className="text-sm font-medium text-purple-400">{this.name}</p>
 
-
         <button
           onClick={() => {
-              onClick();
-            }}
+            onClick();
+          }}
           className="
           relative
           flex flex-col 
@@ -349,15 +349,15 @@ export class BaseConfig {
           cursor-pointer
           "
         >
-            <div className="w-full">
-                {this.running ? (
-                    <div className="absolute right-2 top-2 rounded-full bg-green-600 h-3 w-3 min-w-1"/>
-
-                ) : (
-                    <div className="absolute right-2 top-2 rounded-full bg-gray-500 h-3 w-3 min-w-1"/>
-                )}
-            </div>
-            <div className="
+          <div className="w-full">
+            {this.running ? (
+              <div className="absolute right-2 top-2 rounded-full bg-green-600 h-3 w-3 min-w-1" />
+            ) : (
+              <div className="absolute right-2 top-2 rounded-full bg-gray-500 h-3 w-3 min-w-1" />
+            )}
+          </div>
+          <div
+            className="
                 flex flex-col gap-y-1
                 w-full min-h-[120px]
                 rounded-lg
@@ -368,18 +368,19 @@ export class BaseConfig {
                 active:bg-gray-500
                 transition
                 cursor-pointer
-                ">
-                    <p className="text-xs text-purple-300">Enabled: {this.enabled}</p>
-                    <p className="text-xs text-purple-300">IP: {this.host}</p>
-                    <p className="text-xs text-purple-300">Port: {this.port}</p>
-                    <p className="text-xs text-purple-300">Role: {this.type}</p>
-                    <p className="text-xs text-purple-300">
-                        Forward IP: {this.forward_host}
-                    </p>
-                    <p className="text-xs text-purple-300">
-                        Forward Port: {this.forward_port}
-                    </p>
-            </div>
+                "
+          >
+            <p className="text-xs text-purple-300">Enabled: {this.enabled}</p>
+            <p className="text-xs text-purple-300">IP: {this.host}</p>
+            <p className="text-xs text-purple-300">Port: {this.port}</p>
+            <p className="text-xs text-purple-300">Role: {this.type}</p>
+            <p className="text-xs text-purple-300">
+              Forward IP: {this.forward_host}
+            </p>
+            <p className="text-xs text-purple-300">
+              Forward Port: {this.forward_port}
+            </p>
+          </div>
         </button>
       </div>
     );
@@ -518,6 +519,10 @@ export class BaseConfig {
         {this.monitor !== null && (
           <>{this.monitor.configLayout(updateNode, () => this.getConfig())}</>
         )}
+
+        {this.attacker !== null && (
+          <>{this.attacker.configLayout(updateNode, () => this.getConfig())}</>
+        )}
       </div>
     );
   }
@@ -538,18 +543,268 @@ export class MonitorNodeConfig extends BaseConfig {
   }
 }
 
-export class AttackerConfig extends BaseConfig {
+export class AttackerConfig {
+  public attack_type: string;
+  public forward_host: string;
+  public forward_port: string;
+  public rate_rps: number;
+  public threads: number;
+  public connections: number;
+  public method: string;
+  public paths: string[];
+  public path_ratios: number[];
+  public headers: Map<string, string>;
+  public keep_alive: boolean;
+
+  private num_paths: Number;
+
   public constructor(
-    name: string,
-    type: NodeType,
-    enabled: boolean,
+    attack_type: string,
     forward_host: string,
     forward_port: string,
-    host: string,
-    port: string
+    rate_rps: number,
+    threads: number,
+    connections: number,
+    method: string,
+    paths: string[],
+    path_ratios: number[],
+    headers: Map<string, string>,
+    keep_alive: boolean
   ) {
-    super(name, type, enabled, forward_host, forward_port, host, port);
-    // Additional config
+    this.attack_type = attack_type;
+    this.forward_host = forward_host;
+    this.forward_port = forward_port;
+    this.rate_rps = rate_rps;
+    this.threads = threads;
+    this.connections = connections;
+    this.method = method;
+    this.paths = paths;
+    this.path_ratios = path_ratios;
+    this.headers = headers;
+    this.keep_alive = keep_alive;
+
+    this.num_paths = paths.length;
+  }
+
+  getConfig() {
+    return {
+      attack_type: this.attack_type,
+      forward_host: this.forward_host,
+      forward_port: this.forward_port,
+      rate_rps: this.rate_rps,
+      threads: this.threads,
+      conenctions: this.connections,
+      method: this.method,
+      paths: this.paths,
+      path_ratios: this.path_ratios,
+      headers: this.headers,
+      keep_alive: this.keep_alive,
+    };
+  }
+
+  configRow(
+    title: string,
+    key: string,
+    inputType: string,
+    icon: React.ReactElement,
+    onChange: (v: any) => void,
+    value: string | boolean,
+    updateNode: (nodeJson: any) => void,
+    parentGetConfig: () => {}
+  ) {
+    return (
+      <div className="flex flex-col w-full overflow-hidden min-w-0 pr-4">
+        <div className="flex w-full flex-row justify-between items-start pr-1">
+          <h4 className="font-light text-gray-300">{title}</h4>
+          <p className="text-gray-500">{key}</p>
+        </div>
+
+        <div className="flex items-center gap-x-2 rounded-md overflow-hidden bg-slate-600 p-1 min-w-0">
+          {icon}
+          {inputType === "checkbox" ? (
+            <input
+              type={inputType}
+              onChange={(v) => {
+                onChange(v);
+                updateNode(parentGetConfig());
+              }}
+              name={key}
+              checked={value as boolean}
+              size={Math.min(30 + 2 || 1, 80)}
+              className="max-w-full bg-slate-600 text-gray-300"
+            />
+          ) : (
+            <input
+              type={inputType}
+              onChange={onChange}
+              name={key}
+              value={value as string}
+              size={Math.min(30 + 2 || 1, 80)}
+              className="max-w-full bg-slate-600 text-gray-300"
+            />
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  multiConfigRow(
+    title: string,
+    title_key: string,
+    inputType: string,
+    icon: React.ReactElement,
+    onChange: (v: any) => void,
+    values: any[], 
+    updateNode: (nodeJson: any) => void,
+    parentGetConfig: () => {}
+  ) {
+    return (
+      <div className="flex flex-col w-full overflow-hidden min-w-0 pr-4">
+        <div className="flex w-full flex-row justify-between items-start pr-1">
+          <h4 className="font-light text-gray-300">{title}</h4>
+          <p className="text-gray-500">{title_key}</p>
+        </div>
+
+        <div className="flex flex-col gap-y-2 items-center">
+            {values.map((key, i) => {
+                        
+                return (
+                    <div className="flex items-center gap-x-2 rounded-md overflow-hidden bg-slate-600 p-1 min-w-0">
+                    {icon}
+                        <input
+                        type={inputType}
+                        onChange={(v) => {
+                            values[i] = v as unknown as string
+                            onChange(values);
+                            updateNode(parentGetConfig())
+                        }}
+                        name={values[i] as string}
+                        value={values[i] as string}
+                        size={Math.min(30 + 2 || 1, 80)}
+                        className="max-w-full bg-slate-600 text-gray-300"
+                        />
+                    </div>
+                )
+            })}
+        </div>
+
+        <div className="flex flex-row gap-x-4 items-start justify-center">
+            <button onClick={() => {
+                values.pop()
+            }}>
+                <CaretUpIcon  width={4}/>
+            </button>
+            <button onClick={() => {
+                values.push("")
+            }}>
+                <CaretDownIcon width={4}/>
+            </button>
+        </div>
+
+      </div>
+    );
+  }
+
+  configLayout(
+    updateNode: (nodeStr: string) => void,
+    parentGetConfig: () => {}
+  ) {
+    return (
+      <div className="flex flex-col w-full gap-y-2 mt-2 pb-2 border-b border-zinc-700">
+        <h3 className="text-lg text-white">Attack Config</h3>
+
+        {this.configRow(
+          "Attack Type",
+          "attack_type",
+          "text",
+          <TextItalicIcon weight="bold" />,
+          (v) => (this.attack_type = v.target),
+          this.attack_type,
+          updateNode,
+          parentGetConfig
+        )}
+        {this.configRow(
+          "Threads",
+          "threads",
+          "text",
+          <TextItalicIcon weight="bold" />,
+          (v) => (this.threads = Number(v.target)),
+          String(this.threads),
+          updateNode,
+          parentGetConfig
+        )}
+        {this.configRow(
+          "Connections",
+          "connections",
+          "text",
+          <TextItalicIcon weight="bold" />,
+          (v) => (this.connections = Number(v.target)),
+          String(this.connections),
+          updateNode,
+          parentGetConfig
+        )}
+        {this.configRow(
+          "Duration Seconds",
+          "duration_seconds",
+          "text",
+          <TextItalicIcon weight="bold" />,
+          (v) => (this.rate_rps = Number(v.target)),
+          String(this.rate_rps),
+          updateNode,
+          parentGetConfig
+        )}
+        {this.configRow(
+          "Method",
+          "method",
+          "text",
+          <TextItalicIcon weight="bold" />,
+          (v) => (this.method = v.target),
+          this.method,
+          updateNode,
+          parentGetConfig
+        )}
+        {this.multiConfigRow(
+          "Paths",
+          "paths",
+          "checkbox",
+          <TextItalicIcon weight="bold" />,
+          (v: any) => (this.paths = v.target),
+          this.paths,
+          updateNode,
+          parentGetConfig
+        )}
+        {this.multiConfigRow(
+          "Path Ratios",
+          "path_ratios",
+          "checkbox",
+          <TextItalicIcon weight="bold" />,
+          (v) => (this.path_ratios= v.target),
+          this.path_ratios,
+          updateNode,
+          parentGetConfig
+        )}
+        {/* {this.configRow(
+          "Headers",
+          "headers",
+          "checkbox",
+          <TextItalicIcon weight="bold" />,
+          (v) => (this.headers= v.target),
+          this.headers,
+          updateNode,
+          parentGetConfig
+        )} */}
+        {this.configRow(
+          "Keep Alive",
+          "keep_alive",
+          "checkbox",
+          <TextItalicIcon weight="bold" />,
+          (v) => (this.keep_alive= v.target),
+          this.keep_alive,
+          updateNode,
+          parentGetConfig
+        )}
+      </div>
+    );
   }
 }
 

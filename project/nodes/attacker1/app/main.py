@@ -23,6 +23,7 @@ import subprocess
 import signal
 import os
 import threading
+from pydantic import BaseModel
 from typing import Dict, List
 
 app = FastAPI()
@@ -41,6 +42,15 @@ app.add_middleware(
 
 MASTER_CONFIG_PATH = Path(__file__).resolve().parent.parent / "MASTER_CONFIG.json"
 
+def write_master_config(configJson: str):
+    if not MASTER_CONFIG_PATH.exists():
+        raise RuntimeError("MASTER_CONFIG.json not found")
+    with open(MASTER_CONFIG_PATH, 'w') as f:
+        f.write(configJson)
+        f.close()
+    
+    return True
+
 def load_master_config():
     """Load config from MASTER_CONFIG.json. Restart container to reload."""
     if not MASTER_CONFIG_PATH.exists():
@@ -48,7 +58,23 @@ def load_master_config():
     with open(MASTER_CONFIG_PATH) as f:
         return json.load(f)
 
-MASTER_CONFIG = load_master_config()
+load_master_config()
+
+class AttackConfig(BaseModel):
+    attack_type: str
+    threads: int 
+    connections: int
+    rate_rps: int
+    method: str
+    paths: List[str]
+    path_ratios: List[int]
+    headers: Dict[str, str]
+    keep_alive: bool 
+    target_host: str
+    target_port: str
+
+class CustomConfig(BaseModel):
+    attack: AttackConfig
 
 # ============================================================================
 # Prometheus Metrics
@@ -105,6 +131,7 @@ def get_attack_config() -> Dict:
     Returns dict with: attack_type, threads, connections, rate_rps,
     method, paths, path_ratios, headers, keep_alive, target_host, target_port
     """
+    MASTER_CONFIG = load_master_config() 
     custom_config = MASTER_CONFIG.get("custom_config", {})
     attack_config = custom_config.get("attack", {})
     
@@ -299,18 +326,18 @@ async def health():
 async def get_config():
     """Get current master config and parsed attack config."""
     try:
-        attack_config = get_attack_config()
-        # return {
-        #     "master_config": MASTER_CONFIG,
-        #     "attack_config": attack_config
-        # }
-        return MASTER_CONFIG
+        return load_master_config()
     except Exception as e:
         return JSONResponse(
             status_code=500,
             content={"error": f"Failed to load config: {str(e)}"}
         )
-
+    
+@app.post("/config")
+async def post_config(config: CustomConfig):
+    configJson = config.model_dump_json(indent=2)
+    write_master_config(configJson)
+    return {"status": "ok", "message": "Config file modified sucesfully"}
 
 @app.post("/start")
 async def start_attack_endpoint():

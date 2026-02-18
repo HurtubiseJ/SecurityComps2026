@@ -16,5 +16,11 @@
             "fastapi": true
         },
         "interval": 1
+    }, 
+    "custom_config": {
+        "duration_seconds": 30,
+        "num_threads": 4,
+        "num_connections": 200,
+        "end_point": "api/test"
     }
 }

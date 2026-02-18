@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { BaseConfig, BaseMonitor } from "../types/BaseConfig"
+import { AttackerConfig, BaseConfig, BaseMonitor } from "../types/BaseConfig"
 import { LOCAL_NODE_IP_MAP } from "../constants/NodeIp"
 import { type NodeType } from "../types/configs"
 import { type metrics } from "../types/BaseConfig"
@@ -49,15 +49,37 @@ const initAttacker2Config = async (url: string, type: NodeType, logger: Logger):
         const res = await resp.json()
         console.log(type, " config json: ", res)
 
+        const mon_metrics = res.monitor?.metrics
+
         const metrics: metrics = {
-            cpu: res.monitor?.metrics?.cpu,
-            memory: res.monitor?.metrics?.memory,
-            disk: res.monitor?.metrics?.disk,
-            network: res.monitor?.metrics?.network,
-            fastapi: res.monitor?.metrics?.fastapi
+            cpu: mon_metrics?.cpu,
+            memory: mon_metrics?.memory,
+            disk: mon_metrics?.disk,
+            network: mon_metrics?.network,
+            fastapi: mon_metrics?.fastapi
         }
         const monitorConfig = res.monitor ? new BaseMonitor(res.monitor.enabled, metrics) : null
-        return new BaseConfig(res.name, type, res.enabled, res.forward_host, res.forward_port, res.host, res.port, monitorConfig, logger)
+
+        if (res.type == "attacker") {
+            const attackerConfig: AttackerConfig = res.custom_config?.attacker
+            const attacker = new AttackerConfig(
+                attackerConfig.attack_type,
+                attackerConfig.forward_host,
+                attackerConfig.forward_port,
+                attackerConfig.rate_rps, 
+                attackerConfig.threads,
+                attackerConfig.connections,
+                attackerConfig.method,
+                attackerConfig.paths,
+                attackerConfig.path_ratios,
+                attackerConfig.headers,
+                attackerConfig.keep_alive
+            )
+            return new BaseConfig(res.name, type, res.enabled, res.forward_host, res.forward_port, res.host, res.port, monitorConfig, attacker, logger)
+        }
+
+        const attacker = null
+        return new BaseConfig(res.name, type, res.enabled, res.forward_host, res.forward_port, res.host, res.port, monitorConfig, attacker, logger)
     } catch {
         return null
     }
@@ -101,8 +123,15 @@ export default function useNodeManager(logger: Logger) {
             fastapi: node?.monitor?.metrics?.fastapi
         }
         const monitorConfig = new BaseMonitor(node.monitor.enabled, metrics)
+
+        let attacker_config = null
+        if (node.type == "attacker") {
+            attacker_config = new AttackerConfig(node.attacker.attack_type, node.attacker.forward_host, node.attacker.forward_port, node.attacker.rate_rps, node.attacker.threads,node.attacker.connections, node.attacker.method, node.attacker.paths, node.attacker.ratios, node.attacker.headers, node.attacker.keep_alive)
+        }
         // console.log("MONITOR: ", monitorConfig)
-        const config = new BaseConfig(node.name, node.type, node.enabled, node.forward_host, node.forward_port, node.host, node.port, monitorConfig)
+        const config = new BaseConfig(node.name, node.type, node.enabled, node.forward_host, node.forward_port, node.host, node.port, monitorConfig, attacker_config)
+
+
         // console.log("INPUT NODE: ", config)
 
         setNodes(nodes.map((currNode: BaseConfig) => {
