@@ -24,7 +24,7 @@ import signal
 import os
 import threading
 from pydantic import BaseModel
-from typing import Dict, List
+from typing import Dict, List, Optional, Any
 import time
 import docker
 
@@ -59,6 +59,20 @@ def load_master_config():
         raise RuntimeError("MASTER_CONFIG.json not found")
     with open(MASTER_CONFIG_PATH) as f:
         return json.load(f)
+    
+
+class Metrics(BaseModel):
+    cpu: bool
+    disk: bool
+    network: bool
+    fastapi: bool
+    memory: bool
+
+class Monitor(BaseModel):
+    enabled: bool
+    interval: Optional[int] = None
+    metrics: Metrics
+
 
 class AttackConfig(BaseModel):
     attack_type: str
@@ -67,15 +81,21 @@ class AttackConfig(BaseModel):
     rate_rps: int
     method: str
     paths: List[str]
-    path_ratios: List[int]
-    headers: Dict[str, str]
+    path_ratios: List[float]
+    # headers: Optional[Dict[str, str]] = None
     keep_alive: bool 
-    target_host: str
-    target_port: str
 
-class CustomConfig(BaseModel):
-    attack: AttackConfig
-
+class Config(BaseModel):
+    id: str
+    name: str
+    type: str
+    enabled: bool
+    forward_host: str
+    forward_port: str
+    host: str
+    port: str
+    monitor: Monitor
+    custom_config: AttackConfig
 # ============================================================================
 # Prometheus Metrics
 # ============================================================================
@@ -138,8 +158,8 @@ def get_attack_config() -> Dict:
         raise ValueError("No attack configuration found in custom_config")
     
     # Fallback to forward_host/port if target not specified
-    target_host = custom_config.get("target_host", MASTER_CONFIG.get("forward_host", "10.0.0.1"))
-    target_port = custom_config.get("target_port", MASTER_CONFIG.get("forward_port", "8000"))
+    # target_host = custom_config.get("target_host", MASTER_CONFIG.get("forward_host", "10.0.0.1"))
+    # target_port = custom_config.get("target_port", MASTER_CONFIG.get("forward_port", "8000"))
     
     return {
         "attack_type": custom_config.get("attack_type", "http_flood"),
@@ -149,10 +169,8 @@ def get_attack_config() -> Dict:
         "method": custom_config.get("method", "GET"),
         "paths": custom_config.get("paths", ["/"]),
         "path_ratios": custom_config.get("path_ratios", [1.0]),
-        "headers": custom_config.get("headers", {}),
+        # "headers": custom_config.get("headers", {}),
         "keep_alive": custom_config.get("keep_alive", True),
-        "target_host": target_host,
-        "target_port": target_port
     }
 
 # ============================================================================
@@ -333,7 +351,8 @@ async def get_config():
         )
     
 @app.post("/config")
-async def post_config(config: CustomConfig):
+async def post_config(config: Config):
+    print(config)
     configJson = config.model_dump_json(indent=2)
     write_master_config(configJson)
     return {"status": "ok", "message": "Config file modified sucesfully"}
@@ -418,5 +437,5 @@ async def restart():
 def run_local_restart():
     time.sleep(0.5) #time for /restart to return
     client = docker.from_env()
-    client.containers.get("attacker1-john").restart()
+    client.containers.get("attacker1").restart()
     return True

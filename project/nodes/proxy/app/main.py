@@ -35,6 +35,15 @@ class Monitor(BaseModel):
     interval: Optional[int] = None
     metrics: Metrics
 
+class ProxyConfig(BaseModel):
+    enabled: bool
+    rate_limit_rate: int
+    max_connections: int
+    burst: int
+    connection_timeout: int
+    read_timeout: int
+    send_timeout: int
+
 class Config(BaseModel):
     id: str
     name: str
@@ -45,6 +54,7 @@ class Config(BaseModel):
     host: str
     port: str
     monitor: Monitor
+    custom_config: ProxyConfig
 
 @app.get("/health")
 async def health():

@@ -7,6 +7,7 @@ FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV LOCAL=True
 
 # Install Python runtime dependencies
 RUN apt-get update && \

@@ -1,6 +1,11 @@
 import { v4 as uuidv4 } from "uuid";
 import type { NodeType } from "./configs";
-import { CaretDownIcon, CaretUpIcon, LetterCircleHIcon, TextItalicIcon } from "@phosphor-icons/react";
+import {
+  CaretDownIcon,
+  CaretUpIcon,
+  LetterCircleHIcon,
+  TextItalicIcon,
+} from "@phosphor-icons/react";
 import { LOCAL_NODE_IP_MAP } from "../constants/NodeIp";
 import type { Logger, Message } from "./Logger";
 import { NodeColorMap } from "../constants/NodeColorMap";
@@ -446,7 +451,7 @@ export class BaseConfig {
             "text",
             <LetterCircleHIcon weight="bold" />,
             (v) => {
-                console.log(v.target.value)
+              console.log(v.target.value);
               this.name = v.target.value;
             },
             this.name,
@@ -525,7 +530,11 @@ export class BaseConfig {
         )}
 
         {this.custom_config !== null && (
-          <>{this.custom_config.configLayout(updateNode, () => this.getConfig())}</>
+          <>
+            {this.custom_config.configLayout(updateNode, () =>
+              this.getConfig()
+            )}
+          </>
         )}
       </div>
     );
@@ -557,7 +566,7 @@ export class AttackerConfig {
   public method: string;
   public paths: string[];
   public path_ratios: number[];
-  public headers: Map<string, string>;
+  //   public headers: Map<string, string>;
   public keep_alive: boolean;
 
   public constructor(
@@ -570,7 +579,7 @@ export class AttackerConfig {
     method: string,
     paths: string[],
     path_ratios: number[],
-    headers: Map<string, string>,
+    // headers: Map<string, string>,
     keep_alive: boolean
   ) {
     this.attack_type = attack_type;
@@ -582,25 +591,24 @@ export class AttackerConfig {
     this.method = method;
     this.paths = paths;
     this.path_ratios = path_ratios;
-    this.headers = headers;
+    // this.headers = headers;
     this.keep_alive = keep_alive;
-
   }
 
-//   @ts-ignore
+  //   @ts-ignore
   getConfig() {
     return {
-        attack_type: this.attack_type,
-        forward_host: this.forward_host,
-        forward_port: this.forward_port,
-        rate_rps: this.rate_rps,
-        threads: this.threads,
-        conenctions: this.connections,
-        method: this.method,
-        paths: this.paths,
-        path_ratios: this.path_ratios,
-        headers: this.headers,
-        keep_alive: this.keep_alive,
+      attack_type: this.attack_type,
+      forward_host: this.forward_host,
+      forward_port: this.forward_port,
+      rate_rps: this.rate_rps,
+      threads: this.threads,
+      connections: this.connections,
+      method: this.method,
+      paths: this.paths,
+      path_ratios: this.path_ratios,
+      // headers: this.headers,
+      keep_alive: this.keep_alive,
     };
   }
 
@@ -659,7 +667,7 @@ export class AttackerConfig {
     inputType: string,
     icon: React.ReactElement,
     onChange: (v: any) => void,
-    values: any[], 
+    values: any[],
     updateNode: (nodeJson: any) => void,
     parentGetConfig: () => {}
   ) {
@@ -671,42 +679,46 @@ export class AttackerConfig {
         </div>
 
         <div className="flex flex-col gap-y-2 items-center">
-            {values.map((key, i) => {
-                        
-                return (
-                    <div className="flex w-full items-center gap-x-2 rounded-md overflow-hidden bg-slate-600 p-1 min-w-0">
-                    {icon}
-                        <input
-                        key={key}
-                        type={inputType}
-                        onChange={(v) => {
-                            values[i] = v as unknown as string
-                            onChange(values);
-                            updateNode(parentGetConfig())
-                        }}
-                        name={values[i] as string}
-                        value={values[i] as string}
-                        size={Math.min(30 + 2 || 1, 80)}
-                        className="max-w-full bg-slate-600 text-gray-300"
-                        />
-                    </div>
-                )
-            })}
+          {values.map((key, i) => {
+            return (
+              <div className="flex w-full items-center gap-x-2 rounded-md overflow-hidden bg-slate-600 p-1 min-w-0">
+                {icon}
+                <input
+                  key={key}
+                  type={inputType}
+                  onChange={(v) => {
+                    values[i] = v as unknown as string;
+                    onChange(values);
+                    updateNode(parentGetConfig());
+                  }}
+                  name={values[i] as string}
+                  value={values[i] as string}
+                  size={Math.min(30 + 2 || 1, 80)}
+                  className="max-w-full bg-slate-600 text-gray-300"
+                />
+              </div>
+            );
+          })}
         </div>
 
         <div className="flex flex-row w-full gap-x-4 items-start justify-center">
-            <button onClick={() => {
-                values.pop()
-            }}>
-                <CaretUpIcon  width={12}/>
-            </button>
-            <button onClick={() => {
-                values.push("")
-            }}>
-                <CaretDownIcon width={12}/>
-            </button>
+          <button
+            onClick={() => {
+              values.pop();
+              updateNode(parentGetConfig());
+            }}
+          >
+            <CaretUpIcon width={12} />
+          </button>
+          <button
+            onClick={() => {
+              values.push("");
+              updateNode(parentGetConfig());
+            }}
+          >
+            <CaretDownIcon width={12} />
+          </button>
         </div>
-
       </div>
     );
   }
@@ -717,7 +729,7 @@ export class AttackerConfig {
   ) {
     return (
       <div className="flex flex-col w-full gap-y-2 mt-2 pb-2 border-b border-zinc-700">
-        <h3 className="text-lg text-white">Attack Config</h3>
+        <h3 className="text-lg text-white">Proxy Config</h3>
 
         {this.configRow(
           "Attack Type",
@@ -784,7 +796,7 @@ export class AttackerConfig {
           "path_ratios",
           "text",
           <TextItalicIcon weight="bold" />,
-          (v) => (this.path_ratios= v.target.value),
+          (v) => (this.path_ratios = v.target.value),
           this.path_ratios,
           updateNode,
           parentGetConfig
@@ -804,7 +816,7 @@ export class AttackerConfig {
           "keep_alive",
           "checkbox",
           <TextItalicIcon weight="bold" />,
-          (v) => (this.keep_alive= v.target),
+          (v) => (this.keep_alive = v.target),
           this.keep_alive,
           updateNode,
           parentGetConfig
@@ -814,18 +826,175 @@ export class AttackerConfig {
   }
 }
 
-export class ProxyConfig extends BaseConfig {
+export class ProxyConfig {
+  public enabled: boolean;
+  public rate_limit_rate: number;
+  public max_connections: number;
+  public burst: number;
+  public connection_timeout: number;
+  public read_timeout: number;
+  public send_timeout: number;
+
   public constructor(
-    name: string,
-    type: NodeType,
     enabled: boolean,
-    forward_host: string,
-    forward_port: string,
-    host: string,
-    port: string
+    rate_limit_rate: number,
+    max_connections: number,
+    burst: number,
+    connection_timeout: number,
+    read_timeout: number,
+    send_timeout: number
   ) {
-    super(name, type, enabled, forward_host, forward_port, host, port);
-    // Additional config
+    this.enabled = enabled;
+    this.rate_limit_rate= rate_limit_rate;
+    this.max_connections = max_connections;
+    this.burst= burst;
+    this.connection_timeout = connection_timeout;
+    this.read_timeout = read_timeout;
+    this.send_timeout = send_timeout;
+}
+
+  //   @ts-ignore
+  getConfig() {
+    return {
+      enabled: this.enabled,
+      rate_limit_rate: this.rate_limit_rate,
+      max_connections: this.max_connections,
+      burst: this.burst,
+      connection_timeout: this.connection_timeout,
+      read_timeout: this.read_timeout,
+      send_timeout: this.send_timeout
+    };
+  }
+
+  configRow(
+    title: string,
+    key: string,
+    inputType: string,
+    icon: React.ReactElement,
+    onChange: (v: any) => void,
+    value: string | boolean,
+    updateNode: (nodeJson: any) => void,
+    parentGetConfig: () => {}
+  ) {
+    return (
+      <div className="flex flex-col w-full overflow-hidden min-w-0 pr-4">
+        <div className="flex w-full flex-row justify-between items-start pr-1">
+          <h4 className="font-light text-gray-300">{title}</h4>
+          <p className="text-gray-500">{key}</p>
+        </div>
+
+        <div className="flex items-center gap-x-2 rounded-md overflow-hidden bg-slate-600 p-1 min-w-0">
+          {icon}
+          {inputType === "checkbox" ? (
+            <input
+              type={inputType}
+              onChange={(v) => {
+                onChange(v);
+                updateNode(parentGetConfig());
+              }}
+              name={key}
+              checked={value as boolean}
+              size={Math.min(30 + 2 || 1, 80)}
+              className="max-w-full bg-slate-600 text-gray-300"
+            />
+          ) : (
+            <input
+              type={inputType}
+              onChange={(v) => {
+                onChange(v);
+                updateNode(parentGetConfig());
+              }}
+              name={key}
+              value={value as string}
+              size={Math.min(30 + 2 || 1, 80)}
+              className="max-w-full bg-slate-600 text-gray-300"
+            />
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  configLayout(
+    updateNode: (nodeStr: string) => void,
+    parentGetConfig: () => {}
+  ) {
+    return (
+      <div className="flex flex-col w-full gap-y-2 mt-2 pb-2 border-b border-zinc-700">
+        <h3 className="text-lg text-white">Attack Config</h3>
+
+        {this.configRow(
+          "Enabled",
+          "enabled",
+          "checkbox",
+          <TextItalicIcon weight="bold" />,
+          (v) => (this.enabled = v.target.checked),
+          this.enabled,
+          updateNode,
+          parentGetConfig
+        )}
+        {this.configRow(
+          "Rate RPS",
+          "rate_limit_rate",
+          "text",
+          <TextItalicIcon weight="bold" />,
+          (v) => (this.rate_limit_rate = Number(v.target.value)),
+          String(this.rate_limit_rate),
+          updateNode,
+          parentGetConfig
+        )}
+        {this.configRow(
+          "Max Connections",
+          "max_connections",
+          "text",
+          <TextItalicIcon weight="bold" />,
+          (v) => (this.max_connections = Number(v.target.value)),
+          String(this.max_connections),
+          updateNode,
+          parentGetConfig
+        )}
+        {this.configRow(
+          "Burst",
+          "burst",
+          "text",
+          <TextItalicIcon weight="bold" />,
+          (v) => (this.burst = Number(v.target.value)),
+          String(this.burst),
+          updateNode,
+          parentGetConfig
+        )}
+        {this.configRow(
+          "Connection Timeout",
+          "connection_timeout",
+          "text",
+          <TextItalicIcon weight="bold" />,
+          (v) => (this.connection_timeout = Number(v.target.value)),
+          String(this.connection_timeout),
+          updateNode,
+          parentGetConfig
+        )}
+        {this.configRow(
+          "Read Timeout",
+          "read_timeout",
+          "text",
+          <TextItalicIcon weight="bold" />,
+          (v: any) => (this.read_timeout = Number(v.target.value)),
+          String(this.read_timeout),
+          updateNode,
+          parentGetConfig
+        )}
+        {this.configRow(
+          "Send Timeout",
+          "send_timeout",
+          "text",
+          <TextItalicIcon weight="bold" />,
+          (v) => (this.send_timeout = Number(v.target.value)),
+          String(this.send_timeout),
+          updateNode,
+          parentGetConfig
+        )}
+      </div>
+    );
   }
 }
 
