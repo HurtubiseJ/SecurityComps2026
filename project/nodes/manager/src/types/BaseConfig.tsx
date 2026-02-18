@@ -88,7 +88,7 @@ export class BaseMonitor {
           "enabled",
           "checkbox",
           <TextItalicIcon weight="bold" />,
-          (v) => (this.enabled = v.target),
+          (v) => (this.enabled = v.target.checked),
           this.enabled,
           updateNode,
           parentGetConfig
@@ -156,7 +156,7 @@ export class BaseConfig {
   public host: string;
 
   public monitor: BaseMonitor | null;
-  public attacker: AttackerConfig | null;
+  public custom_config: AttackerConfig | ProxyConfig | null;
 
   public logger: Logger | null;
 
@@ -169,7 +169,7 @@ export class BaseConfig {
     host: string = "10.0.0.1",
     port: string = "8000",
     monitor: BaseMonitor | null = null,
-    attacker: AttackerConfig | null = null,
+    custom_config: AttackerConfig | ProxyConfig | null = null,
     logger: Logger | null = null,
     running: boolean = false
   ) {
@@ -183,7 +183,7 @@ export class BaseConfig {
     this.host = host;
 
     this.monitor = monitor;
-    this.attacker = attacker;
+    this.custom_config = custom_config;
 
     this.logger = logger;
 
@@ -268,6 +268,7 @@ export class BaseConfig {
     return res;
   };
 
+  //   @ts-ignore
   getConfig() {
     return {
       id: this.id,
@@ -280,6 +281,8 @@ export class BaseConfig {
       port: this.port,
 
       monitor: this.monitor?.getConfig(),
+
+      custom_config: this.custom_config?.getConfig(),
     };
   }
 
@@ -443,7 +446,8 @@ export class BaseConfig {
             "text",
             <LetterCircleHIcon weight="bold" />,
             (v) => {
-              this.name = v.target.name;
+                console.log(v.target.value)
+              this.name = v.target.value;
             },
             this.name,
             (nodeStr: any) => updateNode(nodeStr)
@@ -451,7 +455,7 @@ export class BaseConfig {
           {this.configRow(
             "Node Type",
             "type",
-            "checkbox",
+            "text",
             <TextItalicIcon weight="bold" />,
             (v) => {
               this.type = v.target.value;
@@ -520,8 +524,8 @@ export class BaseConfig {
           <>{this.monitor.configLayout(updateNode, () => this.getConfig())}</>
         )}
 
-        {this.attacker !== null && (
-          <>{this.attacker.configLayout(updateNode, () => this.getConfig())}</>
+        {this.custom_config !== null && (
+          <>{this.custom_config.configLayout(updateNode, () => this.getConfig())}</>
         )}
       </div>
     );
@@ -556,8 +560,6 @@ export class AttackerConfig {
   public headers: Map<string, string>;
   public keep_alive: boolean;
 
-  private num_paths: Number;
-
   public constructor(
     attack_type: string,
     forward_host: string,
@@ -583,22 +585,22 @@ export class AttackerConfig {
     this.headers = headers;
     this.keep_alive = keep_alive;
 
-    this.num_paths = paths.length;
   }
 
+//   @ts-ignore
   getConfig() {
     return {
-      attack_type: this.attack_type,
-      forward_host: this.forward_host,
-      forward_port: this.forward_port,
-      rate_rps: this.rate_rps,
-      threads: this.threads,
-      conenctions: this.connections,
-      method: this.method,
-      paths: this.paths,
-      path_ratios: this.path_ratios,
-      headers: this.headers,
-      keep_alive: this.keep_alive,
+        attack_type: this.attack_type,
+        forward_host: this.forward_host,
+        forward_port: this.forward_port,
+        rate_rps: this.rate_rps,
+        threads: this.threads,
+        conenctions: this.connections,
+        method: this.method,
+        paths: this.paths,
+        path_ratios: this.path_ratios,
+        headers: this.headers,
+        keep_alive: this.keep_alive,
     };
   }
 
@@ -636,7 +638,10 @@ export class AttackerConfig {
           ) : (
             <input
               type={inputType}
-              onChange={onChange}
+              onChange={(v) => {
+                onChange(v);
+                updateNode(parentGetConfig());
+              }}
               name={key}
               value={value as string}
               size={Math.min(30 + 2 || 1, 80)}
@@ -669,9 +674,10 @@ export class AttackerConfig {
             {values.map((key, i) => {
                         
                 return (
-                    <div className="flex items-center gap-x-2 rounded-md overflow-hidden bg-slate-600 p-1 min-w-0">
+                    <div className="flex w-full items-center gap-x-2 rounded-md overflow-hidden bg-slate-600 p-1 min-w-0">
                     {icon}
                         <input
+                        key={key}
                         type={inputType}
                         onChange={(v) => {
                             values[i] = v as unknown as string
@@ -688,16 +694,16 @@ export class AttackerConfig {
             })}
         </div>
 
-        <div className="flex flex-row gap-x-4 items-start justify-center">
+        <div className="flex flex-row w-full gap-x-4 items-start justify-center">
             <button onClick={() => {
                 values.pop()
             }}>
-                <CaretUpIcon  width={4}/>
+                <CaretUpIcon  width={12}/>
             </button>
             <button onClick={() => {
                 values.push("")
             }}>
-                <CaretDownIcon width={4}/>
+                <CaretDownIcon width={12}/>
             </button>
         </div>
 
@@ -718,7 +724,7 @@ export class AttackerConfig {
           "attack_type",
           "text",
           <TextItalicIcon weight="bold" />,
-          (v) => (this.attack_type = v.target),
+          (v) => (this.attack_type = v.target.value),
           this.attack_type,
           updateNode,
           parentGetConfig
@@ -728,7 +734,7 @@ export class AttackerConfig {
           "threads",
           "text",
           <TextItalicIcon weight="bold" />,
-          (v) => (this.threads = Number(v.target)),
+          (v) => (this.threads = Number(v.target.value)),
           String(this.threads),
           updateNode,
           parentGetConfig
@@ -738,17 +744,17 @@ export class AttackerConfig {
           "connections",
           "text",
           <TextItalicIcon weight="bold" />,
-          (v) => (this.connections = Number(v.target)),
+          (v) => (this.connections = Number(v.target.value)),
           String(this.connections),
           updateNode,
           parentGetConfig
         )}
         {this.configRow(
-          "Duration Seconds",
+          "Duration",
           "duration_seconds",
           "text",
           <TextItalicIcon weight="bold" />,
-          (v) => (this.rate_rps = Number(v.target)),
+          (v) => (this.rate_rps = Number(v.target.value)),
           String(this.rate_rps),
           updateNode,
           parentGetConfig
@@ -758,7 +764,7 @@ export class AttackerConfig {
           "method",
           "text",
           <TextItalicIcon weight="bold" />,
-          (v) => (this.method = v.target),
+          (v) => (this.method = v.target.value),
           this.method,
           updateNode,
           parentGetConfig
@@ -766,9 +772,9 @@ export class AttackerConfig {
         {this.multiConfigRow(
           "Paths",
           "paths",
-          "checkbox",
+          "text",
           <TextItalicIcon weight="bold" />,
-          (v: any) => (this.paths = v.target),
+          (v: any) => (this.paths = v.target.value),
           this.paths,
           updateNode,
           parentGetConfig
@@ -776,9 +782,9 @@ export class AttackerConfig {
         {this.multiConfigRow(
           "Path Ratios",
           "path_ratios",
-          "checkbox",
+          "text",
           <TextItalicIcon weight="bold" />,
-          (v) => (this.path_ratios= v.target),
+          (v) => (this.path_ratios= v.target.value),
           this.path_ratios,
           updateNode,
           parentGetConfig

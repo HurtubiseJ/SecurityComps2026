@@ -25,6 +25,8 @@ import os
 import threading
 from pydantic import BaseModel
 from typing import Dict, List
+import time
+import docker
 
 app = FastAPI()
 
@@ -57,8 +59,6 @@ def load_master_config():
         raise RuntimeError("MASTER_CONFIG.json not found")
     with open(MASTER_CONFIG_PATH) as f:
         return json.load(f)
-
-load_master_config()
 
 class AttackConfig(BaseModel):
     attack_type: str
@@ -133,25 +133,24 @@ def get_attack_config() -> Dict:
     """
     MASTER_CONFIG = load_master_config() 
     custom_config = MASTER_CONFIG.get("custom_config", {})
-    attack_config = custom_config.get("attack", {})
     
-    if not attack_config:
-        raise ValueError("No attack configuration found in custom_config.attack")
+    if not custom_config:
+        raise ValueError("No attack configuration found in custom_config")
     
     # Fallback to forward_host/port if target not specified
-    target_host = attack_config.get("target_host", MASTER_CONFIG.get("forward_host", "10.0.0.1"))
-    target_port = attack_config.get("target_port", MASTER_CONFIG.get("forward_port", "8000"))
+    target_host = custom_config.get("target_host", MASTER_CONFIG.get("forward_host", "10.0.0.1"))
+    target_port = custom_config.get("target_port", MASTER_CONFIG.get("forward_port", "8000"))
     
     return {
-        "attack_type": attack_config.get("attack_type", "http_flood"),
-        "threads": attack_config.get("threads", 4),
-        "connections": attack_config.get("connections", 200),
-        "rate_rps": attack_config.get("rate_rps", 5000),
-        "method": attack_config.get("method", "GET"),
-        "paths": attack_config.get("paths", ["/"]),
-        "path_ratios": attack_config.get("path_ratios", [1.0]),
-        "headers": attack_config.get("headers", {}),
-        "keep_alive": attack_config.get("keep_alive", True),
+        "attack_type": custom_config.get("attack_type", "http_flood"),
+        "threads": custom_config.get("threads", 4),
+        "connections": custom_config.get("connections", 200),
+        "rate_rps": custom_config.get("rate_rps", 5000),
+        "method": custom_config.get("method", "GET"),
+        "paths": custom_config.get("paths", ["/"]),
+        "path_ratios": custom_config.get("path_ratios", [1.0]),
+        "headers": custom_config.get("headers", {}),
+        "keep_alive": custom_config.get("keep_alive", True),
         "target_host": target_host,
         "target_port": target_port
     }
@@ -403,3 +402,21 @@ async def root():
             "metrics": "/metrics"
         }
     }
+
+@app.get("/restart")
+async def restart():
+    if os.getenv("LOCAL"):
+        thread = threading.Thread(
+            target=run_local_restart
+        )
+        thread.start()
+        return {"status": "ok", "message": "Awaiting docker restart via local restart command"}
+    else:
+        Path("/control/restart_required").touch()
+        return {"status": "ok", "message": "Awaiting docker restart via systemd service"}
+
+def run_local_restart():
+    time.sleep(0.5) #time for /restart to return
+    client = docker.from_env()
+    client.containers.get("attacker1-john").restart()
+    return True

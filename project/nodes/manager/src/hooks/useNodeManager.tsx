@@ -60,8 +60,8 @@ const initAttacker2Config = async (url: string, type: NodeType, logger: Logger):
         }
         const monitorConfig = res.monitor ? new BaseMonitor(res.monitor.enabled, metrics) : null
 
-        if (res.type == "attacker") {
-            const attackerConfig: AttackerConfig = res.custom_config?.attacker
+        if (res.type === "attacker") {
+            const attackerConfig: AttackerConfig = res.custom_config
             const attacker = new AttackerConfig(
                 attackerConfig.attack_type,
                 attackerConfig.forward_host,
@@ -75,12 +75,15 @@ const initAttacker2Config = async (url: string, type: NodeType, logger: Logger):
                 attackerConfig.headers,
                 attackerConfig.keep_alive
             )
+
+            console.log("Attack conf:", attacker)
             return new BaseConfig(res.name, type, res.enabled, res.forward_host, res.forward_port, res.host, res.port, monitorConfig, attacker, logger)
         }
 
         const attacker = null
         return new BaseConfig(res.name, type, res.enabled, res.forward_host, res.forward_port, res.host, res.port, monitorConfig, attacker, logger)
-    } catch {
+    } catch (e) {
+        console.log("Error, ", e)
         return null
     }
 }
@@ -124,9 +127,12 @@ export default function useNodeManager(logger: Logger) {
         }
         const monitorConfig = new BaseMonitor(node.monitor.enabled, metrics)
 
+        console.log("NODE: ", node)
+
         let attacker_config = null
         if (node.type == "attacker") {
-            attacker_config = new AttackerConfig(node.attacker.attack_type, node.attacker.forward_host, node.attacker.forward_port, node.attacker.rate_rps, node.attacker.threads,node.attacker.connections, node.attacker.method, node.attacker.paths, node.attacker.ratios, node.attacker.headers, node.attacker.keep_alive)
+            const attack = node?.custom_config
+            attacker_config = new AttackerConfig(attack.attack_type, attack.forward_host, attack.forward_port, attack.rate_rps, attack.threads,attack.connections, attack.method, attack.paths, attack.ratios, attack.headers, attack.keep_alive)
         }
         // console.log("MONITOR: ", monitorConfig)
         const config = new BaseConfig(node.name, node.type, node.enabled, node.forward_host, node.forward_port, node.host, node.port, monitorConfig, attacker_config)
@@ -142,6 +148,8 @@ export default function useNodeManager(logger: Logger) {
             }
         }))
     }
+
+    console.log(nodes)
 
     return {
         nodes,
