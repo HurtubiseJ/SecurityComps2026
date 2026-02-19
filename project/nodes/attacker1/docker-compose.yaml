@@ -13,6 +13,7 @@ services:
     volumes: 
       - ./app:/app  # Live code reload
       - ./MASTER_CONFIG.json:/MASTER_CONFIG.json  # Config (restart to reload)
+    cpus: 2
     networks: 
       - ddos-shared
 

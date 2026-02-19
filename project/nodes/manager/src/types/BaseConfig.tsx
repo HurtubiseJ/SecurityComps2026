@@ -293,10 +293,10 @@ export class BaseConfig {
 
   getApplyRestart() {
     return (
-      <div className="flex flex-1 flex-col items-start justify-center gap-y-2">
+      <div className="flex flex-1 w-full flex-col items-start justify-center gap-y-2 pr-4">
         <div className="flex flex-1 w-full flex-row gap-x-4 items-start justify-between">
           <a
-            className="flex w-full bg-yellow-200 hover:bg-yellow-100 cursor-pointer rounded-md px-4 py-2"
+            className="flex w-full bg-yellow-200 hover:bg-yellow-100 cursor-pointer items-center rounded-md px-4 py-2"
             onClick={async () => {
               await this.applyConfigActiveNode();
             }}
@@ -304,12 +304,12 @@ export class BaseConfig {
             <p className="text-black text-sm">Save Config</p>
           </a>
           <a
-            className="flex w-full bg-blue-200 hover:bg-blue-100 cursor-pointer rounded-md px-4 py-2"
+            className="flex w-full bg-blue-200 hover:bg-blue-100 cursor-pointer items-center rounded-md px-4 py-2"
             onClick={async () => {
               await this.restartConfigActiveNode();
             }}
           >
-            <p className="text-black text-sm">Apply Config</p>
+            <p className="text-black text-sm">Restart</p>
           </a>
         </div>
         <div className="flex flex-1 w-full  flex-row gap-x-4 items-start justify-between">
@@ -560,6 +560,7 @@ export class AttackerConfig {
   public attack_type: string;
   public forward_host: string;
   public forward_port: string;
+  public duration_seconds: number;
   public rate_rps: number;
   public threads: number;
   public connections: number;
@@ -573,6 +574,7 @@ export class AttackerConfig {
     attack_type: string,
     forward_host: string,
     forward_port: string,
+    duration_seconds: number,
     rate_rps: number,
     threads: number,
     connections: number,
@@ -593,6 +595,7 @@ export class AttackerConfig {
     this.path_ratios = path_ratios;
     // this.headers = headers;
     this.keep_alive = keep_alive;
+    this.duration_seconds = duration_seconds
   }
 
   //   @ts-ignore
@@ -601,13 +604,13 @@ export class AttackerConfig {
       attack_type: this.attack_type,
       forward_host: this.forward_host,
       forward_port: this.forward_port,
+      duration_seconds: this.duration_seconds,
       rate_rps: this.rate_rps,
       threads: this.threads,
       connections: this.connections,
       method: this.method,
       paths: this.paths,
       path_ratios: this.path_ratios,
-      // headers: this.headers,
       keep_alive: this.keep_alive,
     };
   }
@@ -679,15 +682,15 @@ export class AttackerConfig {
         </div>
 
         <div className="flex flex-col gap-y-2 items-center">
-          {values.map((key, i) => {
+          {values?.map((key, i) => {
             return (
-              <div className="flex w-full items-center gap-x-2 rounded-md overflow-hidden bg-slate-600 p-1 min-w-0">
+              <div key={key} className="flex w-full items-center gap-x-2 rounded-md overflow-hidden bg-slate-600 p-1 min-w-0">
                 {icon}
                 <input
-                  key={key}
                   type={inputType}
                   onChange={(v) => {
-                    values[i] = v as unknown as string;
+                    values[i] = v.target.value as unknown as string;
+
                     onChange(values);
                     updateNode(parentGetConfig());
                   }}
@@ -729,7 +732,7 @@ export class AttackerConfig {
   ) {
     return (
       <div className="flex flex-col w-full gap-y-2 mt-2 pb-2 border-b border-zinc-700">
-        <h3 className="text-lg text-white">Proxy Config</h3>
+        <h3 className="text-lg text-white">Attacker Config</h3>
 
         {this.configRow(
           "Attack Type",
@@ -752,22 +755,32 @@ export class AttackerConfig {
           parentGetConfig
         )}
         {this.configRow(
+          "Duration Sec",
+          "duration_seconds",
+          "text",
+          <TextItalicIcon weight="bold" />,
+          (v) => (this.duration_seconds = Number(v.target.value)),
+          String(this.duration_seconds),
+          updateNode,
+          parentGetConfig
+        )}
+        {this.configRow(
+          "Request Rate",
+          "rate_rps",
+          "text",
+          <TextItalicIcon weight="bold" />,
+          (v) => (this.rate_rps = Number(v.target.value)),
+          String(this.rate_rps),
+          updateNode,
+          parentGetConfig
+        )}
+        {this.configRow(
           "Connections",
           "connections",
           "text",
           <TextItalicIcon weight="bold" />,
           (v) => (this.connections = Number(v.target.value)),
           String(this.connections),
-          updateNode,
-          parentGetConfig
-        )}
-        {this.configRow(
-          "Duration",
-          "duration_seconds",
-          "text",
-          <TextItalicIcon weight="bold" />,
-          (v) => (this.rate_rps = Number(v.target.value)),
-          String(this.rate_rps),
           updateNode,
           parentGetConfig
         )}
@@ -786,7 +799,7 @@ export class AttackerConfig {
           "paths",
           "text",
           <TextItalicIcon weight="bold" />,
-          (v: any) => (this.paths = v.target.value),
+          (v: any) => (this.paths = v),
           this.paths,
           updateNode,
           parentGetConfig
@@ -796,21 +809,11 @@ export class AttackerConfig {
           "path_ratios",
           "text",
           <TextItalicIcon weight="bold" />,
-          (v) => (this.path_ratios = v.target.value),
+          (v) => (this.path_ratios = v),
           this.path_ratios,
           updateNode,
           parentGetConfig
         )}
-        {/* {this.configRow(
-          "Headers",
-          "headers",
-          "checkbox",
-          <TextItalicIcon weight="bold" />,
-          (v) => (this.headers= v.target),
-          this.headers,
-          updateNode,
-          parentGetConfig
-        )} */}
         {this.configRow(
           "Keep Alive",
           "keep_alive",
@@ -921,7 +924,7 @@ export class ProxyConfig {
   ) {
     return (
       <div className="flex flex-col w-full gap-y-2 mt-2 pb-2 border-b border-zinc-700">
-        <h3 className="text-lg text-white">Attack Config</h3>
+        <h3 className="text-lg text-white">Proxy Config</h3>
 
         {this.configRow(
           "Enabled",

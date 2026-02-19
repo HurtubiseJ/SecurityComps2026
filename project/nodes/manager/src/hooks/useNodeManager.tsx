@@ -67,6 +67,7 @@ const initAttacker2Config = async (url: string, type: NodeType, logger: Logger):
                 attackerConfig.attack_type,
                 attackerConfig.forward_host,
                 attackerConfig.forward_port,
+                attackerConfig.duration_seconds,
                 attackerConfig.rate_rps, 
                 attackerConfig.threads,
                 attackerConfig.connections,
@@ -149,7 +150,7 @@ export default function useNodeManager(logger: Logger) {
         let attacker_config = null
         if (node.type == "attacker") {
             const attack = node?.custom_config
-            attacker_config = new AttackerConfig(attack.attack_type, attack.forward_host, attack.forward_port, attack.rate_rps, attack.threads,attack.connections, attack.method, attack.paths, attack.ratios, attack.keep_alive)
+            attacker_config = new AttackerConfig(attack.attack_type, attack.forward_host, attack.forward_port, attack.duration_seconds, attack.rate_rps, attack.threads,attack.connections, attack.method, attack.paths, attack.ratios, attack.keep_alive)
         }
         // console.log("MONITOR: ", monitorConfig)
         const config = new BaseConfig(node.name, node.type, node.enabled, node.forward_host, node.forward_port, node.host, node.port, monitorConfig, attacker_config)

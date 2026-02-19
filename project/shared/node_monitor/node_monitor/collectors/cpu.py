@@ -74,11 +74,12 @@ class CPUMonitor:
         if hasattr(cpu, 'iowait'):
             self.cpu_time_pct.labels("iowait").set(cpu.iowait)
         if hasattr(cpu, 'irq'):
-            self.cpu_time_pct.labels("irq").set(cpu.iowait)
+            self.cpu_time_pct.labels("irq").set(cpu.irq)
         if hasattr(cpu, 'softirq'):
-            self.cpu_time_pct.labels("softirq").set(cpu.iowait)
+            self.cpu_time_pct.labels("softirq").set(cpu.softirq)
         if hasattr(cpu, 'steal'):
-            self.cpu_time_pct.labels("steal").set(cpu.iowait)
+            self.cpu_time_pct.labels("steal").set(cpu.steal)
+
         
         
     def _collect_cpu_stats(self):

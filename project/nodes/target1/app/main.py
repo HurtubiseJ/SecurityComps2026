@@ -10,6 +10,8 @@ from pydantic import BaseModel
 from typing import Optional
 import docker
 import os
+import math
+import asyncio
 
 class Metrics(BaseModel):
     cpu: bool
@@ -102,8 +104,13 @@ async def health():
 
 @app.get("/api/{func}")
 async def api_func(func: str):
-    time.sleep(0.001)
+    await asyncio.sleep(0.01)
     return {"function": func, "result": random.randint(1, 100)}
+
+@app.get("/api/cpu")
+async def api_cpu_func():
+    for _ in range(1000000):
+        math.sqrt(random.random())
 
 @app.get("/config")
 async def show_config():

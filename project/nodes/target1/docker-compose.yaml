@@ -9,6 +9,7 @@ services:
     volumes:
       - ./app:/app/app
       - ./MASTER_CONFIG.json:/app/MASTER_CONFIG.json
+    cpus: 3
     networks:
       - ddos-shared
 

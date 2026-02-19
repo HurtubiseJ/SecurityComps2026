@@ -2,6 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+import subprocess
 from typing import Optional
 import threading
 import time
@@ -96,12 +97,11 @@ async def reset():
         Path("/control/restart_required").touch()
         return {"status": "ok", "message": "Restarting container vis systemd"}
 
-
 def run_local_restart():
     time.sleep(0.5)
     client = docker.from_env()
-    client.containers.get("proxy").restart()
-    client.containers.get("proxy-fastapi").restart()
+    client.containers.get("proxy").exec_run("/reload_conf.sh")
+    client.containers.get("proxy").exec_run("nginx -s reload")
     return True
 
 @app.get("/metrics")

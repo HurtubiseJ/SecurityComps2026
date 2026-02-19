@@ -1,28 +1,28 @@
 {
-  "id": "proxy-grape01",
+  "id": "bec6a9e9-6e10-4e48-8661-43712aaccbaa",
   "name": "proxy",
   "type": "proxy",
   "enabled": true,
   "forward_host": "0.0.0.0",
   "forward_port": "8001",
-  "port": "8000",
   "host": "0.0.0.0",
+  "port": "8000",
   "monitor": {
     "enabled": true,
+    "interval": null,
     "metrics": {
       "cpu": true,
-      "memory": true,
       "disk": true,
       "network": true,
-      "fastapi": true
-    },
-    "interval": 1
+      "fastapi": true,
+      "memory": true
+    }
   },
   "custom_config": {
     "enabled": true,
-    "rate_limit_rate": 10,
-    "max_connections": 10,
-    "burst": 10,
+    "rate_limit_rate": 34000,
+    "max_connections": 10000,
+    "burst": 5000,
     "connection_timeout": 10,
     "read_timeout": 30,
     "send_timeout": 30
