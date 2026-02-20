@@ -15,7 +15,8 @@
       "disk": true,
       "network": true,
       "fastapi": true
-    }
+    }, 
+    "interval": 1
   },
   "custom_config": {
     "attack_type": "slowloris",
