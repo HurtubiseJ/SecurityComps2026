@@ -26,3 +26,6 @@ scrape_configs:
       - targets: ['proxy-fastapi:8000']
         labels:
           node: "proxy-fastapi"
+      - targets: ['cadvisor:8080']
+        labels: 
+          node: "cadvisor"

@@ -21,9 +21,9 @@
   "custom_config": {
     "attack_type": "http_flood",
     "threads": 2,
-    "connections": 500,
-    "duration_seconds": 30,
-    "rate_rps": 1500,
+    "connections": 400,
+    "duration_seconds": 120,
+    "rate_rps": 600,
     "method": "GET",
     "paths": [
       "/api/cpu"
