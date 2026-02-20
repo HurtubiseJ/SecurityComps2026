@@ -19,8 +19,21 @@
     "interval": 1
   },
   "custom_config": {
-    "attack_type": "slowloris",
-    "connections": 300,
-    "keep_alive": true
+    "attack_type": "http_flood",
+    "threads": 2,
+    "connections": 400,
+    "duration_seconds": 120,
+    "rate_rps": 600,
+    "method": "GET",
+    "paths": [
+      "/api/cpu"
+    ],
+    "path_ratios": [
+      1.0
+    ],
+    "keep_alive": true, 
+    "header_interval_ms": 100,
+    "payload_bytes": 0,
+    "connect_timeout_ms": 3000
   }
 }

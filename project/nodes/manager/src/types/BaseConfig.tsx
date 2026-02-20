@@ -624,6 +624,9 @@ export class AttackerConfig {
       paths: this.paths,
       path_ratios: this.path_ratios,
       keep_alive: this.keep_alive,
+      header_interval_ms: this.header_interval_ms,
+      connect_timeout_ms: this.connect_timeout_ms,
+      payload_bytes: this.payload_bytes
     };
   }
 
