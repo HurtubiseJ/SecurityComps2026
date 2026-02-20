@@ -1,0 +1,25 @@
+{
+  "id": "a6e3b44c-fcef-4630-bd5f-4b52952658af",
+  "name": "attacker3",
+  "type": "attacker",
+  "enabled": true,
+  "forward_host": "proxy",
+  "forward_port": "8000",
+  "host": "localhost",
+  "port": "8040",
+  "monitor": {
+    "enabled": true,
+    "metrics": {
+      "cpu": true,
+      "memory": true,
+      "disk": true,
+      "network": true,
+      "fastapi": true
+    }
+  },
+  "custom_config": {
+    "attack_type": "slowloris",
+    "connections": 300,
+    "keep_alive": true
+  }
+}

@@ -564,11 +564,15 @@ export class AttackerConfig {
   public rate_rps: number;
   public threads: number;
   public connections: number;
+//   public socket_count: number;
   public method: string;
   public paths: string[];
   public path_ratios: number[];
   //   public headers: Map<string, string>;
   public keep_alive: boolean;
+  public header_interval_ms: number;
+  public payload_bytes: number;
+  public connect_timeout_ms: number;
 
   public constructor(
     attack_type: string,
@@ -578,11 +582,15 @@ export class AttackerConfig {
     rate_rps: number,
     threads: number,
     connections: number,
+    // socket_count: number,
     method: string,
     paths: string[],
     path_ratios: number[],
     // headers: Map<string, string>,
-    keep_alive: boolean
+    keep_alive: boolean,
+    header_interval_ms: number,
+    payload_bytes: number,
+    connection_timeout_ms: number
   ) {
     this.attack_type = attack_type;
     this.forward_host = forward_host;
@@ -590,12 +598,16 @@ export class AttackerConfig {
     this.rate_rps = rate_rps;
     this.threads = threads;
     this.connections = connections;
+    // this.socket_count = socket_count;
     this.method = method;
     this.paths = paths;
     this.path_ratios = path_ratios;
     // this.headers = headers;
     this.keep_alive = keep_alive;
-    this.duration_seconds = duration_seconds
+    this.duration_seconds = duration_seconds;
+    this.header_interval_ms = header_interval_ms;
+    this.payload_bytes = payload_bytes;
+    this.connect_timeout_ms = connection_timeout_ms;
   }
 
   //   @ts-ignore
@@ -821,6 +833,36 @@ export class AttackerConfig {
           <TextItalicIcon weight="bold" />,
           (v) => (this.keep_alive = v.target),
           this.keep_alive,
+          updateNode,
+          parentGetConfig
+        )}
+        {this.configRow(
+          "Header Interval",
+          "header_interval_ms",
+          "text",
+          <TextItalicIcon weight="bold" />,
+          (v) => (this.header_interval_ms = Number(v.target.value)),
+          String(this.header_interval_ms),
+          updateNode,
+          parentGetConfig
+        )}
+        {this.configRow(
+          "Payload Bytes",
+          "payload_bytes",
+          "text",
+          <TextItalicIcon weight="bold" />,
+          (v) => (this.payload_bytes= Number(v.target.value)),
+          String(this.payload_bytes),
+          updateNode,
+          parentGetConfig
+        )}
+        {this.configRow(
+          "Connection Timeout",
+          "connection_timeout_ms",
+          "text",
+          <TextItalicIcon weight="bold" />,
+          (v) => (this.connect_timeout_ms = Number(v.target.value)),
+          String(this.connect_timeout_ms),
           updateNode,
           parentGetConfig
         )}

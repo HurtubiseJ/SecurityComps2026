@@ -4,7 +4,9 @@ include:
   - nodes/proxy/docker-compose.pn.yaml
   - nodes/monitor/docker-compose.yaml
   - nodes/target1/docker-compose.yaml
-  - nodes/attacker1/docker-compose.yaml
+  # - nodes/attacker1/docker-compose.yaml
+  # - nodes/attacker1-john/docker-compose.yaml
   # - nodes/attacker2/docker-compose.yaml
+  - nodes/attacker3/docker-compose.yaml
   - nodes/manager/docker-compose.yaml
   - nodes/cAdvisor/docker-compose.yaml

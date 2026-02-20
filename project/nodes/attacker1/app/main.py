@@ -85,6 +85,9 @@ class AttackConfig(BaseModel):
     path_ratios: List[float]
     # headers: Optional[Dict[str, str]] = None
     keep_alive: bool 
+    header_timeout_ms: int
+    payload_bytes: int
+    connect_timeout_ms: int
 
 class Config(BaseModel):
     id: str
@@ -174,7 +177,10 @@ def get_attack_config() -> Dict:
         # "headers": custom_config.get("headers", {}),
         "keep_alive": custom_config.get("keep_alive", True),
         "forward_host": forward_host,
-        "forward_port": forward_port
+        "forward_port": forward_port, 
+        "header_timeout_ms": custom_config.get("header_timeout_ms", 100),
+        "payload_bytes": custom_config.get("payload_bytes", 100),
+        "connect_timeout_ms": custom_config.get("connect_timeout_ms", 50)
     }
 
 # wrk -t4 -c2000 -d60s -R5000 http://target:8000/api/feed

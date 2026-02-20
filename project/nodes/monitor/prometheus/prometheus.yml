@@ -20,6 +20,9 @@ scrape_configs:
       - targets: ['attacker2:8000']
         labels:
           node: 'attacker2'
+      - targets: ['attacker3:8000']
+        labels:
+          node: 'attacker3'
       - targets: ['nginx-exporter:9113']
         labels:
           node: "proxy"

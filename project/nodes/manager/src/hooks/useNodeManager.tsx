@@ -12,6 +12,10 @@ const InitDefaultNodes = async (logger: Logger): Promise<BaseConfig[]> => {
     if (attacker2Config) {
         list.push(attacker2Config)
     }
+    const attacker3Config = await initAttacker2Config(LOCAL_NODE_IP_MAP['attacker3'], "attacker", logger)
+    if (attacker3Config) {
+        list.push(attacker3Config)
+    }
     const targetConfig = await initAttacker2Config(LOCAL_NODE_IP_MAP['target1'], "target", logger)
     if (targetConfig) {
         list.push(targetConfig)
@@ -74,8 +78,11 @@ const initAttacker2Config = async (url: string, type: NodeType, logger: Logger):
                 attackerConfig.method,
                 attackerConfig.paths,
                 attackerConfig.path_ratios,
-                // attackerConfig.headers,
-                attackerConfig.keep_alive
+                attackerConfig.keep_alive, 
+                attackerConfig.header_interval_ms,
+                attackerConfig.payload_bytes,
+                attackerConfig.connect_timeout_ms
+
             )
 
             console.log("Attack conf:", attacker)
@@ -150,7 +157,7 @@ export default function useNodeManager(logger: Logger) {
         let attacker_config = null
         if (node.type == "attacker") {
             const attack = node?.custom_config
-            attacker_config = new AttackerConfig(attack.attack_type, attack.forward_host, attack.forward_port, attack.duration_seconds, attack.rate_rps, attack.threads,attack.connections, attack.method, attack.paths, attack.ratios, attack.keep_alive)
+            attacker_config = new AttackerConfig(attack.attack_type, attack.forward_host, attack.forward_port, attack.duration_seconds, attack.rate_rps, attack.threads,attack.connections, attack.method, attack.paths, attack.ratios, attack.keep_alive, attack.header_interval_ms, attack.payload_bytes, attack.connect_timeout_ms)
         }
         // console.log("MONITOR: ", monitorConfig)
         const config = new BaseConfig(node.name, node.type, node.enabled, node.forward_host, node.forward_port, node.host, node.port, monitorConfig, attacker_config)
