@@ -12,6 +12,10 @@ const InitDefaultNodes = async (logger: Logger): Promise<BaseConfig[]> => {
     if (attacker2Config) {
         list.push(attacker2Config)
     }
+    const attacker3Config = await initAttacker2Config(LOCAL_NODE_IP_MAP['attacker3'], "attacker", logger)
+    if (attacker3Config) {
+        list.push(attacker3Config)
+    }
     const targetConfig = await initAttacker2Config(LOCAL_NODE_IP_MAP['target1'], "target", logger)
     if (targetConfig) {
         list.push(targetConfig)
@@ -61,19 +65,27 @@ const initAttacker2Config = async (url: string, type: NodeType, logger: Logger):
         const monitorConfig = res.monitor ? new BaseMonitor(res.monitor.enabled, metrics) : null
 
         if (res.type === "attacker") {
-            const attackerConfig: AttackerConfig = res.custom_config
+            const attackerConfig = res.custom_config ?? {}
+            const socket_count = attackerConfig.socket_count ?? attackerConfig.connections ?? 200
+            const header_interval_ms = attackerConfig.header_interval_ms ?? 10000
+            const payload_bytes = attackerConfig.payload_bytes ?? 0
+            const connect_timeout_ms = attackerConfig.connect_timeout_ms ?? 3000
             const attacker = new AttackerConfig(
-                attackerConfig.attack_type,
-                attackerConfig.forward_host,
-                attackerConfig.forward_port,
-                attackerConfig.rate_rps, 
-                attackerConfig.threads,
-                attackerConfig.connections,
-                attackerConfig.method,
-                attackerConfig.paths,
-                attackerConfig.path_ratios,
-                attackerConfig.headers,
-                attackerConfig.keep_alive
+                attackerConfig.attack_type ?? "unknown",
+                attackerConfig.forward_host ?? res.forward_host ?? "",
+                attackerConfig.forward_port ?? res.forward_port ?? "",
+                attackerConfig.rate_rps ?? 0, 
+                attackerConfig.threads ?? 1,
+                attackerConfig.connections ?? 100,
+                socket_count,
+                attackerConfig.method ?? "GET",
+                attackerConfig.paths ?? [],
+                attackerConfig.path_ratios ?? [],
+                attackerConfig.headers ?? {},
+                attackerConfig.keep_alive ?? true,
+                header_interval_ms,
+                payload_bytes,
+                connect_timeout_ms
             )
 
             console.log("Attack conf:", attacker)
@@ -132,7 +144,27 @@ export default function useNodeManager(logger: Logger) {
         let attacker_config = null
         if (node.type == "attacker") {
             const attack = node?.custom_config
-            attacker_config = new AttackerConfig(attack.attack_type, attack.forward_host, attack.forward_port, attack.rate_rps, attack.threads,attack.connections, attack.method, attack.paths, attack.ratios, attack.headers, attack.keep_alive)
+            const socket_count = attack.socket_count ?? attack.connections ?? 200
+            const header_interval_ms = attack.header_interval_ms ?? 10000
+            const payload_bytes = attack.payload_bytes ?? 0
+            const connect_timeout_ms = attack.connect_timeout_ms ?? 3000
+            attacker_config = new AttackerConfig(
+                attack.attack_type,
+                attack.forward_host,
+                attack.forward_port,
+                attack.rate_rps,
+                attack.threads,
+                attack.connections,
+                socket_count,
+                attack.method,
+                attack.paths,
+                attack.path_ratios ?? attack.ratios ?? [],
+                attack.headers,
+                attack.keep_alive,
+                header_interval_ms,
+                payload_bytes,
+                connect_timeout_ms
+            )
         }
         // console.log("MONITOR: ", monitorConfig)
         const config = new BaseConfig(node.name, node.type, node.enabled, node.forward_host, node.forward_port, node.host, node.port, monitorConfig, attacker_config)

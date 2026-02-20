@@ -1,0 +1,17 @@
+services:
+  attacker3:
+    container_name: attacker3
+    build:
+      context: ../../
+      dockerfile: nodes/attacker3/Dockerfile
+    ports:
+      - "8040:8000"
+    volumes:
+      - ./app:/app
+      - ./MASTER_CONFIG.json:/MASTER_CONFIG.json
+    networks:
+      - ddos-shared
+
+networks:
+  ddos-shared:
+    external: true

@@ -1,0 +1,33 @@
+{
+    "name": "attacker3",
+    "type": "attacker",
+    "enabled": true,
+    "forward_host": "proxy",
+    "forward_port": "8000",
+    "port": "8040",
+    "host": "localhost",
+    "monitor": {
+        "enabled": true,
+        "metrics": {
+            "cpu": true,
+            "memory": true,
+            "disk": true,
+            "network": true,
+            "fastapi": true
+        },
+        "interval": 1
+    },
+    "custom_config": {
+        "attack_type": "slowloris",
+        "socket_count": 300,
+        "header_interval_ms": 10000,
+        "keep_alive": true,
+        "target_host": "proxy",
+        "target_port": 8000,
+        "headers": {
+            "User-Agent": "slowloris-attacker3"
+        },
+        "payload_bytes": 0,
+        "connect_timeout_ms": 3000
+    }
+}

@@ -7,4 +7,5 @@ include:
   - nodes/attacker1/docker-compose.yaml
   - nodes/attacker1-john/docker-compose.yaml
   - nodes/attacker2/docker-compose.yaml
+  - nodes/attacker3/docker-compose.yaml
   - nodes/manager/docker-compose.yaml
