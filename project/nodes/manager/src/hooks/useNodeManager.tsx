@@ -12,6 +12,10 @@ const InitDefaultNodes = async (logger: Logger): Promise<BaseConfig[]> => {
     if (attacker2Config) {
         list.push(attacker2Config)
     }
+    const attacker3Config = await initAttacker2Config(LOCAL_NODE_IP_MAP['attacker3'], "attacker", logger)
+    if (attacker3Config) {
+        list.push(attacker3Config)
+    }
     const targetConfig = await initAttacker2Config(LOCAL_NODE_IP_MAP['target1'], "target", logger)
     if (targetConfig) {
         list.push(targetConfig)

@@ -564,11 +564,15 @@ export class AttackerConfig {
   public rate_rps: number;
   public threads: number;
   public connections: number;
+  public socket_count: number;
   public method: string;
   public paths: string[];
   public path_ratios: number[];
   //   public headers: Map<string, string>;
   public keep_alive: boolean;
+  public header_interval_ms: number;
+  public payload_bytes: number;
+  public connect_timeout_ms: number;
 
   public constructor(
     attack_type: string,
@@ -578,6 +582,7 @@ export class AttackerConfig {
     rate_rps: number,
     threads: number,
     connections: number,
+    socket_count: number,
     method: string,
     paths: string[],
     path_ratios: number[],
@@ -590,6 +595,7 @@ export class AttackerConfig {
     this.rate_rps = rate_rps;
     this.threads = threads;
     this.connections = connections;
+    this.socket_count = socket_count;
     this.method = method;
     this.paths = paths;
     this.path_ratios = path_ratios;
