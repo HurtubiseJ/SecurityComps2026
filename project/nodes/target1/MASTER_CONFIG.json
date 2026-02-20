@@ -15,34 +15,24 @@
         },
         "interval": 1
     },
-
-
     "custom_config": {
+        "caching": {
+        "enabled": true,
+        "static_cache": true,
+        "dynamic_cache": false,
+        "cache_ttl_seconds": 300,
+        "cache_vary_headers": ["Accept-Encoding"],
+        "cache_bypass_on_headers": ["Authorization"]
+      }, 
+      "rate_limit": {
+        "enabled": true,
+        "requests_per_ip_per_minute": 300,
+        "burst": 50,
+        "enforce_on_paths": ["/api"],
+        "exclude_paths": ["/health"]
+      }
+    }
 
-    },
 
-    "caching": {
-    "enabled": true,
-    "static_cache": true,
-    "dynamic_cache": false,
-    "cache_ttl_seconds": 300,
-    "cache_vary_headers": ["Accept-Encoding"],
-    "cache_bypass_on_headers": ["Authorization"]
-  }, 
-
-  "rate_limit": {
-    "enabled": true,
-    "requests_per_ip_per_minute": 300,
-    "burst": 50,
-    "enforce_on_paths": ["/api"],
-    "exclude_paths": ["/health"]
-  }, 
-  
-  "database": {
-    "max_connections": 20,
-    "connection_timeout_ms": 1000,
-    "query_timeout_ms": 2000,
-    "retry_enabled": false
-  }
 }
 

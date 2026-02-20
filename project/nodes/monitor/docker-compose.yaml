@@ -43,12 +43,16 @@ services:
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
     restart: always
+    cpuset: "7"
+    mem_limit: 2g
     networks:
       - ddos-shared
 
   grafana:
     image: grafana/grafana
     container_name: grafana
+    cpuset: "7"
+    mem_limit: 2g
     ports:
       - "3000:3000"
     depends_on:

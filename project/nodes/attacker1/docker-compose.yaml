@@ -13,7 +13,8 @@ services:
     volumes: 
       - ./app:/app  # Live code reload
       - ./MASTER_CONFIG.json:/MASTER_CONFIG.json  # Config (restart to reload)
-    cpus: 2
+    cpuset: "1,2"
+    mem_limit: 2g
     networks: 
       - ddos-shared
 

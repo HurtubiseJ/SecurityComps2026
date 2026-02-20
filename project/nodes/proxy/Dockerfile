@@ -26,6 +26,7 @@ FROM nginx:1.25-alpine
 RUN apk add --no-cache jq gettext
 
 COPY nginx/nginx.conf.template /etc/nginx/nginx.conf.template
+# COPY nginx/nginx.conf.ect.template /etc/nginx/nginx.conf.ext.template
 COPY nginx/entrypoint.sh /entrypoint.sh
 COPY nginx/reload_conf.sh /reload_conf.sh
 COPY MASTER_CONFIG.json .

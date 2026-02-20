@@ -1,5 +1,5 @@
 {
-  "id": "8ef3d47c-9e0f-4954-9378-24bf5a1eaeda",
+  "id": "d6cda150-47c7-49b7-a06b-03b176200245",
   "name": "attacker1",
   "type": "attacker",
   "enabled": true,
@@ -20,10 +20,10 @@
   },
   "custom_config": {
     "attack_type": "http_flood",
-    "threads": 3,
-    "connections": 200,
+    "threads": 2,
+    "connections": 500,
     "duration_seconds": 30,
-    "rate_rps": 1000,
+    "rate_rps": 1500,
     "method": "GET",
     "paths": [
       "/api/cpu"

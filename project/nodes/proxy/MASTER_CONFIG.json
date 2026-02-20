@@ -1,5 +1,5 @@
 {
-  "id": "bec6a9e9-6e10-4e48-8661-43712aaccbaa",
+  "id": "dbb4e8bc-d5ee-4d73-a20c-ac0fa448f7a1",
   "name": "proxy",
   "type": "proxy",
   "enabled": true,
@@ -20,9 +20,9 @@
   },
   "custom_config": {
     "enabled": true,
-    "rate_limit_rate": 34000,
+    "rate_limit_rate": 4000,
     "max_connections": 10000,
-    "burst": 5000,
+    "burst": 4000,
     "connection_timeout": 10,
     "read_timeout": 30,
     "send_timeout": 30

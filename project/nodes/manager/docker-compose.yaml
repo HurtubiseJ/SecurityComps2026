@@ -6,6 +6,8 @@ services:
       dockerfile: nodes/manager/Dockerfile
     ports:
       - "5173:80"
+    cpuset: "3"
+    mem_limit: 2g
     networks: 
       - ddos-shared
     
