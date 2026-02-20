@@ -24,7 +24,7 @@ import signal
 import os
 import threading
 from pydantic import BaseModel
-from typing import Dict, List
+from typing import Dict, List, Optional, Any
 import time
 import docker
 
@@ -42,7 +42,7 @@ app.add_middleware(
 # Configuration Loading
 # ============================================================================
 
-MASTER_CONFIG_PATH = Path(__file__).resolve().parent.parent / "MASTER_CONFIG.json"
+MASTER_CONFIG_PATH = Path("../MASTER_CONFIG.json")
 
 def write_master_config(configJson: str):
     if not MASTER_CONFIG_PATH.exists():
@@ -59,23 +59,44 @@ def load_master_config():
         raise RuntimeError("MASTER_CONFIG.json not found")
     with open(MASTER_CONFIG_PATH) as f:
         return json.load(f)
+    
+
+class Metrics(BaseModel):
+    cpu: bool
+    disk: bool
+    network: bool
+    fastapi: bool
+    memory: bool
+
+class Monitor(BaseModel):
+    enabled: bool
+    interval: Optional[int] = None
+    metrics: Metrics
+
 
 class AttackConfig(BaseModel):
     attack_type: str
     threads: int 
     connections: int
+    duration_seconds: int
     rate_rps: int
     method: str
     paths: List[str]
-    path_ratios: List[int]
-    headers: Dict[str, str]
+    path_ratios: List[float]
+    # headers: Optional[Dict[str, str]] = None
     keep_alive: bool 
-    target_host: str
-    target_port: str
 
-class CustomConfig(BaseModel):
-    attack: AttackConfig
-
+class Config(BaseModel):
+    id: str
+    name: str
+    type: str
+    enabled: bool
+    forward_host: str
+    forward_port: str
+    host: str
+    port: str
+    monitor: Monitor
+    custom_config: AttackConfig
 # ============================================================================
 # Prometheus Metrics
 # ============================================================================
@@ -138,22 +159,26 @@ def get_attack_config() -> Dict:
         raise ValueError("No attack configuration found in custom_config")
     
     # Fallback to forward_host/port if target not specified
-    target_host = custom_config.get("target_host", MASTER_CONFIG.get("forward_host", "10.0.0.1"))
-    target_port = custom_config.get("target_port", MASTER_CONFIG.get("forward_port", "8000"))
+    forward_host = custom_config.get("target_host", MASTER_CONFIG.get("forward_host", "10.0.0.1"))
+    forward_port = custom_config.get("target_port", MASTER_CONFIG.get("forward_port", "8000"))
     
     return {
         "attack_type": custom_config.get("attack_type", "http_flood"),
         "threads": custom_config.get("threads", 4),
+        "duration_seconds": custom_config.get("duration_seconds", 30),
         "connections": custom_config.get("connections", 200),
         "rate_rps": custom_config.get("rate_rps", 5000),
         "method": custom_config.get("method", "GET"),
         "paths": custom_config.get("paths", ["/"]),
         "path_ratios": custom_config.get("path_ratios", [1.0]),
-        "headers": custom_config.get("headers", {}),
+        # "headers": custom_config.get("headers", {}),
         "keep_alive": custom_config.get("keep_alive", True),
-        "target_host": target_host,
-        "target_port": target_port
+        "forward_host": forward_host,
+        "forward_port": forward_port
     }
+
+# wrk -t4 -c2000 -d60s -R5000 http://target:8000/api/feed
+
 
 # ============================================================================
 # wrk2 Command Builder
@@ -171,21 +196,22 @@ def build_wrk2_command(config: Dict, path: str, path_rate_rps: int) -> List[str]
     Returns:
         List of command arguments for subprocess
     """
-    target_url = f"http://{config['target_host']}:{config['target_port']}{path}"
+    target_url = f"http://{config['forward_host']}:{config['forward_port']}{path}"
     
     cmd = [
         "wrk",
         "-t", str(config["threads"]),      # Thread count
         "-c", str(config["connections"]),  # Connection count
         "-R", str(path_rate_rps),          # Rate limit (required for wrk2)
-        "-d", "999999s",                   # Run until manually stopped
+        "-d", str(config["duration_seconds"]),                   # Run until manually stopped
         "--timeout", "2s",
         "--latency"
     ]
     
     # Add custom headers
-    for key, value in config["headers"].items():
-        cmd.extend(["-H", f"{key}: {value}"])
+    if config.get("headers"):
+        for key, value in config["headers"].items():
+            cmd.extend(["-H", f"{key}: {value}"])
     
     # Disable keep-alive by adding Connection: Close header
     if not config["keep_alive"]:
@@ -218,62 +244,65 @@ def start_attack() -> Dict:
         if attack_status == "running":
             raise HTTPException(status_code=400, detail="Attack already running")
         
-        try:
-            config = get_attack_config()
+        # try:
+        config = get_attack_config()
+        
+        # Validate paths and ratios match
+        if len(config["paths"]) != len(config["path_ratios"]):
+            raise ValueError("paths and path_ratios must have the same length")
+        
+        if abs(sum(config["path_ratios"]) - 1.0) > 0.01:
+            raise ValueError("path_ratios must sum to 1.0")
+        
+        # Calculate RPS per path (e.g., 5000 RPS with [0.8, 0.2] = [4000, 1000])
+        total_rps = config["rate_rps"]
+        path_rps_list = [int(total_rps * ratio) for ratio in config["path_ratios"]]
+        
+        # Handle rounding errors by adding remainder to first path
+        diff = total_rps - sum(path_rps_list)
+        if diff > 0:
+            path_rps_list[0] += diff
+        
+        # Launch wrk2 process for each path
+        attack_processes = []
+        for path, path_rps in zip(config["paths"], path_rps_list):
+            if path_rps > 0:
+                cmd = build_wrk2_command(config, path, path_rps)
+
+                print(cmd)
+                
+                # Start in new process group so we can kill entire group later
+                process = subprocess.Popen(
+                    cmd,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    preexec_fn=os.setsid
+                )
+
+                attack_processes.append({
+                    "process": process,
+                    "path": path,
+                    "rps": path_rps,
+                    "cmd": " ".join(cmd)
+                })
+        
+        if not attack_processes:
+            raise ValueError("No attack processes started (all RPS values were 0)")
+        
+        attack_status = "running"
+        ATTACK_STATUS.set(1)
+        
+        return {
+            "status": "started",
+            "processes": len(attack_processes),
+            "total_rps": total_rps,
+            "paths": [p["path"] for p in attack_processes]
+        }
             
-            # Validate paths and ratios match
-            if len(config["paths"]) != len(config["path_ratios"]):
-                raise ValueError("paths and path_ratios must have the same length")
-            
-            if abs(sum(config["path_ratios"]) - 1.0) > 0.01:
-                raise ValueError("path_ratios must sum to 1.0")
-            
-            # Calculate RPS per path (e.g., 5000 RPS with [0.8, 0.2] = [4000, 1000])
-            total_rps = config["rate_rps"]
-            path_rps_list = [int(total_rps * ratio) for ratio in config["path_ratios"]]
-            
-            # Handle rounding errors by adding remainder to first path
-            diff = total_rps - sum(path_rps_list)
-            if diff > 0:
-                path_rps_list[0] += diff
-            
-            # Launch wrk2 process for each path
-            attack_processes = []
-            for path, path_rps in zip(config["paths"], path_rps_list):
-                if path_rps > 0:
-                    cmd = build_wrk2_command(config, path, path_rps)
-                    
-                    # Start in new process group so we can kill entire group later
-                    process = subprocess.Popen(
-                        cmd,
-                        stdout=subprocess.PIPE,
-                        stderr=subprocess.PIPE,
-                        preexec_fn=os.setsid
-                    )
-                    attack_processes.append({
-                        "process": process,
-                        "path": path,
-                        "rps": path_rps,
-                        "cmd": " ".join(cmd)
-                    })
-            
-            if not attack_processes:
-                raise ValueError("No attack processes started (all RPS values were 0)")
-            
-            attack_status = "running"
-            ATTACK_STATUS.set(1)
-            
-            return {
-                "status": "started",
-                "processes": len(attack_processes),
-                "total_rps": total_rps,
-                "paths": [p["path"] for p in attack_processes]
-            }
-            
-        except Exception as e:
-            attack_status = "stopped"
-            ATTACK_STATUS.set(2)
-            raise HTTPException(status_code=500, detail=f"Failed to start attack: {str(e)}")
+        # except Exception as e:
+        #     attack_status = "stopped"
+        #     ATTACK_STATUS.set(2)
+        #     raise HTTPException(status_code=500, detail=f"Failed to start attack: {str(e)}")
 
 
 def stop_attack() -> Dict:
@@ -333,7 +362,8 @@ async def get_config():
         )
     
 @app.post("/config")
-async def post_config(config: CustomConfig):
+async def post_config(config: Config):
+    print(config)
     configJson = config.model_dump_json(indent=2)
     write_master_config(configJson)
     return {"status": "ok", "message": "Config file modified sucesfully"}
@@ -341,12 +371,12 @@ async def post_config(config: CustomConfig):
 @app.post("/start")
 async def start_attack_endpoint():
     """Start HTTP flood attack using MASTER_CONFIG.json settings."""
-    try:
-        return start_attack()
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    # try:
+    return start_attack()
+    # except HTTPException:
+    #     raise
+    # except Exception as e:
+    #     raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.post("/stop")
@@ -418,5 +448,5 @@ async def restart():
 def run_local_restart():
     time.sleep(0.5) #time for /restart to return
     client = docker.from_env()
-    client.containers.get("attacker1-john").restart()
+    client.containers.get("attacker1").restart()
     return True

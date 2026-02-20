@@ -27,8 +27,10 @@ RUN apk add --no-cache jq gettext
 
 COPY nginx/nginx.conf.template /etc/nginx/nginx.conf.template
 COPY nginx/entrypoint.sh /entrypoint.sh
+COPY nginx/reload_conf.sh /reload_conf.sh
 COPY MASTER_CONFIG.json .
 
 RUN chmod +x /entrypoint.sh
+RUN chmod +x /reload_conf.sh
 
 ENTRYPOINT ["/entrypoint.sh"]

@@ -2,7 +2,7 @@ events {}
 
 http {
 
-  limit_req_zone $binary_remote_addr zone=req_limit:10m rate=${RATE_LIMIT};
+  limit_req_zone $binary_remote_addr zone=req_limit:10m rate=${RATE_LIMIT}r/s;
   limit_req_status 429;
 
   limit_conn_zone $binary_remote_addr zone=conn_limit:10m;
@@ -15,6 +15,8 @@ http {
   server {
     listen ${PORT};
     listen 8001;
+
+    access_log off;
 
     location = /proxy-health {
       return 200 "proxy ok\n";
@@ -31,14 +33,14 @@ http {
       limit_conn conn_limit ${MAX_CONNECTIONS};
       limit_req zone=req_limit burst=${BURST} nodelay;
 
-      proxy_pass http://target_upstream;
+      proxy_pass http://target1:8000;
       proxy_set_header Host $host;
       proxy_set_header X-Real-IP $remote_addr;
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
       proxy_set_header X-Forwarded-Proto $scheme;
-      proxy_connect_timeout ${CONNECT_TIMEOUT};
-      proxy_read_timeout ${READ_TIMEOUT};
-      proxy_send_timeout ${SEND_TIMEOUT};
+      proxy_connect_timeout ${CONNECTION_TIMEOUT}s;
+      proxy_read_timeout ${READ_TIMEOUT}s;
+      proxy_send_timeout ${SEND_TIMEOUT}s;
     }
   }
 }
