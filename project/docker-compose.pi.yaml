@@ -1,0 +1,10 @@
+name: ddos-system-local
+
+include:
+  - nodes/attacker1/docker-compose.pi.yaml
+  - nodes/attacker2/docker-compose.pi.yaml
+  - nodes/attacker3/docker-compose.pi.yaml
+  - nodes/proxy/docker-compose.pi.yaml
+  - nodes/target1/docker-compose.pi.yaml
+  - nodes/monitor/docker-compose.pi.yaml
+  - nodes/manager/docker-compose.pi.yaml

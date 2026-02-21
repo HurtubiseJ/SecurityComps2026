@@ -1,0 +1,12 @@
+services:
+  attacker1-john:
+    container_name: attacker1-john
+    build: 
+      context: ../../
+      dockerfile: nodes/attacker1-john/Dockerfile
+    ports:
+      - "8000:8000"
+    volumes: 
+      - ./app:/app
+      - ./control:/control # Pass through for systemd service
+      # - /var/run/docker.sock:/var/run/docker.sock #FOR LOCAL RESTART REMOVE ON PROD, ROOT ACCESS = BAD

@@ -1,39 +1,43 @@
 import { useEffect, useState } from "react"
 import { AttackerConfig, BaseConfig, BaseMonitor, ProxyConfig } from "../types/BaseConfig"
-import { LOCAL_NODE_IP_MAP } from "../constants/NodeIp"
+import { LOCAL_NODE_IP_MAP, NODE_IP_MAP } from "../constants/NodeIp"
 import { type NodeType } from "../types/configs"
 import { type metrics } from "../types/BaseConfig"
 import { type Logger } from "../types/Logger"
 
+const IS_LOCAL = import.meta.env.LOCAL;
+
 const InitDefaultNodes = async (logger: Logger): Promise<BaseConfig[]> => {
     const list: BaseConfig[] = []
 
-    const attacker2Config = await initAttacker2Config(LOCAL_NODE_IP_MAP['attacker2'], "attacker", logger)
+    const IP_MAP = IS_LOCAL ? LOCAL_NODE_IP_MAP : NODE_IP_MAP;
+
+    const attacker2Config = await initAttacker2Config(IP_MAP['attacker2'], "attacker", logger)
     if (attacker2Config) {
         list.push(attacker2Config)
     }
-    const attacker3Config = await initAttacker2Config(LOCAL_NODE_IP_MAP['attacker3'], "attacker", logger)
+    const attacker3Config = await initAttacker2Config(IP_MAP['attacker3'], "attacker", logger)
     if (attacker3Config) {
         list.push(attacker3Config)
     }
-    const targetConfig = await initAttacker2Config(LOCAL_NODE_IP_MAP['target1'], "target", logger)
+    const targetConfig = await initAttacker2Config(IP_MAP['target1'], "target", logger)
     if (targetConfig) {
         list.push(targetConfig)
     }
 
-    const attacker1Config = await initAttacker2Config(LOCAL_NODE_IP_MAP['attacker1'], 'attacker', logger)
+    const attacker1Config = await initAttacker2Config(IP_MAP['attacker1'], 'attacker', logger)
     console.log("ATTACKER1, ", attacker1Config)
     if (attacker1Config) {
         list.push(attacker1Config)
     }
 
-    const attacker1JohnConfig = await initAttacker2Config(LOCAL_NODE_IP_MAP['attacker1-john'], 'attacker', logger)
+    const attacker1JohnConfig = await initAttacker2Config(IP_MAP['attacker1-john'], 'attacker', logger)
     console.log("ATTACKER1, ", attacker1JohnConfig)
     if (attacker1JohnConfig) {
         list.push(attacker1JohnConfig)
     }
 
-    const proxy = await initAttacker2Config(LOCAL_NODE_IP_MAP['proxy'], 'proxy', logger)
+    const proxy = await initAttacker2Config(IP_MAP['proxy'], 'proxy', logger)
     if (proxy) {
         list.push(proxy)
     }

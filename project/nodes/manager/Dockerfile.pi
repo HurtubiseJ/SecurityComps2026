@@ -1,0 +1,14 @@
+FROM node:21-alpine AS build
+ENV LOCAL=false
+WORKDIR /app
+COPY /nodes/manager/package*.json ./
+RUN npm install
+COPY /nodes/manager/. .
+RUN npm run build
+
+FROM nginx:alpine AS production
+ENV LOCAL=false
+COPY --from=build /app/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+
