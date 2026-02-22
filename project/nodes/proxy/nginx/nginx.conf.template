@@ -1,13 +1,18 @@
 events {}
 
 http {
+  limit_req_zone $binary_remote_addr zone=req_limit:10m rate=${RATE_LIMIT}r/s;
+  limit_req_status 429;
+
+  limit_conn_zone $binary_remote_addr zone=conn_limit:10m;
+  limit_conn_status 503;
 
   upstream target_upstream {
     server ${FORWARD_HOST}:${FORWARD_PORT};
   }
 
   upstream fastapi_upstream {
-    server proxy-fastapi:8001;
+    server 192.168.192.204:8001;
   }
 
   server {
@@ -48,12 +53,6 @@ http {
     }
 
     location / {
-
-      limit_req_zone $binary_remote_addr zone=req_limit:10m rate=${RATE_LIMIT}r/s;
-      limit_req_status 429;
-
-      limit_conn_zone $binary_remote_addr zone=conn_limit:10m;
-      limit_conn_status 503;
 
       limit_conn conn_limit ${MAX_CONNECTIONS};
       limit_req zone=req_limit burst=${BURST} nodelay;
