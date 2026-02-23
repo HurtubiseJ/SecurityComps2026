@@ -41,7 +41,7 @@ http {
     }
 
     location /config {
-        proxy_pass http://fastapi_local:
+        proxy_pass http://fastapi_local;
     }
 
     location /status {
@@ -49,7 +49,7 @@ http {
     }
 
     location /health {
-        proxy_pass http://fastapi_local
+        proxy_pass http://fastapi_local;
     }
 
     location / {
