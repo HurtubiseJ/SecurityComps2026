@@ -11,8 +11,8 @@ http {
     server ${FORWARD_HOST}:${FORWARD_PORT};
   }
 
-  upstream fastapi_upstream {
-    server 192.168.192.204:8001;
+  upstream fastapi_local {
+    server ${HOST}:8001;
   }
 
   server {
@@ -33,23 +33,23 @@ http {
     }
 
     location /restart {
-        proxy-pass http://fastapi_upstream;
+        proxy_pass http://fastapi_local;
     }
 
     location /metrics {
-        proxy-pass http://fastapi_upstream;
+        proxy_pass http://fastapi_local;
     }
 
     location /config {
-        proxy-pass http://fastapi_upstream:
+        proxy_pass http://fastapi_local:
     }
 
     location /status {
-        proxy-pass http://fastapi_upstream;
+        proxy_pass http://fastapi_local;
     }
 
     location /health {
-        proxy-pass http://fastapi_upstream
+        proxy_pass http://fastapi_local
     }
 
     location / {
