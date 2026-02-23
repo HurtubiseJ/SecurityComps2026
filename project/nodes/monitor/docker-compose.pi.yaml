@@ -24,6 +24,6 @@ services:
       driver: none
     volumes:
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini:ro
-      - /grafana/grafana-data:/var/lib/grafana
+      - ./grafana/grafana-data:/var/lib/grafana
     restart: always
 
