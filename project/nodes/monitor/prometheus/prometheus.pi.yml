@@ -3,21 +3,21 @@ global:
 scrape_configs:
   - job_name: 'nodes'
     static_configs:
-      - targets: ['192.168.192.205:8000']
+      - targets: ['192.168.0.141:8000']
         labels:
           node: 'target1'
-      - targets: ['192.168.192.201:8000']
+      - targets: ['192.168.0.195:8000']
         labels:
           node: 'attacker1'
-      - targets: ['192.168.192.202:8000']
+      - targets: ['192.168.0.172:8000']
         labels:
           node: 'attacker2'
-      - targets: ['192.168.192.203:8000']
+      - targets: ['192.168.0.180:8000']
         labels:
           node: 'attacker3'
-      - targets: ['192.168.192.204:9113']
+      - targets: ['192.168.0.109:9113']
         labels:
           node: "proxy"
-      - targets: ['192.168.192.204:8000']
+      - targets: ['192.168.0.109:8000']
         labels:
           node: "proxy-fastapi"
