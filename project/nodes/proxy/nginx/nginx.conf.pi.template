@@ -14,7 +14,7 @@ http {
   }
 
   upstream fastapi_local {
-    server 127.0.0.1:8001;
+    server proxy-fastapi:8001;
   }
 
   server {
