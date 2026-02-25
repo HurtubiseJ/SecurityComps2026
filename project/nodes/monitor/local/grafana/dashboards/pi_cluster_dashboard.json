@@ -26,7 +26,7 @@
       {
         "datasource": {
           "type": "prometheus",
-          "uid": "ffecbq78hqolcf"
+          "uid": "PBFA97CFB590B2093"
         },
         "fieldConfig": {
           "defaults": {
@@ -217,7 +217,7 @@
       {
         "datasource": {
           "type": "prometheus",
-          "uid": "ffecbq78hqolcf"
+          "uid": "PBFA97CFB590B2093"
         },
         "fieldConfig": {
           "defaults": {
@@ -408,7 +408,7 @@
       {
         "datasource": {
           "type": "prometheus",
-          "uid": "ffecbq78hqolcf"
+          "uid": "PBFA97CFB590B2093"
         },
         "fieldConfig": {
           "defaults": {
@@ -593,7 +593,7 @@
       {
         "datasource": {
           "type": "prometheus",
-          "uid": "ffecbq78hqolcf"
+          "uid": "PBFA97CFB590B2093"
         },
         "fieldConfig": {
           "defaults": {
@@ -778,7 +778,7 @@
       {
         "datasource": {
           "type": "prometheus",
-          "uid": "ffecbq78hqolcf"
+          "uid": "PBFA97CFB590B2093"
         },
         "fieldConfig": {
           "defaults": {
@@ -963,7 +963,7 @@
       {
         "datasource": {
           "type": "prometheus",
-          "uid": "ffecbq78hqolcf"
+          "uid": "PBFA97CFB590B2093"
         },
         "fieldConfig": {
           "defaults": {
@@ -1148,7 +1148,7 @@
       {
         "datasource": {
           "type": "prometheus",
-          "uid": "ffecbq78hqolcf"
+          "uid": "PBFA97CFB590B2093"
         },
         "fieldConfig": {
           "defaults": {
@@ -1333,7 +1333,7 @@
       {
         "datasource": {
           "type": "prometheus",
-          "uid": "ffecbq78hqolcf"
+          "uid": "PBFA97CFB590B2093"
         },
         "fieldConfig": {
           "defaults": {
@@ -1518,7 +1518,7 @@
       {
         "datasource": {
           "type": "prometheus",
-          "uid": "ffecbq78hqolcf"
+          "uid": "PBFA97CFB590B2093"
         },
         "fieldConfig": {
           "defaults": {
@@ -1709,7 +1709,7 @@
       {
         "datasource": {
           "type": "prometheus",
-          "uid": "ffecbq78hqolcf"
+          "uid": "PBFA97CFB590B2093"
         },
         "fieldConfig": {
           "defaults": {
@@ -1894,7 +1894,7 @@
       {
         "datasource": {
           "type": "prometheus",
-          "uid": "ffecbq78hqolcf"
+          "uid": "PBFA97CFB590B2093"
         },
         "fieldConfig": {
           "defaults": {
@@ -2085,7 +2085,7 @@
       {
         "datasource": {
           "type": "prometheus",
-          "uid": "ffecbq78hqolcf"
+          "uid": "PBFA97CFB590B2093"
         },
         "fieldConfig": {
           "defaults": {
@@ -2276,7 +2276,7 @@
       {
         "datasource": {
           "type": "prometheus",
-          "uid": "ffecbq78hqolcf"
+          "uid": "PBFA97CFB590B2093"
         },
         "fieldConfig": {
           "defaults": {
@@ -2467,7 +2467,7 @@
       {
         "datasource": {
           "type": "prometheus",
-          "uid": "ffecbq78hqolcf"
+          "uid": "PBFA97CFB590B2093"
         },
         "fieldConfig": {
           "defaults": {
@@ -2658,7 +2658,7 @@
       {
         "datasource": {
           "type": "prometheus",
-          "uid": "ffecbq78hqolcf"
+          "uid": "PBFA97CFB590B2093"
         },
         "fieldConfig": {
           "defaults": {
@@ -2864,7 +2864,7 @@
       {
         "datasource": {
           "type": "prometheus",
-          "uid": "ffecbq78hqolcf"
+          "uid": "PBFA97CFB590B2093"
         },
         "fieldConfig": {
           "defaults": {
@@ -3055,7 +3055,7 @@
       {
         "datasource": {
           "type": "prometheus",
-          "uid": "ffecbq78hqolcf"
+          "uid": "PBFA97CFB590B2093"
         },
         "fieldConfig": {
           "defaults": {
@@ -3261,7 +3261,7 @@
       {
         "datasource": {
           "type": "prometheus",
-          "uid": "ffecbq78hqolcf"
+          "uid": "PBFA97CFB590B2093"
         },
         "fieldConfig": {
           "defaults": {
@@ -3530,7 +3530,7 @@
       {
         "datasource": {
           "type": "prometheus",
-          "uid": "ffecbq78hqolcf"
+          "uid": "PBFA97CFB590B2093"
         },
         "description": "1 Signifies Instance is up and running.",
         "fieldConfig": {
@@ -3621,7 +3621,7 @@
           },
           "datasource": {
             "type": "prometheus",
-            "uid": "ffecbq78hqolcf"
+            "uid": "PBFA97CFB590B2093"
           },
           "definition": "label_values(up,node)",
           "label": "machines",
@@ -3690,5 +3690,5 @@
     "timezone": "browser",
     "title": "PI Cluster Dashboard",
     "uid": "asdsasd4f",
-    "version": 4
+    "version": 5
   }
