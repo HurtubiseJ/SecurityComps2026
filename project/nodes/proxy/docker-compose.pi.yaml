@@ -2,7 +2,7 @@ services:
   proxy:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.pi
     container_name: proxy
     ports:
       - "8000:8000"
