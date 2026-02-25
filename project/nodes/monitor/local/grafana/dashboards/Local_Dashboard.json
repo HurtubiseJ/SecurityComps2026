@@ -19,7 +19,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
+  "id": 5,
   "links": [],
   "liveNow": true,
   "panels": [
@@ -2829,5 +2829,5 @@
   "timezone": "browser",
   "title": "Local Dashboard",
   "uid": "ad6cj4f",
-  "version": 10
+  "version": 1
 }

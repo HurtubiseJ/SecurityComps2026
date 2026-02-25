@@ -157,16 +157,16 @@ class MemoryMonitor:
         delta_pgscan = pgscan - self._last_pgscan
         delta_pgsteal = pgsteal - self._last_pgsteal
 
-        if delta_pgfault > 0:
+        if delta_pgfault >= 0:
             self.memory_events_total.labels("pgfault").inc(delta_pgfault)
 
-        if delta_pgmajfault > 0:
+        if delta_pgmajfault >= 0:
             self.memory_events_total.labels("pgmajfault").inc(delta_pgmajfault)
 
-        if delta_pgscan > 0:
+        if delta_pgscan >= 0:
             self.memory_events_total.labels("pgscan").inc(delta_pgscan)
 
-        if delta_pgsteal > 0:
+        if delta_pgsteal >= 0:
             self.memory_events_total.labels("pgsteal").inc(delta_pgsteal)
 
         self._last_pgfault = pgfault

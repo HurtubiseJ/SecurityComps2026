@@ -44,38 +44,44 @@ class NetworkMonitor:
         self._last_net_counts = None
 
         self.network_bytes_total = Counter(
-            "node_network_total_bytes",
+            "node_sys_network_total_bytes",
             "Total number of network bytes sent/recv on node",
             ['type']
         )
         
         self.network_packets_total = Counter(
-            'node_network_total_packets',
+            'node_sys_network_total_packets',
             "Total number of network packets sent/recv on node",
             ['type']
         )
 
         self.network_error_total = Counter(
-            'node_network_errors_total',
+            'node_sys_network_errors_total',
             "Total number of errors while send/recv on node",
             ['type']
         )
 
         self.network_drop_total = Counter(
-            'node_network_drop_total', 
+            'node_sys_network_drop_total', 
             'Total number of dropped in/out packets',
             ['type']
         )
 
         self.network_tcp_count = Gauge(
-            "node_network_tcp_count",
+            "node_sys_network_tcp_count",
             "TCP connections on node machine",
             ['type']
         )
 
         self.network_udp_count = Gauge(
-            'node_network_udp_count',
+            'node_sys_network_udp_count',
             "UDP connections on node",
+            ['type']
+        )
+
+        self.network_conntrack_count = Gauge(
+            'node_sys_conntrack_total',
+            "Amount of tracked connections VIA conntrack",
             ['type']
         )
 
@@ -85,7 +91,28 @@ class NetworkMonitor:
     def collect(self):
         self._process_net_connections()
         self._process_net_io_counters()
+        self._process_net_conntrack()
         pass
+
+    def _process_net_conntrack(self):
+        nf_count = 0
+        nf_max = 0
+        try:
+            with open("/proc/sys/net/netfilter/nf_conntrack_count", "r") as f:
+                nf_count = f.readline()
+        except:
+            logging.exception("_proccess_net_conntrack unable to open nf_conntrack")
+
+        try:
+            with open("/proc/sys/net/netfilter/nf_conntrack_max", "r") as f:
+                nf_max = f.readline()
+        except:
+            logging.exception("_proccess_net_conntrack unable to open nf_conntrack")
+
+
+        self.network_conntrack_count.labels("count").set(nf_count)
+        self.network_conntrack_count.labels("max").set(nf_max)
+
 
     def _process_net_io_counters(self):
         try:
@@ -94,7 +121,7 @@ class NetworkMonitor:
             logging.exception("_process_net_io_counters failed")
 
         def inc_if_positive(counter: Counter, label: str, value: int):
-            if value > 0:
+            if value >= 0:
                 counter.labels(label).inc(value)
 
         if self._last_net_counts is None:

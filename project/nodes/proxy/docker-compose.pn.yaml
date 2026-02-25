@@ -23,8 +23,6 @@ services:
     image: nginx/nginx-prometheus-exporter:1.4
     container_name: nginx-exporter
     command: ["--nginx.scrape-uri=http://proxy:8000/stub_status"]
-    ports: 
-      - "9113:9113"
     depends_on:
       - proxy
     cpuset: "3"
@@ -44,8 +42,6 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock #FOR LOCAL RESTART REMOVE ON PROD, ROOT ACCESS = BAD
       - ./MASTER_CONFIG.json:/MASTER_CONFIG.json
-
-    #   - ./app:/app
     networks:
       - ddos-shared
 

@@ -61,6 +61,7 @@ class MemoryMonitor:
 
         self.memory_total_bytes.labels('total').set(virtMem.total)
         self.memory_total_bytes.labels('available').set(virtMem.available)
+        self.memory_total_bytes.labels('percent').set(virtMem.percent)
         self.memory_total_bytes.labels('free').set(virtMem.free)
 
         if hasattr(virtMem, "buffers"):
@@ -82,3 +83,4 @@ class MemoryMonitor:
         self.memory_swap_bytes.labels('free').set(swapMem.free)
         self.memory_swap_bytes.labels('sin').set(swapMem.sin)
         self.memory_swap_bytes.labels('frsoutee').set(swapMem.sout)
+        self.memory_swap_bytes.labels('percent').set(swapMem.percent)

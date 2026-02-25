@@ -257,7 +257,7 @@ class NetworkMonitor:
             return
 
         def inc(counter, label, delta):
-            if delta > 0:
+            if delta >= 0:
                 counter.labels(label).inc(delta)
 
         inc(self.network_bytes_total, "recv", stats["rx_bytes"] - self._last_stats["rx_bytes"])
