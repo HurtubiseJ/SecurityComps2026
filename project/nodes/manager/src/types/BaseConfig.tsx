@@ -6,12 +6,12 @@ import {
   LetterCircleHIcon,
   TextItalicIcon,
 } from "@phosphor-icons/react";
-import { LOCAL_NODE_IP_MAP } from "../constants/NodeIp";
+import { LOCAL_NODE_IP_MAP, NODE_IP_MAP } from "../constants/NodeIp";
 import type { Logger, Message } from "./Logger";
 import { NodeColorMap } from "../constants/NodeColorMap";
 
 const IS_LOCAL = import.meta.env.VITE_LOCAL === "true";
-
+const IP_MAP = IS_LOCAL ? LOCAL_NODE_IP_MAP : NODE_IP_MAP
 export type metrics = {
   cpu: boolean;
   memory: boolean;
@@ -217,7 +217,7 @@ export class BaseConfig {
 
   checkStatus = async () => {
     // @ts-ignore
-    const response = await fetch(`${LOCAL_NODE_IP_MAP[this.name]}status`);
+    const response = await fetch(`${IP_MAP[this.name]}status`);
     if (!response || response.status != 200) {
         this.state = "stopped";
         return
@@ -252,7 +252,7 @@ export class BaseConfig {
   applyConfigActiveNode = async () => {
     console.log(JSON.stringify(this.getConfig()));
     // @ts-ignore
-    const response = await fetch(`${LOCAL_NODE_IP_MAP[this.name]}config`, {
+    const response = await fetch(`${IP_MAP[this.name]}config`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -273,13 +273,13 @@ export class BaseConfig {
 
   restartConfigActiveNode = async () => {
     // @ts-ignore
-    const response = await fetch(`${LOCAL_NODE_IP_MAP[this.name]}restart`);
+    const response = await fetch(`${IP_MAP[this.name]}restart`);
     const res = await response.json();
     this.appendToLogger(JSON.stringify(res["message"]));
   };
   getConfigActiveNodeConfig = async () => {
     // @ts-ignore
-    const response = await fetch(`${LOCAL_NODE_IP_MAP[this.jname]}config`);
+    const response = await fetch(`${IP_MAP[this.jname]}config`);
     const res = await response.json();
 
     this.appendToLogger(`Successfully fetched Node Config`);
@@ -288,7 +288,7 @@ export class BaseConfig {
 
   startActiveNode = async () => {
     // @ts-ignore
-    const response = await fetch(`${LOCAL_NODE_IP_MAP[this.name]}start`, {
+    const response = await fetch(`${IP_MAP[this.name]}start`, {
       method: "POST",
     });
     const res = await response.json();
@@ -302,7 +302,7 @@ export class BaseConfig {
 
   stopActiveNode = async () => {
     // @ts-ignore
-    const response = await fetch(`${LOCAL_NODE_IP_MAP[this.name]}stop`, {
+    const response = await fetch(`${IP_MAP[this.name]}stop`, {
       method: "POST",
     });
 
