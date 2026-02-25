@@ -1,20 +1,39 @@
 {
+    "id": "081f4555-2980-428b-9426-a0cec71e8a06",
     "name": "attacker2",
     "type": "attacker",
     "enabled": true,
-    "forward_host": "localhost",
-    "forward_port": "8001",
-    "port": "8000",
-    "host": "localhost",
+    "forward_host": "proxy",
+    "forward_port": "8000",
+    "host": "0.0.0.0",
+    "port": "8002",
     "monitor": {
-        "enabled": true,
-        "metrics": {
-            "cpu": true,
-            "memory": true,
-            "disk": true,
-            "network": true, 
-            "fastapi": true
-        },
-        "interval": 1
+      "enabled": true,
+      "interval": null,
+      "metrics": {
+        "cpu": true,
+        "disk": true,
+        "network": true,
+        "fastapi": true,
+        "memory": true
+      }
+    },
+    "custom_config": {
+      "attack_type": "http_flood",
+      "threads": 2,
+      "connections": 100,
+      "duration_seconds": 120,
+      "rate_rps": 50,
+      "method": "GET",
+      "paths": [
+        "/api/cpu"
+      ],
+      "path_ratios": [
+        1.0
+      ],
+      "keep_alive": true,
+      "header_interval_ms": 100,
+      "payload_bytes": 0,
+      "connect_timeout_ms": 3000
     }
-}
+  }

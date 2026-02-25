@@ -121,21 +121,21 @@ class CPUMonitor:
 
 
         self.cpu_seconds_total = Counter(
-            "container_cpu_seconds_total",
+            "node_container_cpu_seconds_total",
             "Cumulative CPU time spent in each mode (cgroup)",
             ["mode"],
         )
 
 
         self.cpu_time_pct = Gauge(
-            "container_cpu_time_pct",
+            "node_container_cpu_time_pct",
             "Percent CPU usage for this container",
             ["mode"],
         )
 
 
         self.cpu_stats_total = Counter(
-            "container_cpu_stats_total",
+            "node_container_cpu_stats_total",
             "Container CPU scheduling statistics",
             ["stat"],
         )

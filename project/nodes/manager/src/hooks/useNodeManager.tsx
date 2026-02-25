@@ -5,39 +5,44 @@ import { type NodeType } from "../types/configs"
 import { type metrics } from "../types/BaseConfig"
 import { type Logger } from "../types/Logger"
 
-const IS_LOCAL = import.meta.env.LOCAL;
+const IS_LOCAL = import.meta.env.VITE_LOCAL === "true";
+
+console.log("IS_LOCAL: ", IS_LOCAL)
 
 const InitDefaultNodes = async (logger: Logger): Promise<BaseConfig[]> => {
     const list: BaseConfig[] = []
 
     const IP_MAP = IS_LOCAL ? LOCAL_NODE_IP_MAP : NODE_IP_MAP;
 
-    const attacker2Config = await initAttacker2Config(IP_MAP['attacker2'], "attacker", logger)
+    // ATTACKERS
+    const attacker1Config = await initNodeConfig(IP_MAP['attacker1'], 'attacker', logger)
+    if (attacker1Config) {
+        list.push(attacker1Config)
+    }
+    const attacker2Config = await initNodeConfig(IP_MAP['attacker2'], "attacker", logger)
     if (attacker2Config) {
         list.push(attacker2Config)
     }
-    const attacker3Config = await initAttacker2Config(IP_MAP['attacker3'], "attacker", logger)
+    const attacker3Config = await initNodeConfig(IP_MAP['attacker3'], "attacker", logger)
     if (attacker3Config) {
         list.push(attacker3Config)
     }
-    const targetConfig = await initAttacker2Config(IP_MAP['target1'], "target", logger)
+
+    // TARGETS
+    const targetConfig = await initNodeConfig(IP_MAP['target1'], "target", logger)
     if (targetConfig) {
         list.push(targetConfig)
     }
 
-    const attacker1Config = await initAttacker2Config(IP_MAP['attacker1'], 'attacker', logger)
-    console.log("ATTACKER1, ", attacker1Config)
-    if (attacker1Config) {
-        list.push(attacker1Config)
-    }
 
-    const attacker1JohnConfig = await initAttacker2Config(IP_MAP['attacker1-john'], 'attacker', logger)
-    console.log("ATTACKER1, ", attacker1JohnConfig)
-    if (attacker1JohnConfig) {
-        list.push(attacker1JohnConfig)
-    }
+    // const attacker1JohnConfig = await initNodeConfig(IP_MAP['attacker1-john'], 'attacker', logger)
+    // console.log("ATTACKER1, ", attacker1JohnConfig)
+    // if (attacker1JohnConfig) {
+    //     list.push(attacker1JohnConfig)
+    // }
 
-    const proxy = await initAttacker2Config(IP_MAP['proxy'], 'proxy', logger)
+    // PROXY
+    const proxy = await initNodeConfig(IP_MAP['proxy'], 'proxy', logger)
     if (proxy) {
         list.push(proxy)
     }
@@ -45,7 +50,7 @@ const InitDefaultNodes = async (logger: Logger): Promise<BaseConfig[]> => {
     return list
 }
 
-const initAttacker2Config = async (url: string, type: NodeType, logger: Logger): Promise<BaseConfig | null> => {
+const initNodeConfig = async (url: string, type: NodeType, logger: Logger): Promise<BaseConfig | null> => {
     const configUrl = `${url}config`
 
     try {
@@ -141,11 +146,27 @@ export default function useNodeManager(logger: Logger) {
         }
     }, [])
 
+    useEffect(() => {
+        const interval = setInterval(updateNodeStatuses, 10000)
+        return () => clearInterval(interval)
+    }, [])
+
     const changeActiveNode = (id: string) => {
         setActiveNode(nodes.find(n => n.id === id) ?? null)
     }
 
-    const updateNode = (node: any) => {
+    const updateNodeStatuses = async () => {
+        console.log("Statuses")
+        const promises: Promise<void>[] = []
+        nodes.map((currNode: BaseConfig) => {
+            const prom = currNode.checkStatus();
+            promises.push(prom);
+        })
+
+        await Promise.all(promises)
+    }
+
+    const updateNode = async (node: any) => {
         // console.log("UPDATE: ", node)
         const metrics: metrics = {
             cpu: node.monitor?.metrics?.cpu,
@@ -165,9 +186,6 @@ export default function useNodeManager(logger: Logger) {
         }
         // console.log("MONITOR: ", monitorConfig)
         const config = new BaseConfig(node.name, node.type, node.enabled, node.forward_host, node.forward_port, node.host, node.port, monitorConfig, attacker_config)
-
-
-        // console.log("INPUT NODE: ", config)
 
         setNodes(nodes.map((currNode: BaseConfig) => {
             if (currNode.id === config.id) {

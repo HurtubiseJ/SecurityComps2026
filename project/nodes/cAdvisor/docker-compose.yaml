@@ -6,14 +6,16 @@ services:
       - "8088:8080"
     privileged: true
     user: root
+    cpuset: "3"
     volumes:
       - /:/rootfs:ro
       - /var/run:/var/run:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /sys:/sys:ro
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
       - /var/lib/docker:/var/lib/docker:ro
       - /dev/disk:/dev/disk:ro
-      # - /var/run/containerd/contxainerd.sock:/var/run/containerd/containerd.sock:ro
+      # - /var/run/containerd/containerd.sock:/var/run/containerd/containerd.sock:ro
     command:
       - --docker_only=true
     networks:

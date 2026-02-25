@@ -9,7 +9,7 @@ services:
       context: ../../  # Project root (needs access to shared/)
       dockerfile: nodes/attacker1/Dockerfile
     ports:
-      - "8020:8000"  # FastAPI control server
+      - "8001:8000"  # FastAPI control server
     volumes: 
       - ./app:/app  # Live code reload
       - ./MASTER_CONFIG.json:/MASTER_CONFIG.json  # Config (restart to reload)

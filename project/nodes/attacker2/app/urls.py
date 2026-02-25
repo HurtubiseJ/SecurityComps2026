@@ -10,9 +10,11 @@ import json
 import subprocess
 from typing import Optional
 from pydantic import BaseModel
+from typing import List, Optional
 from pathlib import Path
 
 logger = logging.getLogger()
+
 
 class Metrics(BaseModel):
     cpu: bool
@@ -26,6 +28,22 @@ class Monitor(BaseModel):
     interval: Optional[int] = None
     metrics: Metrics
 
+
+class AttackConfig(BaseModel):
+    attack_type: str
+    threads: int 
+    connections: int
+    duration_seconds: int
+    rate_rps: int
+    method: str
+    paths: List[str]
+    path_ratios: List[float]
+    # headers: Optional[Dict[str, str]] = None
+    keep_alive: bool 
+    header_interval_ms: int
+    payload_bytes: int
+    connect_timeout_ms: int
+
 class Config(BaseModel):
     id: str
     name: str
@@ -36,13 +54,15 @@ class Config(BaseModel):
     host: str
     port: str
     monitor: Monitor
-
+    custom_config: AttackConfig
 
 router = APIRouter()
 
 @router.get("/status")
 async def status():
-    return {"status": "running"}
+    from processes import RUNNING_PROCESS
+    state = "running" if RUNNING_PROCESS else "idle"
+    return {"status": "ok", "state": state}
 
 @router.post("/start")
 async def start():
@@ -70,7 +90,6 @@ async def test():
 
 @router.get("/config")
 async def config():
-    subprocess.run(["ls"])
     with open("../MASTER_CONFIG.json", "r") as f:
         config = json.load(f)
     
@@ -87,11 +106,6 @@ async def modifyConfig(config: Config):
             config.model_dump_json(indent=2)
         )
         f.close()
-
-    with open("../MASTER_CONFIG.json", "r") as f:
-        c = json.load(f)
-        print(c)
-        logger.warning(c)
     
     return {"status": "ok", "message": "Config file modified. GET /restart to apply changes."}
 

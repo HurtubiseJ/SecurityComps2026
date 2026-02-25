@@ -19,6 +19,7 @@ import json
 import time
 import os
 import random
+from typing import List, Optional
 
 app = FastAPI()
 app.add_middleware(
@@ -47,17 +48,45 @@ def write_master_config(config_json: str):
     return True
 
 
-class CustomConfig(BaseModel):
-    attack_type: str = "slowloris"
-    connections: int = 300
-    header_interval_ms: int = 10000
-    keep_alive: bool = True
-    target_host: str
-    target_port: int
-    headers: Dict[str, str] | None = None
-    payload_bytes: int | None = 0
-    connect_timeout_ms: int = 3000
+class Metrics(BaseModel):
+    cpu: bool
+    disk: bool
+    network: bool
+    fastapi: bool
+    memory: bool
 
+class Monitor(BaseModel):
+    enabled: bool
+    interval: Optional[int] = None
+    metrics: Metrics
+
+
+class AttackConfig(BaseModel):
+    attack_type: str
+    threads: int 
+    connections: int
+    duration_seconds: int
+    rate_rps: int
+    method: str
+    paths: List[str]
+    path_ratios: List[float]
+    # headers: Optional[Dict[str, str]] = None
+    keep_alive: bool 
+    header_interval_ms: int
+    payload_bytes: int
+    connect_timeout_ms: int
+
+class Config(BaseModel):
+    id: str
+    name: str
+    type: str
+    enabled: bool
+    forward_host: str
+    forward_port: str
+    host: str
+    port: str
+    monitor: Monitor
+    custom_config: AttackConfig
 
 # Metrics
 ACTIVE_CONNECTIONS = Gauge(
@@ -180,7 +209,7 @@ class SlowlorisAttack:
                     pass
             self.sockets.clear()
         ACTIVE_CONNECTIONS.set(0)
-        self.status = "stopped"
+        self.status = "idle"
         ATTACK_STATUS.set(2)
 
     def info(self) -> Dict[str, Any]:
@@ -204,6 +233,10 @@ async def health():
     return {"status": "ok", "type": "attacker3", "attack_status": attack.status}
 
 
+@app.get("/status")
+async def status():
+    return {"status": "ok", "state": attack.status}
+
 @app.get("/config")
 async def get_config():
     try:
@@ -213,7 +246,7 @@ async def get_config():
 
 
 @app.post("/config")
-async def update_config(config: Dict[str, Any]):
+async def update_config(config: Config):
     try:
         config_json = json.dumps(config, indent=2)
         write_master_config(config_json)

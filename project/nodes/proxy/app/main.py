@@ -63,7 +63,7 @@ async def health():
 
 @app.get("/status")
 async def status():
-    return {"status": "ok", "message": "Status OK"}
+    return {"status": "ok", "state": "running", "message": "Status OK"}
 
 @app.get("/config")
 async def getConfig():

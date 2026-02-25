@@ -39,7 +39,7 @@ services:
     ports:
       - "9090:9090"
     volumes:
-      - ./prometheus:/etc/prometheus
+      - ./local/prometheus:/etc/prometheus
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
     restart: always
@@ -60,8 +60,10 @@ services:
     logging:
       driver: none
     volumes:
-      - ./grafana/grafana.ini:/etc/grafana/grafana.ini:ro
-      - ~/grafana-data:/var/lib/grafana
+      - ./local/grafana/grafana.ini:/etc/grafana/grafana.ini:ro
+      - ./local/grafana/grafana-data:/var/lib/grafana
+      - ./local/grafana/provisioning:/etc/grafana/provisioning
+      - ./local/grafana:/var/lib/grafana
     restart: always
     networks:
       - ddos-shared

@@ -302,7 +302,8 @@ def start_attack() -> Dict:
             "status": "started",
             "processes": len(attack_processes),
             "total_rps": total_rps,
-            "paths": [p["path"] for p in attack_processes]
+            "paths": [p["path"] for p in attack_processes], 
+            "message": f"Http Flood Attack Started, Duration: {config['duration_seconds']}"
         }
             
         # except Exception as e:
@@ -324,7 +325,7 @@ def stop_attack() -> Dict:
     
     with attack_lock:
         if attack_status != "running":
-            return {"status": "no_attack_running"}
+            return {"status": "no_attack_running", "message": "No attack is running"}
         
         stopped_count = 0
         for proc_info in attack_processes:
@@ -343,7 +344,8 @@ def stop_attack() -> Dict:
         
         return {
             "status": "stopped",
-            "processes_stopped": stopped_count
+            "processes_stopped": stopped_count, 
+            "message": f"Attack Stopped, processes stopped {stopped_count}"
         }
 
 # ============================================================================
@@ -378,6 +380,7 @@ async def post_config(config: Config):
 async def start_attack_endpoint():
     """Start HTTP flood attack using MASTER_CONFIG.json settings."""
     # try:
+
     return start_attack()
     # except HTTPException:
     #     raise
@@ -411,9 +414,10 @@ async def get_attack_status():
             })
         
         return {
-            "status": attack_status,
+            "status": "ok",
             "processes": process_info,
-            "total_processes": len(attack_processes)
+            "total_processes": len(attack_processes), 
+            "state": attack_status
         }
 
 

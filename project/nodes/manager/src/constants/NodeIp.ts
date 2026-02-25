@@ -12,11 +12,11 @@ export const NODE_IP_MAP = {
 }
 
 export const LOCAL_NODE_IP_MAP = {
-    "attacker2": "http://localhost:8000/", 
-    "attacker1": "http://localhost:8020/",
-    "attacker1-john": "http://localhost:8010/",
-    "attacker3": "http://localhost:8040/",
-    "proxy": "http://localhost:8030/",
-    "target1": "http://localhost:8002/",
+    "attacker1": "http://localhost:8001/",
+    "attacker2": "http://localhost:8002/", 
+    // "attacker1-john": "http://localhost:8010/",
+    "attacker3": "http://localhost:8003/",
+    "proxy": "http://localhost:8004/",
+    "target1": "http://localhost:8005/",
     "monitor": "http://localhost"
 }

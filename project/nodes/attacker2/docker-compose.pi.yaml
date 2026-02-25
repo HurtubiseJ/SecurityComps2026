@@ -3,9 +3,10 @@ services:
     container_name: attacker2
     build: 
       context: ../../
-      dockerfile: nodes/attacker2/Dockerfile
+      dockerfile: nodes/attacker2/Dockerfile.pi
     ports:
       - "8000:8000"
     volumes: 
       - ./app:/app
       - ./control:/control # Pass through for systemd service
+      - ./MASTER_CONFIG.json:/MASTER_CONFIG.json  # Config (restart to reload)

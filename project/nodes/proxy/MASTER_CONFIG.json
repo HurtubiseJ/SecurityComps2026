@@ -1,10 +1,10 @@
 {
-  "id": "dbb4e8bc-d5ee-4d73-a20c-ac0fa448f7a1",
+  "id": "af4d4e12-e5cf-441e-9829-1ef99a8bb2f1",
   "name": "proxy",
   "type": "proxy",
   "enabled": true,
-  "forward_host": "0.0.0.0",
-  "forward_port": "8001",
+  "forward_host": "target1",
+  "forward_port": "8000",
   "host": "0.0.0.0",
   "port": "8000",
   "monitor": {
@@ -20,7 +20,7 @@
   },
   "custom_config": {
     "enabled": true,
-    "rate_limit_rate": 4000,
+    "rate_limit_rate": 4500,
     "max_connections": 10000,
     "burst": 4000,
     "connection_timeout": 10,

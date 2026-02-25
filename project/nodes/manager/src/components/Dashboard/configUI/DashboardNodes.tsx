@@ -48,7 +48,7 @@ export default function DashboardNodes({ nodeManager }: { nodeManager: any }) {
           transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
         }}
       >
-        <div className="flex flex-row items-start gap-x-24 p-8">
+        <div className="flex flex-row items-center gap-x-24 p-8">
           {/* ATTACKER */}
           <div className="flex flex-col gap-y-12">
             {nodeManager.nodes.map((node: BaseConfig) =>

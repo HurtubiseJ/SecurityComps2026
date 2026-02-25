@@ -10,6 +10,8 @@ import { LOCAL_NODE_IP_MAP } from "../constants/NodeIp";
 import type { Logger, Message } from "./Logger";
 import { NodeColorMap } from "../constants/NodeColorMap";
 
+const IS_LOCAL = import.meta.env.VITE_LOCAL === "true";
+
 export type metrics = {
   cpu: boolean;
   memory: boolean;
@@ -165,6 +167,12 @@ export class BaseConfig {
 
   public logger: Logger | null;
 
+  public state: "stopped" | "idle" | "running";
+
+  public run_time: number = 0;
+  public cpu_cpt: number = 0;
+  public cpu_count: number = 0;
+
   public constructor(
     name: string,
     type: NodeType,
@@ -176,7 +184,8 @@ export class BaseConfig {
     monitor: BaseMonitor | null = null,
     custom_config: AttackerConfig | ProxyConfig | null = null,
     logger: Logger | null = null,
-    running: boolean = false
+    running: boolean = false, 
+    state: "stopped" | "idle" | "running" = "idle"
   ) {
     this.id = uuidv4();
     this.name = name;
@@ -193,7 +202,35 @@ export class BaseConfig {
     this.logger = logger;
 
     this.running = running;
+
+    this.state = state;
+
+    this.checkStatus();
   }
+
+  checkMetrics = async () => {
+    if (IS_LOCAL) { // Use cAdvisor
+        
+    }
+    
+  }
+
+  checkStatus = async () => {
+    // @ts-ignore
+    const response = await fetch(`${LOCAL_NODE_IP_MAP[this.name]}status`);
+    if (!response || response.status != 200) {
+        this.state = "stopped";
+        return
+    }
+
+    const content = await response.json();
+    if (!content) {
+      this.state = "stopped";
+      return;
+    }
+
+    this.state = content["state"] ?? "stopped";
+  };
 
   appendToLogger = (text: string, isError: boolean = false) => {
     if (this.logger == null) {
@@ -258,6 +295,8 @@ export class BaseConfig {
 
     this.appendToLogger(JSON.stringify(res["message"]));
 
+    this.checkStatus();
+
     return res;
   };
 
@@ -270,6 +309,8 @@ export class BaseConfig {
     const res = await response.json();
 
     this.appendToLogger(JSON.stringify(res["message"]));
+
+    this.checkStatus();
     return res;
   };
 
@@ -312,24 +353,27 @@ export class BaseConfig {
             <p className="text-black text-sm">Restart</p>
           </a>
         </div>
-        <div className="flex flex-1 w-full  flex-row gap-x-4 items-start justify-between">
-          <a
-            className="flex w-full bg-green-500 hover:bg-green-400 cursor-pointer rounded-md px-4 py-2"
-            onClick={async () => {
-              await this.startActiveNode();
-            }}
-          >
-            <p className="text-black text-sm">START</p>
-          </a>
-          <a
-            className="flex w-full bg-red-500 hover:bg-red-400 cursor-pointer rounded-md px-4 py-2"
-            onClick={async () => {
-              await this.stopActiveNode();
-            }}
-          >
-            <p className="text-black text-sm">STOP</p>
-          </a>
-        </div>
+
+        {this.type === "attacker" && (
+          <div className="flex flex-1 w-full  flex-row gap-x-4 items-start justify-between">
+            <a
+              className="flex w-full bg-green-500 hover:bg-green-400 cursor-pointer rounded-md px-4 py-2"
+              onClick={async () => {
+                await this.startActiveNode();
+              }}
+            >
+              <p className="text-black text-sm">START</p>
+            </a>
+            <a
+              className="flex w-full bg-red-500 hover:bg-red-400 cursor-pointer rounded-md px-4 py-2"
+              onClick={async () => {
+                await this.stopActiveNode();
+              }}
+            >
+              <p className="text-black text-sm">STOP</p>
+            </a>
+          </div>
+        )}
       </div>
     );
   }
@@ -358,8 +402,10 @@ export class BaseConfig {
           "
         >
           <div className="w-full">
-            {this.running ? (
+            {this.state === "running" ? (
               <div className="absolute right-2 top-2 rounded-full bg-green-600 h-3 w-3 min-w-1" />
+            ) : this.state === "idle" ? (
+              <div className="absolute right-2 top-2 rounded-full bg-yellow-400 h-3 w-3 min-w-1" />
             ) : (
               <div className="absolute right-2 top-2 rounded-full bg-gray-500 h-3 w-3 min-w-1" />
             )}
@@ -564,7 +610,7 @@ export class AttackerConfig {
   public rate_rps: number;
   public threads: number;
   public connections: number;
-//   public socket_count: number;
+  //   public socket_count: number;
   public method: string;
   public paths: string[];
   public path_ratios: number[];
@@ -626,7 +672,7 @@ export class AttackerConfig {
       keep_alive: this.keep_alive,
       header_interval_ms: this.header_interval_ms,
       connect_timeout_ms: this.connect_timeout_ms,
-      payload_bytes: this.payload_bytes
+      payload_bytes: this.payload_bytes,
     };
   }
 
@@ -699,7 +745,10 @@ export class AttackerConfig {
         <div className="flex flex-col gap-y-2 items-center">
           {values?.map((key, i) => {
             return (
-              <div key={key} className="flex w-full items-center gap-x-2 rounded-md overflow-hidden bg-slate-600 p-1 min-w-0">
+              <div
+                key={key}
+                className="flex w-full items-center gap-x-2 rounded-md overflow-hidden bg-slate-600 p-1 min-w-0"
+              >
                 {icon}
                 <input
                   type={inputType}
@@ -854,7 +903,7 @@ export class AttackerConfig {
           "payload_bytes",
           "text",
           <TextItalicIcon weight="bold" />,
-          (v) => (this.payload_bytes= Number(v.target.value)),
+          (v) => (this.payload_bytes = Number(v.target.value)),
           String(this.payload_bytes),
           updateNode,
           parentGetConfig
@@ -893,13 +942,13 @@ export class ProxyConfig {
     send_timeout: number
   ) {
     this.enabled = enabled;
-    this.rate_limit_rate= rate_limit_rate;
+    this.rate_limit_rate = rate_limit_rate;
     this.max_connections = max_connections;
-    this.burst= burst;
+    this.burst = burst;
     this.connection_timeout = connection_timeout;
     this.read_timeout = read_timeout;
     this.send_timeout = send_timeout;
-}
+  }
 
   //   @ts-ignore
   getConfig() {
@@ -910,7 +959,7 @@ export class ProxyConfig {
       burst: this.burst,
       connection_timeout: this.connection_timeout,
       read_timeout: this.read_timeout,
-      send_timeout: this.send_timeout
+      send_timeout: this.send_timeout,
     };
   }
 

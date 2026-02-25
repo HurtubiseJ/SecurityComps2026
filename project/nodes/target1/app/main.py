@@ -75,19 +75,19 @@ QUEUE_DEPTH = Gauge("app_request_queue_depth", "Simulated queue depth")
 
 
 #node becomes offline/ shuts off cleanly if disabled
-@app.middleware("http")
-async def metrics_middleware(request: Request, call_next):
-    if not MASTER_CONFIG.get("enabled", True):
-        return JSONResponse(status_code=503, content={"error": "Target disabled by config"})
+# @app.middleware("http")
+# async def metrics_middleware(request: Request, call_next):
+#     if not MASTER_CONFIG.get("enabled", True):
+#         return JSONResponse(status_code=503, content={"error": "Target disabled by config"})
 
-    INFLIGHT.inc()
-    start = time.time()
-    response = await call_next(request)
-    latency = time.time() - start
-    REQUEST_LATENCY.labels(path=request.url.path).observe(latency)
-    REQUEST_COUNT.labels(request.method, request.url.path, response.status_code).inc()
-    INFLIGHT.dec()
-    return response
+#     INFLIGHT.inc()
+#     start = time.time()
+#     response = await call_next(request)
+#     latency = time.time() - start
+#     REQUEST_LATENCY.labels(path=request.url.path).observe(latency)
+#     REQUEST_COUNT.labels(request.method, request.url.path, response.status_code).inc()
+#     INFLIGHT.dec()
+#     return response
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -111,16 +111,6 @@ async def api_func(func: str):
 async def api_cpu_func():
     for _ in range(1000000):
         math.sqrt(random.random())
-
-@app.get("/config")
-async def show_config():
-    return MASTER_CONFIG
-
-#Prometheus endpoint
-# @app.get("/metrics")
-# def metrics():
-#     return generate_latest()
-
 
 @app.get("/config")
 async def getConfig():
@@ -154,6 +144,13 @@ async def reset():
     else:
         Path("/control/restart_required").touch()
         return {"status": "ok", "message": "Restarting container vis systemd"}
+    
+@app.get("/status")
+async def status():
+    return {
+        "status": "ok",
+        "state": "running",
+    }
 
 
 def run_local_restart():

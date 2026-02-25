@@ -1,0 +1,16 @@
+# Add to your docker-compose.yml
+services:
+  docker-exporter:
+    container_name: docker-exporter
+    image: wywywywy/docker_stats_exporter:latest
+    cpuset: "3"
+    environment:
+      - INTERVAL=3
+      - COLLECTDEFAULT=true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    ports:
+      - "9487:9487"
+    networks:
+      - ddos-shared
+    restart: unless-stopped

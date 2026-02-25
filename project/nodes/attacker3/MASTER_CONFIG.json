@@ -1,39 +1,39 @@
 {
-  "id": "a6e3b44c-fcef-4630-bd5f-4b52952658af",
-  "name": "attacker3",
-  "type": "attacker",
-  "enabled": true,
-  "forward_host": "proxy",
-  "forward_port": "8000",
-  "host": "localhost",
-  "port": "8040",
-  "monitor": {
+    "id": "081f4555-2980-428b-9426-a0cec71e8a06",
+    "name": "attacker3",
+    "type": "attacker",
     "enabled": true,
-    "metrics": {
-      "cpu": true,
-      "memory": true,
-      "disk": true,
-      "network": true,
-      "fastapi": true
-    }, 
-    "interval": 1
-  },
-  "custom_config": {
-    "attack_type": "http_flood",
-    "threads": 2,
-    "connections": 400,
-    "duration_seconds": 120,
-    "rate_rps": 600,
-    "method": "GET",
-    "paths": [
-      "/api/cpu"
-    ],
-    "path_ratios": [
-      1.0
-    ],
-    "keep_alive": true, 
-    "header_interval_ms": 100,
-    "payload_bytes": 0,
-    "connect_timeout_ms": 3000
+    "forward_host": "proxy",
+    "forward_port": "8000",
+    "host": "0.0.0.0",
+    "port": "8003",
+    "monitor": {
+      "enabled": true,
+      "interval": null,
+      "metrics": {
+        "cpu": true,
+        "disk": true,
+        "network": true,
+        "fastapi": true,
+        "memory": true
+      }
+    },
+    "custom_config": {
+      "attack_type": "http_flood",
+      "threads": 2,
+      "connections": 100,
+      "duration_seconds": 120,
+      "rate_rps": 50,
+      "method": "GET",
+      "paths": [
+        "/api/cpu"
+      ],
+      "path_ratios": [
+        1.0
+      ],
+      "keep_alive": true,
+      "header_interval_ms": 100,
+      "payload_bytes": 0,
+      "connect_timeout_ms": 3000
+    }
   }
-}
