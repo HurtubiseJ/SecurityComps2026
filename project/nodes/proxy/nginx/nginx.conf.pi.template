@@ -29,6 +29,8 @@ http {
 
     location = /stub_status {
       stub_status;
+      allow 172.0.0.0/8;   # docker network
+      allow 127.0.0.1;
       allow all;
     }
 
