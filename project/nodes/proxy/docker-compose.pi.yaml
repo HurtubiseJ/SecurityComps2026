@@ -18,7 +18,7 @@ services:
   nginx-exporter:
     image: nginx/nginx-prometheus-exporter:1.4
     container_name: nginx-exporter
-    command: ["--nginx.scrape-uri=http://192.168.192.109:8000/stub_status"]
+    command: ["--nginx.scrape-uri=http://proxy:8000/stub_status"]
     depends_on:
       - proxy
 
