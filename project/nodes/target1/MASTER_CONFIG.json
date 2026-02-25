@@ -6,15 +6,18 @@
     "forward_port": "8000",
     "monitor": {
         "enabled": true,
+        "interval": null,
         "metrics": {
-            "cpu": true,
-            "memory": true,
-            "disk": true,
-            "network": true, 
-            "fastapi": true
-        },
-        "interval": 1
-    },
+          "cpu": true,
+          "disk": true,
+          "network": true,
+          "fastapi": true,
+          "memory": true, 
+          "sys_cpu": true,
+          "sys_network": true,
+          "sys_memory": true
+          }
+      },
     "custom_config": {
         "caching": {
         "enabled": true,

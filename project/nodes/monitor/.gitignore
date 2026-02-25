@@ -1,0 +1,3 @@
+local/grafana/png/*
+local/grafana/csv/*
+*/local/grafana/plugins/*

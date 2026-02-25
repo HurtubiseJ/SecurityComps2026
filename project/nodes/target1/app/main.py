@@ -19,6 +19,9 @@ class Metrics(BaseModel):
     network: bool
     fastapi: bool
     memory: bool
+    sys_cpu: bool
+    sys_memory: bool
+    sys_network: bool
 
 class Monitor(BaseModel):
     enabled: bool

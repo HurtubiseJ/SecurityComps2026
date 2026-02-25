@@ -10,7 +10,7 @@ services:
     volumes:
       - ./pi/prometheus:/etc/prometheus
     command:
-      - "--config.file=/etc/prometheus/prometheus.pi.yml"
+      - "--config.file=/etc/prometheus/prometheus.yml"
     restart: always
 
   grafana:

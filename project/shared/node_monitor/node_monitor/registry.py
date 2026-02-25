@@ -11,6 +11,10 @@ from .collectors.network import NetworkMonitor
 from .collectors.disk import DiskMonitor
 from .fastapi import BindPrometheus
 
+from .collectors.sys_cpu import CPUMonitor as SysCPUMonitor
+from .collectors.sys_memory import MemoryMonitor as SysMemoryMonitor
+from .collectors.sys_network import NetworkMonitor as SysNetworkMonitor
+
 class Registry:
 
     def __init__(self):
@@ -87,6 +91,10 @@ class Registry:
         self._register(DiskMonitor, self.config.metrics['disk'])
         self._register(MemoryMonitor, self.config.metrics['memory'])
         self._register(NetworkMonitor, self.config.metrics['network'])
+
+        self._register(SysCPUMonitor, self.config.metrics['sys_cpu'])
+        self._register(SysMemoryMonitor, self.config.metrics['sys_memory'])
+        self._register(SysNetworkMonitor, self.config.metrics['sys_network'])
 
     def _register(self, cls, enabled: bool):
         if enabled:

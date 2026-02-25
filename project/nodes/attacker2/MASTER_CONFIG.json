@@ -15,8 +15,11 @@
         "disk": true,
         "network": true,
         "fastapi": true,
-        "memory": true
-      }
+        "memory": true, 
+        "sys_cpu": true,
+        "sys_network": true,
+        "sys_memory": true
+        }
     },
     "custom_config": {
       "attack_type": "http_flood",

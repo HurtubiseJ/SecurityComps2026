@@ -12,12 +12,16 @@ import { NodeColorMap } from "../constants/NodeColorMap";
 
 const IS_LOCAL = import.meta.env.VITE_LOCAL === "true";
 const IP_MAP = IS_LOCAL ? LOCAL_NODE_IP_MAP : NODE_IP_MAP
+
 export type metrics = {
   cpu: boolean;
   memory: boolean;
   disk: boolean;
   network: boolean;
   fastapi: boolean;
+  sys_cpu: boolean;
+  sys_memory: boolean;
+  sys_network: boolean;
 };
 
 export class BaseMonitor {
@@ -143,6 +147,36 @@ export class BaseMonitor {
           <TextItalicIcon weight="bold" />,
           (v) => (this.metrics.fastapi = v.target.checked),
           this.metrics.fastapi,
+          updateNode,
+          parentGetConfig
+        )}
+        {this.configRow(
+          "System CPU",
+          "sys_cpu",
+          "checkbox",
+          <TextItalicIcon weight="bold" />,
+          (v) => (this.metrics.sys_cpu = v.target.checked),
+          this.metrics.sys_cpu,
+          updateNode,
+          parentGetConfig
+        )}
+        {this.configRow(
+          "System Memory",
+          "sys_memory",
+          "checkbox",
+          <TextItalicIcon weight="bold" />,
+          (v) => (this.metrics.sys_memory = v.target.checked),
+          this.metrics.sys_memory,
+          updateNode,
+          parentGetConfig
+        )}
+        {this.configRow(
+          "System Network",
+          "sys_network",
+          "checkbox",
+          <TextItalicIcon weight="bold" />,
+          (v) => (this.metrics.sys_network = v.target.checked),
+          this.metrics.sys_network,
           updateNode,
           parentGetConfig
         )}

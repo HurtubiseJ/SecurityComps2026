@@ -69,7 +69,10 @@ const initNodeConfig = async (url: string, type: NodeType, logger: Logger): Prom
             memory: mon_metrics?.memory,
             disk: mon_metrics?.disk,
             network: mon_metrics?.network,
-            fastapi: mon_metrics?.fastapi
+            fastapi: mon_metrics?.fastapi,
+            sys_cpu: mon_metrics?.sys_cpu,
+            sys_memory: mon_metrics?.sys_memory,
+            sys_network: mon_metrics?.sys_network,
         }
         const monitorConfig = res.monitor ? new BaseMonitor(res.monitor.enabled, metrics) : null
 
@@ -173,7 +176,10 @@ export default function useNodeManager(logger: Logger) {
             memory: node?.monitor?.metrics?.memory,
             disk: node?.monitor?.metrics?.disk,
             network: node?.monitor?.metrics?.network,
-            fastapi: node?.monitor?.metrics?.fastapi
+            fastapi: node?.monitor?.metrics?.fastapi,
+            sys_cpu: node?.monitor?.metrics?.sys_cpu,
+            sys_memory: node?.monitor?.metrics?.sys_memory,
+            sys_network: node?.monitor?.metrics?.sys_network
         }
         const monitorConfig = new BaseMonitor(node.monitor.enabled, metrics)
 
