@@ -76,7 +76,7 @@ http {
     }
 
     location /start {
-      proxy_pass http://${FORWARD_HOST}:${FORWARD_PORT};
+      proxy_pass http://target_upstream;
       proxy_set_header Host $host;
       proxy_set_header X-Real-IP $remote_addr;
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -84,7 +84,7 @@ http {
     }
 
     location /stop {
-      proxy_pass http://${FORWARD_HOST}:${FORWARD_PORT};
+      proxy_pass http://target_upstream;
       proxy_set_header Host $host;
       proxy_set_header X-Real-IP $remote_addr;
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -92,11 +92,10 @@ http {
     }
 
     location / {
-
       limit_conn conn_limit ${MAX_CONNECTIONS};
       limit_req zone=req_limit burst=${BURST} nodelay;
 
-      proxy_pass http://${FORWARD_HOST}:${FORWARD_PORT};
+      proxy_pass http://target_upstream;
       proxy_set_header Host $host;
       proxy_set_header X-Real-IP $remote_addr;
       proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
