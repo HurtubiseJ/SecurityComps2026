@@ -8,7 +8,7 @@ http {
   limit_conn_status 503;
 
   upstream target_upstream {
-    server ${FORWARD_HOST}:${FORWARD_PORT};
+    server 192.168.0.141:8000;
   }
 
   upstream fastapi_local {
