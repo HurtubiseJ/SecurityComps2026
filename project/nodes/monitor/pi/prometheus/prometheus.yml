@@ -21,3 +21,6 @@ scrape_configs:
       - targets: ['192.168.0.109:8000']
         labels:
           node: "proxy-fastapi"
+      - targets: ['192.168.0.141:9100']
+        labels:
+          node: "export-target1"
