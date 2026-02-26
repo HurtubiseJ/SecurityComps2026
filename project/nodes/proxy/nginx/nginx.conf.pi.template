@@ -1,6 +1,8 @@
 worker_processes auto;
 
-events {}
+events {
+    worker_connections 4096;
+}
 
 http {
   limit_req_zone $binary_remote_addr zone=req_limit:10m rate=${RATE_LIMIT}r/s;
