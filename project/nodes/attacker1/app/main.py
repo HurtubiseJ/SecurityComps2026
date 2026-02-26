@@ -283,8 +283,6 @@ def start_attack() -> Dict:
                 # Start in new process group so we can kill entire group later
                 process = subprocess.Popen(
                     cmd,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
                     preexec_fn=os.setsid
                 )
 
