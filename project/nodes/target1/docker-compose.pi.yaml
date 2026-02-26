@@ -10,9 +10,8 @@ services:
       - ./app:/app/app
       - ./MASTER_CONFIG.json:/app/MASTER_CONFIG.json
   node_exporter:
-    build: .
     image: quay.io/prometheus/node-exporter:latest
-    container_name: node_exporter
+    container_name: target1_node_exporter
     command:
       - '--path.rootfs=/host'
     network_mode: host
