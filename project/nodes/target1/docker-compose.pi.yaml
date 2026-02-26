@@ -15,8 +15,8 @@ services:
     command:
       - '--path.rootfs=/host'
       - '--web.listen-address=0.0.0.0:9100'
-    network_mode: host
-    pid: host
+    # network_mode: host
+    # pid: host
     restart: unless-stopped
     volumes:
       - '/:/host:ro,rslave'
