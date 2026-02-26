@@ -291,9 +291,6 @@ def start_attack() -> Dict:
                     text=True
                 )
 
-                for line in process.stdout:
-                    print(line, end="") 
-
                 attack_processes.append({
                     "process": process,
                     "path": path,
