@@ -214,7 +214,8 @@ def build_wrk2_command(config: Dict, path: str, path_rate_rps: int) -> List[str]
         "-R", str(path_rate_rps),          # Rate limit (required for wrk2)
         "-d", str(config["duration_seconds"]),                   # Run until manually stopped
         "--timeout", "2s",
-        "--latency"
+        "--latency",
+        "-s", "./wrk_stats.lua" 
     ]
     
     # Add custom headers
