@@ -9,7 +9,6 @@ RUN apt-get update && \
         python3 \
         python3-venv \
         python3-pip \
-        hping3 \
         ca-certificates && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -24,10 +23,9 @@ COPY shared/node_monitor /opt/node_monitor
 RUN pip install -e /opt/node_monitor
 
 COPY nodes/target1/app /app
-
-
 COPY nodes/target1/requirements.txt /app/requirements.txt
-COPY nodes/target1/MASTER_CONFIG.json .
+COPY nodes/target1/MASTER_CONFIG.json /MASTER_CONFIG.json
+
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
 EXPOSE 8000

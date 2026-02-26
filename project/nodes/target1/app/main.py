@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Request, BackgroundTasks, HTTPException
 from fastapi.responses import HTMLResponse, PlainTextResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from prometheus_client import Counter, Histogram, Gauge, generate_latest
+# from prometheus_client import Counter, Histogram, Gauge, generate_latest
 from pathlib import Path
 import json
 import time, random, threading
@@ -64,16 +64,16 @@ MASTER_CONFIG = load_master_config()
 
 
 #counts every requests, method -> GET/POST/etc, pathh -> /api/foo, status -> 200, 500, etc
-REQUEST_COUNT = Counter("http_requests_total", "Total HTTP requests", ["method", "path", "status"])
+# REQUEST_COUNT = Counter("http_requests_total", "Total HTTP requests", ["method", "path", "status"])
 
-#measure how long requests take per path
-REQUEST_LATENCY = Histogram("http_request_duration_seconds", "Request latency", ["path"])
+# #measure how long requests take per path
+# REQUEST_LATENCY = Histogram("http_request_duration_seconds", "Request latency", ["path"])
 
-#tracks how many requests are currently being processed
-INFLIGHT = Gauge("http_inflight_requests", "In-flight requests")
+# #tracks how many requests are currently being processed
+# INFLIGHT = Gauge("http_inflight_requests", "In-flight requests")
 
-#simulates a background job queue size
-QUEUE_DEPTH = Gauge("app_request_queue_depth", "Simulated queue depth")
+# #simulates a background job queue size
+# QUEUE_DEPTH = Gauge("app_request_queue_depth", "Simulated queue depth")
 
 
 
