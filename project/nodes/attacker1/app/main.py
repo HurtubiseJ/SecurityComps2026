@@ -225,6 +225,8 @@ def build_wrk2_command(config: Dict, path: str, path_rate_rps: int) -> List[str]
     # Disable keep-alive by adding Connection: Close header
     if not config["keep_alive"]:
         cmd.extend(["-H", "Connection: Close"])
+    else: 
+        cmd.extend(["-H", "Connection: keep-alive"])
     
     # Add HTTP method if not GET (wrk2 defaults to GET)
     if config["method"] != "GET":
