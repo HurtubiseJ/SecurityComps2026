@@ -12,7 +12,7 @@ scrape_configs:
       - targets: ['192.168.0.195:8000']
         labels:
           node: 'attacker1'
-      - targets: ['192.168.0.195:9100 ']
+      - targets: ['192.168.0.195:9100']
         labels:
           nodes: 'export-attacker1'
       - targets: ['192.168.0.172:8000']
