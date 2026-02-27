@@ -16,7 +16,7 @@ RUN apt-get update && \
 RUN python3 -m venv venv
 ENV PATH="/venv/bin:$PATH"
 ENV CONFIG_FILE_PATH="/MASTER_CONFIG.json"
-ENV PROMETHEUES_MULTIPROC_DIR="/tmp/prom-trgt1/"
+ENV PROMETHEUES_MULTIPROC_DIR="/home/compsw2026/tmp/prom-trgt1/"
 
 RUN pip install --upgrade pip setuptools wheel
 
