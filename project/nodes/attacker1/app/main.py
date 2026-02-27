@@ -297,9 +297,10 @@ def start_attack() -> Dict:
                     "rps": path_rps,
                     "cmd": " ".join(cmd)
                 })
-        for process_group in attack_processes: 
-            for lin in process_group['process'].stdout:
-                print(lin, end="")
+
+        # for process_group in attack_processes: 
+        #     for lin in process_group['process'].stdout:
+        #         print(lin, end="")
         
         if not attack_processes:
             raise ValueError("No attack processes started (all RPS values were 0)")
@@ -309,7 +310,8 @@ def start_attack() -> Dict:
         
         return {
             "status": "running",
-            "processes": len(attack_processes),
+            "num_processes": len(attack_processes),
+            "processes": attack_processes,
             "total_rps": total_rps,
             "paths": [p["path"] for p in attack_processes], 
             "message": f"Http Flood Attack Started, Duration: {config['duration_seconds']}"
@@ -389,7 +391,6 @@ async def post_config(config: Config):
 async def start_attack_endpoint():
     """Start HTTP flood attack using MASTER_CONFIG.json settings."""
     # try:
-
     return start_attack()
     # except HTTPException:
     #     raise
