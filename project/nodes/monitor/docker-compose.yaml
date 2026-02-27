@@ -29,8 +29,8 @@ services:
       driver: none
     volumes:
       - ./local/grafana/grafana.ini:/etc/grafana/grafana.ini:ro
-      - ./local/grafana/grafana-data:/var/lib/grafana
       - ./local/grafana/provisioning:/etc/grafana/provisioning
+      - ./local/grafana/dashboards:/var/lib/grafana/dashboards
       - ./local/grafana:/var/lib/grafana
     restart: always
     networks:

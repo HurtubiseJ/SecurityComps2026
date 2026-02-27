@@ -3,6 +3,7 @@
 from prometheus_fastapi_instrumentator import Instrumentator
 from fastapi import FastAPI
 import logging
+import os
 
 def BindPrometheus(app: FastAPI) -> bool:
     try:
