@@ -311,7 +311,7 @@ def start_attack() -> Dict:
         return {
             "status": "running",
             "num_processes": len(attack_processes),
-            "processes": attack_processes,
+            # "processes": attack_processes,
             "total_rps": total_rps,
             "paths": [p["path"] for p in attack_processes], 
             "message": f"Http Flood Attack Started, Duration: {config['duration_seconds']}"
