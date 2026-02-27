@@ -10,15 +10,14 @@ services:
       - ./app:/app
       - ./control:/control # Pass through for systemd service
       - ./MASTER_CONFIG.json:/MASTER_CONFIG.json  # Config (restart to reload)
-
-  # node_exporter:
-  #   image: quay.io/prometheus/node-exporter:latest
-  #   container_name: attacker2_node_exporter
-  #   command:
-  #     - '--path.rootfs=/host'
-  #     - '--web.listen-address=0.0.0.0:9100'
-  #   ports:
-  #     - "9100:9100"
-  #   restart: unless-stopped
-  #   volumes:
-  #     - '/:/host:ro,rslave'
+  attaker2_node_exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: attacker2_node_exporter
+    command:
+      - '--path.rootfs=/host'
+      - '--web.listen-address=0.0.0.0:9100'
+    ports:
+      - "9100:9100"
+    restart: unless-stopped
+    volumes:
+      - '/:/host:ro,rslave'

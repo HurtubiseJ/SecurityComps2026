@@ -14,9 +14,27 @@ services:
       - ./app:/app  # Live code reload
       - ./MASTER_CONFIG.json:/MASTER_CONFIG.json  # Config (restart to reload)
     cpuset: "1,2"
+    cpus: 2
     mem_limit: 2g
     networks: 
       - ddos-shared
+  # target1_node_exporter:
+  #   image: quay.io/prometheus/node-exporter:latest
+  #   container_name: target1_node_exporter
+  #   command:
+  #     # - '--path.rootfs=/host'
+  #     - '--web.listen-address=0.0.0.0:9100'
+  #     - '--path.procfs=/host/proc'
+  #     - '--path.sysfs=/host/sys'
+  #   ports:
+  #     - "9100:9100"
+  #   restart: unless-stopped
+  #   volumes:
+  #     - /proc:/host/proc:ro
+  #     - /sys:/host/sys:ro
+  #   networks:
+  #     - ddos-shared
+
 
 networks:
   ddos-shared:

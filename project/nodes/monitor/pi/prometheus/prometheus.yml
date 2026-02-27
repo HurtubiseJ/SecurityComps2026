@@ -6,21 +6,33 @@ scrape_configs:
       - targets: ['192.168.0.141:8000']
         labels:
           node: 'target1'
-      - targets: ['192.168.0.195:8000']
-        labels:
-          node: 'attacker1'
-      - targets: ['192.168.0.172:8000']
-        labels:
-          node: 'attacker2'
-      - targets: ['192.168.0.180:8000']
-        labels:
-          node: 'attacker3'
-      - targets: ['192.168.0.109:9113']
-        labels:
-          node: "proxy"
-      - targets: ['192.168.0.109:8000']
-        labels:
-          node: "proxy-fastapi"
       - targets: ['192.168.0.141:9100']
         labels:
           node: "export-target1"
+      - targets: ['192.168.0.195:8000']
+        labels:
+          node: 'attacker1'
+      - targets: ['192.168.0.195:9100 ']
+        labels:
+          nodes: 'export-attacker1'
+      - targets: ['192.168.0.172:8000']
+        labels:
+          node: 'attacker2'
+      - target: ['192.168.0.172:9100']
+        labels:
+          node: 'export-attacker2'
+      - targets: ['192.168.0.180:8000']
+        labels:
+          node: 'attacker3'
+      - targets: ['192.168.0.180:9100']
+        labels: 
+          node: 'export-attacker3'
+      - targets: ['192.168.0.109:9113']
+        labels:
+          node: "nginx-proxy"
+      - targets: ['192.168.0.109:9100']
+        labels:
+          node: "export-proxy"
+      - targets: ['192.168.0.109:8000']
+        labels:
+          node: "proxy-fastapi"

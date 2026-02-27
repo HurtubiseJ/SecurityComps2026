@@ -5,31 +5,20 @@ services:
       dockerfile: nodes/target1/Dockerfile
     container_name: target1
     ports:
-      - "8005:8000"
+      - "8000:8000"
     volumes:
       - ./app:/app/app
       - ./MASTER_CONFIG.json:/app/MASTER_CONFIG.json
-    cpuset: "6,7"
-    cpus: 2
-    mem_limit: 2g
-    networks:
-      - ddos-shared
   target1_node_exporter:
     image: quay.io/prometheus/node-exporter:latest
     container_name: target1_node_exporter
     command:
-      # - '--path.rootfs=/host'
+      - '--path.rootfs=/host'
       - '--web.listen-address=0.0.0.0:9100'
-      - '--path.procfs=/host/proc'
-      - '--path.sysfs=/host/sys'
+    network_mode: host
+    pid: host
     ports:
       - "9100:9100"
     restart: unless-stopped
     volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-    networks:
-      - ddos-shared
-networks:
-  ddos-shared:
-    external: True
+      - '/:/host:ro,rslave'

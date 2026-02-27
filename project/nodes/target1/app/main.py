@@ -112,7 +112,7 @@ async def api_func(func: str):
 
 @app.get("/api/cpu")
 async def api_cpu_func():
-    for _ in range(1000000):
+    for _ in range(100000):
         math.sqrt(random.random())
 
 @app.get("/config")

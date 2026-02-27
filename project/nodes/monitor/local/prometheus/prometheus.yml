@@ -27,3 +27,6 @@ scrape_configs:
       - targets: ['docker-exporter:9487']
         labels:
           node: "docker-exporter"
+      - targets: ['target1_node_exporter:9100']
+        labels:
+          node: "target1-node-exporter"

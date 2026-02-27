@@ -28,4 +28,3 @@ services:
       - ./pi/grafana/provisioning:/etc/grafana/provisioning
       - ./pi/grafana:/var/lib/grafana
     restart: always
-

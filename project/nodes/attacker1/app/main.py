@@ -13,7 +13,7 @@ API Endpoints:
 """
 
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from prometheus_client import Counter, Gauge, generate_latest
 from node_monitor import Registry
@@ -297,6 +297,9 @@ def start_attack() -> Dict:
                     "rps": path_rps,
                     "cmd": " ".join(cmd)
                 })
+        for process_group in attack_processes: 
+            for lin in process_group['process'].stdout:
+                print(lin, end="")
         
         if not attack_processes:
             raise ValueError("No attack processes started (all RPS values were 0)")
@@ -305,7 +308,7 @@ def start_attack() -> Dict:
         ATTACK_STATUS.set(1)
         
         return {
-            "status": "started",
+            "status": "running",
             "processes": len(attack_processes),
             "total_rps": total_rps,
             "paths": [p["path"] for p in attack_processes], 
@@ -349,7 +352,7 @@ def stop_attack() -> Dict:
         ATTACK_STATUS.set(2)
         
         return {
-            "status": "stopped",
+            "status": "idle",
             "processes_stopped": stopped_count, 
             "message": f"Attack Stopped, processes stopped {stopped_count}"
         }
@@ -436,6 +439,7 @@ async def get_attack_status():
 @app.get("/")
 async def root():
     """Root endpoint with service info and available endpoints."""
+
     return {
         "name": "Attacker 1 - Layer 7 HTTP Attacker",
         "status": attack_status,

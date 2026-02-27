@@ -1,5 +1,5 @@
 {
-  "id": "e0dbc283-5d3c-4f07-bc5c-519a2820969f",
+  "id": "cc32469d-51b2-407f-a683-237ae10b73ed",
   "name": "attacker1",
   "type": "attacker",
   "enabled": true,
@@ -15,7 +15,7 @@
       "disk": true,
       "network": true,
       "fastapi": true,
-      "memory": true, 
+      "memory": true,
       "sys_cpu": true,
       "sys_network": true,
       "sys_memory": true
@@ -24,12 +24,12 @@
   "custom_config": {
     "attack_type": "http_flood",
     "threads": 2,
-    "connections": 400,
-    "duration_seconds": 120,
-    "rate_rps": 600,
+    "connections": 200,
+    "duration_seconds": 60,
+    "rate_rps": 500,
     "method": "GET",
     "paths": [
-      "/api/cpu"
+      "/"
     ],
     "path_ratios": [
       1.0

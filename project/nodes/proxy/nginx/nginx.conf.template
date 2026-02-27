@@ -7,6 +7,8 @@ http {
   limit_conn_zone $binary_remote_addr zone=conn_limit:10m;
   limit_conn_status 503;
 
+  keepalive_timeout 20s;
+
   upstream target_upstream {
     server ${FORWARD_HOST}:${FORWARD_PORT};
   }

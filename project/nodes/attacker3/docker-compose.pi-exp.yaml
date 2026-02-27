@@ -1,17 +1,17 @@
 services:
-  target1:
+  attacker3:
+    container_name: attacker3
     build:
       context: ../../
-      dockerfile: nodes/target1/Dockerfile
-    container_name: target1
+      dockerfile: nodes/attacker3/Dockerfile
     ports:
       - "8000:8000"
     volumes:
-      - ./app:/app/app
-      - ./MASTER_CONFIG.json:/app/MASTER_CONFIG.json
-  target1_node_exporter:
+      - ./app:/app
+      - ./MASTER_CONFIG.json:/MASTER_CONFIG.json
+  attacker3_node_exporter:
     image: quay.io/prometheus/node-exporter:latest
-    container_name: target1_node_exporter
+    container_name: attacker3_node_exporter
     command:
       - '--path.rootfs=/host'
       - '--web.listen-address=0.0.0.0:9100'

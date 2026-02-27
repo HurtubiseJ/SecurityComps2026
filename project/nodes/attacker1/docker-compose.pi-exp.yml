@@ -1,0 +1,24 @@
+
+
+services:
+  attacker1:
+    container_name: attacker1
+    build: 
+      context: ../../  # Project root (needs access to shared/)
+      dockerfile: nodes/attacker1/Dockerfile
+    ports:
+      - "8000:8000"  # FastAPI control server
+    volumes: 
+      - ./app:/app  # Live code reload
+      - ./MASTER_CONFIG.json:/MASTER_CONFIG.json  # Config (restart to reload)
+  attacker1_node_exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: attacker1_node_exporter
+    command:
+      - '--path.rootfs=/host'
+      - '--web.listen-address=0.0.0.0:9100'
+    ports:
+      - "9100:9100"
+    restart: unless-stopped
+    volumes:
+      - '/:/host:ro,rslave'
