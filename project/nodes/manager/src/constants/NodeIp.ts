@@ -8,7 +8,8 @@ export const NODE_IP_MAP = {
     "proxy": "http://192.168.0.109:8000/",
     "target1": "http://192.168.0.141:8000/",
     "monitor": "http://192.168.0.120",
-    "manager": "http://192.168.0.135/"
+    "manager": "http://192.168.0.135/",
+    "target1-alt": "http://192.168.0.119:8000/"
 }
 
 export const LOCAL_NODE_IP_MAP = {
@@ -18,5 +19,6 @@ export const LOCAL_NODE_IP_MAP = {
     "attacker3": "http://localhost:8003/",
     "proxy": "http://localhost:8004/",
     "target1": "http://localhost:8005/",
+    "target1-alt": "http://localhost:9999/",
     "monitor": "http://localhost"
 }

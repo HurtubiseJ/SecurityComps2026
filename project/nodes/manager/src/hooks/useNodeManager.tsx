@@ -7,8 +7,6 @@ import { type Logger } from "../types/Logger"
 
 const IS_LOCAL = import.meta.env.VITE_LOCAL === "true";
 
-console.log("IS_LOCAL: ", IS_LOCAL)
-
 const InitDefaultNodes = async (logger: Logger): Promise<BaseConfig[]> => {
     const list: BaseConfig[] = []
 
@@ -32,6 +30,11 @@ const InitDefaultNodes = async (logger: Logger): Promise<BaseConfig[]> => {
     const targetConfig = await initNodeConfig(IP_MAP['target1'], "target", logger)
     if (targetConfig) {
         list.push(targetConfig)
+    }
+    const targetAltConfig = await initNodeConfig(IP_MAP['target1-alt'], "target", logger)
+    if (targetConfig) {
+        // @ts-ignore
+        list.push(targetAltConfig)
     }
 
 
