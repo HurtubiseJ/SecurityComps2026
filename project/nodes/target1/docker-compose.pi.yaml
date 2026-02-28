@@ -4,6 +4,7 @@ services:
       context: ../../
       dockerfile: nodes/target1/Dockerfile
     container_name: target1
+    network_mode: host
     ports:
       - "8000:8000"
     volumes:

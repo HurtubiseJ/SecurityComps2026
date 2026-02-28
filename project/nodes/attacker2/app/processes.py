@@ -32,6 +32,7 @@ def run_hping3():
         cmd.append("-S")
         cmd.append("-p")
         cmd.append(port)
+        cmd.append("--keep")
         cmd.append("-i")
         cmd.append(f"u{interval}")
         cmd.append(host)
