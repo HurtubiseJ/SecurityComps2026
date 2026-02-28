@@ -32,8 +32,7 @@ const InitDefaultNodes = async (logger: Logger): Promise<BaseConfig[]> => {
         list.push(targetConfig)
     }
     const targetAltConfig = await initNodeConfig(IP_MAP['target1-alt'], "target", logger)
-    if (targetConfig) {
-        // @ts-ignore
+    if (targetAltConfig) {
         list.push(targetAltConfig)
     }
 
@@ -163,7 +162,6 @@ export default function useNodeManager(logger: Logger) {
     }
 
     const updateNodeStatuses = async () => {
-        console.log("Statuses")
         const promises: Promise<void>[] = []
         nodes.map((currNode: BaseConfig) => {
             const prom = currNode.checkStatus();
@@ -186,8 +184,6 @@ export default function useNodeManager(logger: Logger) {
             sys_network: node?.monitor?.metrics?.sys_network
         }
         const monitorConfig = new BaseMonitor(node.monitor.enabled, metrics)
-
-        console.log("NODE: ", node)
 
         let attacker_config = null
         if (node.type == "attacker") {
