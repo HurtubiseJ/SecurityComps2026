@@ -62,7 +62,7 @@ def load_master_config():
     with open(MASTER_CONFIG_PATH) as f:
         global MASTER_CONFIG
         MASTER_CONFIG = json.load(f)
-        return json.load(f)
+        return True
 
 load_master_config()
 
@@ -102,7 +102,7 @@ async def home():
     return "<h1>Target Node</h1><p>Simulated Web Service</p>"
 
 @app.get("/rate-limit", response_class=HTMLResponse)
-async def home():
+async def rl_home():
     return "<h1>Target Node</h1><p>Simulated Web Service</p>"
 
 @app.get("/assets/{name}")
