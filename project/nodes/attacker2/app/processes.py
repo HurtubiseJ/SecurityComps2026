@@ -54,7 +54,7 @@ def run_hping3():
     process = subprocess.Popen(
         cmd, 
         # ["hping3", "-S", "-p", "8000", "-c", "10000", "-i", "u1000", "proxy"],
-        # stdout=subprocess.PIPE,
+        stdout=subprocess.DEVNULL,
         # stderr=subprocess.STDOUT
     )
     RUNNING_PROCESS = process
