@@ -32,40 +32,8 @@ services:
     ports:
       - "8001:8001"
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock #FOR LOCAL RESTART REMOVE ON PROD, ROOT ACCESS = BAD
+      # - /var/run/docker.sock:/var/run/docker.sock #FOR LOCAL RESTART REMOVE ON PROD, ROOT ACCESS = BAD
+      - /run/user/1003/docker.sock:/run/user/1003/docker.sock
       - ./MASTER_CONFIG.json:/MASTER_CONFIG.json
-  # proxy_node_exporter:
-  #   image: quay.io/prometheus/node-exporter:latest
-  #   container_name: proxy_node_exporter
-  #   restart: unless-stopped
-  #   network_mode: host
-    # # pid: host
-    # volumes:
-    #   - /proc:/host/proc:ro
-    #   - /sys:/host/sys:ro
-    #   - /:/rootfs:ro
-    # command:
-    #   - '--path.procfs=/host/proc'
-    #   - '--path.sysfs=/host/sys'
-    #   - '--path.rootfs=/rootfs'
-
-    #   - '--collector.ethtool'
-    #   - '--collector.softirqs'
-    #   - '--collector.interrupts'
-    #   - '--collector.tcpstat'
-    #   - '--collector.qdisc'
-
-    #   - '--no-collector.buddyinfo'
-    #   - '--no-collector.ksmd'
-    #   - '--no-collector.cpu_vulnerabilities'
-    #   - '--no-collector.zoneinfo'
-    #   - '--no-collector.mountstats'
-    #   - '--no-collector.drbd'
-    #   - '--no-collector.drm'
-    #   - '--no-collector.wifi'
-    #   - '--no-collector.xfrm'
-    #   - '--no-collector.logind'
-    #   - '--no-collector.systemd'
-
-    # ports:
-    #   - "9100:9100"
+    environment:
+      - DOCKER_HOST=unix:///run/user/1003/docker.sock
