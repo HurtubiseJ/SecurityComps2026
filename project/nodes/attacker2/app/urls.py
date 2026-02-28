@@ -46,6 +46,8 @@ class AttackConfig(BaseModel):
     header_interval_ms: int
     payload_bytes: int
     connect_timeout_ms: int
+    packet_interval_ms: int
+    protocol: str
 
 class Config(BaseModel):
     id: str
@@ -72,7 +74,7 @@ async def start():
     success = start_hping3()
     if not success:
         raise HTTPException("Process already running")
-    return {"status": "running"}
+    return {"status": "running", "message": "hping3 process started."}
 
 @router.post("/stop")
 async def stop():
@@ -81,7 +83,8 @@ async def stop():
         raise HTTPException("No process to stop")
     
     return {
-        "status": "stopped"
+        "status": "idle", 
+        "message": "hping3 process stopped."
     }
 
 @router.get("/test")

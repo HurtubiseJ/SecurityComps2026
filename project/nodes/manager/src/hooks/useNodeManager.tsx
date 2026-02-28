@@ -93,8 +93,9 @@ const initNodeConfig = async (url: string, type: NodeType, logger: Logger): Prom
                 attackerConfig.keep_alive, 
                 attackerConfig.header_interval_ms,
                 attackerConfig.payload_bytes,
-                attackerConfig.connect_timeout_ms
-
+                attackerConfig.connect_timeout_ms,
+                attackerConfig.packet_interval_ms,
+                attackerConfig.protocol,
             )
 
             console.log("Attack conf:", attacker)
@@ -188,7 +189,7 @@ export default function useNodeManager(logger: Logger) {
         let attacker_config = null
         if (node.type == "attacker") {
             const attack = node?.custom_config
-            attacker_config = new AttackerConfig(attack.attack_type, attack.forward_host, attack.forward_port, attack.duration_seconds, attack.rate_rps, attack.threads,attack.connections, attack.method, attack.paths, attack.ratios, attack.keep_alive, attack.header_interval_ms, attack.payload_bytes, attack.connect_timeout_ms)
+            attacker_config = new AttackerConfig(attack.attack_type, attack.forward_host, attack.forward_port, attack.duration_seconds, attack.rate_rps, attack.threads,attack.connections, attack.method, attack.paths, attack.ratios, attack.keep_alive, attack.header_interval_ms, attack.payload_bytes, attack.connect_timeout_ms, attack.packet_interval_ms, attack.protocol)
         }
         // console.log("MONITOR: ", monitorConfig)
         const config = new BaseConfig(node.name, node.type, node.enabled, node.forward_host, node.forward_port, node.host, node.port, monitorConfig, attacker_config)

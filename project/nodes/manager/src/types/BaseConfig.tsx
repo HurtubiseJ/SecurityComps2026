@@ -1928,6 +1928,8 @@ export class AttackerConfig {
   public header_interval_ms: number;
   public payload_bytes: number;
   public connect_timeout_ms: number;
+  public packet_interval_ms: number;
+  public protocol: string
 
   public constructor(
     attack_type: string,
@@ -1943,7 +1945,9 @@ export class AttackerConfig {
     keep_alive: boolean,
     header_interval_ms: number,
     payload_bytes: number,
-    connection_timeout_ms: number
+    connection_timeout_ms: number,
+    packet_interval_ms: number,
+    protocol: string
   ) {
     this.attack_type = attack_type;
     this.forward_host = forward_host;
@@ -1959,6 +1963,8 @@ export class AttackerConfig {
     this.header_interval_ms = header_interval_ms;
     this.payload_bytes = payload_bytes;
     this.connect_timeout_ms = connection_timeout_ms;
+    this.packet_interval_ms = packet_interval_ms;
+    this.protocol = protocol;
   }
 
   //   @ts-ignore
@@ -1978,6 +1984,8 @@ export class AttackerConfig {
       header_interval_ms: this.header_interval_ms,
       connect_timeout_ms: this.connect_timeout_ms,
       payload_bytes: this.payload_bytes,
+      packet_interval_ms: this.packet_interval_ms,
+      protocol: this.protocol,
     };
   }
 
@@ -2104,6 +2112,26 @@ export class AttackerConfig {
           icon={<TextItalicIcon weight="bold" />}
           onChange={(v) => (this.connect_timeout_ms = Number(v.target.value))}
           value={String(this.connect_timeout_ms)}
+          updateNode={updateNode}
+          parentGetConfig={parentGetConfig}
+        />
+        <ConfigRow
+          title="Hping Packet Interval"
+          keyLabel="packet_interval_ms"
+          inputType="text"
+          icon={<TextItalicIcon weight="bold" />}
+          onChange={(v) => (this.packet_interval_ms = Number(v.target.value))}
+          value={String(this.packet_interval_ms)}
+          updateNode={updateNode}
+          parentGetConfig={parentGetConfig}
+        />
+        <ConfigRow
+          title="Hping Protocol"
+          keyLabel="protocol"
+          inputType="text"
+          icon={<TextItalicIcon weight="bold" />}
+          onChange={(v) => (this.protocol = v.target.value)}
+          value={String(this.protocol)}
           updateNode={updateNode}
           parentGetConfig={parentGetConfig}
         />

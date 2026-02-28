@@ -91,6 +91,8 @@ class AttackConfig(BaseModel):
     header_interval_ms: int
     payload_bytes: int
     connect_timeout_ms: int
+    packet_interval_ms: int
+    protocol: str
 
 class Config(BaseModel):
     id: str

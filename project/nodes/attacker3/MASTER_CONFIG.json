@@ -37,6 +37,8 @@
       "keep_alive": true,
       "header_interval_ms": 100,
       "payload_bytes": 0,
-      "connect_timeout_ms": 3000
+      "connect_timeout_ms": 3000, 
+      "packet_interval_ms": 1000,
+      "protocol": "TCP"
     }
   }
