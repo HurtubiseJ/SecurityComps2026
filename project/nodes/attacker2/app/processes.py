@@ -27,7 +27,7 @@ def run_hping3():
 
     global RUNNING_PROCESS
     
-    cmd = ['hping3']
+    cmd = ['hping3', "-q"]
     if protocol == "TCP":
         cmd.append("-S")
         cmd.append("-p")
@@ -41,6 +41,8 @@ def run_hping3():
         cmd.append(port)
         cmd.append("-i")
         cmd.append(f"u{interval}")
+        cmd.append("-t") #ttl
+        cmd.append("3")
         cmd.append(host)
     elif protocol == "ICMP":
         cmd.append("--icmp")
