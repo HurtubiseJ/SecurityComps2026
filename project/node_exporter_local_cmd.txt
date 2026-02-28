@@ -1,0 +1,17 @@
+./node_exporter \
+  --collector.ethtool \
+  --collector.softirqs \
+  --collector.interrupts \
+  --collector.tcpstat \
+  --collector.qdisc \
+  --no-collector.buddyinfo \
+  --no-collector.ksmd \
+  --no-collector.cpu_vulnerabilities \
+  --no-collector.zoneinfo \
+  --no-collector.mountstats \
+  --no-collector.drbd \
+  --no-collector.drm \
+  --no-collector.wifi \
+  --no-collector.xfrm \
+  --no-collector.logind \
+  --no-collector.systemd
