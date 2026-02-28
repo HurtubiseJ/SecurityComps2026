@@ -54,13 +54,17 @@ registry.registerFastAPIApp(app=app)
 
 MASTER_CONFIG_PATH = Path(__file__).resolve().parent.parent / "MASTER_CONFIG.json"
 
+MASTER_CONFIG = None
+
 def load_master_config():
     if not MASTER_CONFIG_PATH.exists():
         raise RuntimeError("MASTER_CONFIG.json not found")
     with open(MASTER_CONFIG_PATH) as f:
+        global MASTER_CONFIG
+        MASTER_CONFIG = json.load(f)
         return json.load(f)
 
-MASTER_CONFIG = load_master_config()
+load_master_config()
 
 
 #counts every requests, method -> GET/POST/etc, pathh -> /api/foo, status -> 200, 500, etc
@@ -97,6 +101,10 @@ MASTER_CONFIG = load_master_config()
 async def home():
     return "<h1>Target Node</h1><p>Simulated Web Service</p>"
 
+@app.get("/rate-limit", response_class=HTMLResponse)
+async def home():
+    return "<h1>Target Node</h1><p>Simulated Web Service</p>"
+
 @app.get("/assets/{name}")
 def asset(name: str):
     return PlainTextResponse(f"asset:{name}")
@@ -130,10 +138,10 @@ async def modifyConfig(config: Config):
     with open("../MASTER_CONFIG.json", "w") as f:
         f.write(config.model_dump_json(indent=2))
         f.close()
+
+    load_master_config()
     
     return {"status": "ok", "message": "Config successfully modified"}
-    
-
 
 @app.post("/restart")
 async def reset():
