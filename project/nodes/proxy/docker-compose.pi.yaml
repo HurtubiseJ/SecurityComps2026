@@ -37,11 +37,35 @@ services:
   proxy_node_exporter:
     image: quay.io/prometheus/node-exporter:latest
     container_name: proxy_node_exporter
+    restart: unless-stopped
+    network_mode: host
+    pid: host
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
     command:
-      - '--path.rootfs=/host'
-      - '--web.listen-address=0.0.0.0:9100'
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+
+      - '--collector.ethtool'
+      - '--collector.softirqs'
+      - '--collector.interrupts'
+      - '--collector.tcpstat'
+      - '--collector.qdisc'
+
+      - '--no-collector.buddyinfo'
+      - '--no-collector.ksmd'
+      - '--no-collector.cpu_vulnerabilities'
+      - '--no-collector.zoneinfo'
+      - '--no-collector.mountstats'
+      - '--no-collector.drbd'
+      - '--no-collector.drm'
+      - '--no-collector.wifi'
+      - '--no-collector.xfrm'
+      - '--no-collector.logind'
+      - '--no-collector.systemd'
+
     ports:
       - "9100:9100"
-    restart: unless-stopped
-    volumes:
-      - '/:/host:ro,rslave'  

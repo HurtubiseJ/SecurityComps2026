@@ -16,6 +16,7 @@ services:
     command:
       - '--path.rootfs=/host'
       - '--web.listen-address=0.0.0.0:9100'
+    network_mode: host
     ports:
       - "9100:9100"
     restart: unless-stopped
