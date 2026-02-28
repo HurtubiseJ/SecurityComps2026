@@ -1,5 +1,5 @@
 {
-  "id": "cc32469d-51b2-407f-a683-237ae10b73ed",
+  "id": "6f42348c-f39b-4ce8-a94a-642eee6eb789",
   "name": "attacker1",
   "type": "attacker",
   "enabled": true,
@@ -24,9 +24,9 @@
   "custom_config": {
     "attack_type": "http_flood",
     "threads": 2,
-    "connections": 200,
+    "connections": 50,
     "duration_seconds": 60,
-    "rate_rps": 500,
+    "rate_rps": 200,
     "method": "GET",
     "paths": [
       "/"
