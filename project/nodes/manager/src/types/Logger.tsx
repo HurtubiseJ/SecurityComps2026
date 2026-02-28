@@ -76,28 +76,28 @@ export class Logger {
     }
 
     // Layout
-    renderLogs(buffer: Message[]) {
+    // renderLogs(buffer: Message[]) {
 
-        return (
-            <div className="w-full h-full items-start justify-end overflow-y-auto overflow-x-hidden">
-                {buffer.map((msg: Message) => {
-                    return (
-                        <div className="flex flex-row gap-x-2 items-start justify-start p-0 overflow-x-hidden"> 
-                            <p className={`font-bold text-${msg.color} overflow-x-hidden`}>
-                                [{msg.owner}]:
-                            </p>
+    //     return (
+    //         <div className="w-full h-full items-start justify-end overflow-y-auto overflow-x-hidden">
+    //             {buffer.map((msg: Message) => {
+    //                 return (
+    //                     <div className="flex flex-row gap-x-2 items-start justify-start p-0 overflow-x-hidden"> 
+    //                         <p className={`font-bold text-${msg.color} overflow-x-hidden`}>
+    //                             [{msg.owner}]:
+    //                         </p>
 
-                            {msg.isError && (
-                                <p className="fold-bold text-red-600 overflow-x-hidden">Error: </p>
-                            )}
+    //                         {msg.isError && (
+    //                             <p className="fold-bold text-red-600 overflow-x-hidden">Error: </p>
+    //                         )}
 
-                            <p className={`text-${msg.color} overflow-x-hidden`}>
-                                {msg.message}
-                            </p>
-                        </div>
-                    )
-                })}
-            </div>
-        )
-    }
+    //                         <p className={`text-${msg.color} overflow-x-hidden`}>
+    //                             {msg.message}
+    //                         </p>
+    //                     </div>
+    //                 )
+    //             })}
+    //         </div>
+    //     )
+    // }
 }
