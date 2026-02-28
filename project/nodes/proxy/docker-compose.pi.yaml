@@ -39,7 +39,7 @@ services:
     container_name: proxy_node_exporter
     restart: unless-stopped
     network_mode: host
-    pid: host
+    # pid: host
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
