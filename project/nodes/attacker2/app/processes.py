@@ -35,8 +35,6 @@ def run_hping3():
         cmd.append("--keep")
         cmd.append("-i")
         cmd.append(f"u{interval}")
-        cmd.append("-a")
-        cmd.append("192.168.0.4")
         cmd.append(host)
     elif protocol == "UDP":
         cmd.append("--udp")
