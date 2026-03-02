@@ -28,9 +28,21 @@
 //         </div>
 //     )
 // }
-import { useState, type ReactElement, type JSX } from "react";
+import { useState, useRef, type ReactElement, type JSX } from "react";
 import { Link } from "react-router-dom";
+
 import ArchDiagram from "../assets/ArchDiagram.png"
+import HTTPFloodNRLConfigImg from "../assets/HTTPFlood-NRL-Config.png"
+import HTTPFloodNRLProxyConigImg from "../assets/HTTPFlood-NRL-ProxyConfig.png"
+
+import HTTPFloodCPUUsageImg from "../assets/HTTPFlood-CPU-Usage.png"
+import HTTPFloodHTTPImg from "../assets/HTTPFlood-HTTP.png"
+import HTTPFloodInteruptsImg from "../assets/HTTPFlood-Interrupts.png"
+import HTTPFloodMemoryImg from "../assets/HTTPFlood-Memory.png"
+import HTTPFloodNetworkImg from "../assets/HTTPFlood-NetworkRates2.png"
+import HTTPFloodTCP from "../assets/HTTPFlood-TCPStats.png"
+
+import HTTPFloodVideo from "../assets/httpflood1.mp4"
 
 // ═══════════════════════════════════════════════════════════════
 // TYPE DEFINITIONS
@@ -64,6 +76,11 @@ interface TextBlock {
   text: string;
 }
 
+interface TextListBlock {
+    type: "textlist";
+    text: string[];
+}
+
 interface CodeBlock {
   type: "code";
   language: string;
@@ -95,7 +112,7 @@ interface VideoBlock {
   duration?: string;
 }
 
-type ContentBlock = HeadingBlock | TextBlock | CodeBlock | CalloutBlock | ImageBlock | VideoBlock;
+type ContentBlock = HeadingBlock | TextBlock | TextListBlock | CodeBlock | CalloutBlock | ImageBlock | VideoBlock;
 
 // --- Page Structure ---
 
@@ -105,7 +122,7 @@ interface ContentPageData {
   blocks: ContentBlock[];
 }
 
-type PageKey = "variables" | "architecture" | "findings" | "howto";
+type PageKey = "variables" | "architecture" | "howto" | "httpflood" | "synflood"; // | "findings";
 
 interface SidebarNavChild {
   label: string;
@@ -128,6 +145,10 @@ interface HeadingBlockProps {
 
 interface TextBlockProps {
   text: string;
+}
+
+interface TextListBlockProps {
+  text: string[];
 }
 
 interface CodeBlockProps {
@@ -320,8 +341,7 @@ const SAMPLE_CONTENT_PAGES: Record<Exclude<PageKey, "variables">, ContentPageDat
       { id: "Observability Layer", type: "heading", level: 2, text: "Observability Layer - Metrics & Dashboard" },
       { type: "text", text: "Observability and Configuration were two major focuses during architecture. Without observability running tests, besides looking cool, lead to no actionable changes. The goal is to be able to watch all relavent system metrics from each node during testing. This information can then be used to modify configuration, see relationships, and potential problems. Similarly, configuration allows us to test a multitude of attack and midigation approaches as well as modify levels within each type. With this functionality we are able to show DDoS attack and midigation relationships clearly through optimal attack and filtering rates." },
       { id: "Observability Stack", type: "heading", level:3, text: "The observability stack primarily uses 2 services:" },
-      { type: "text", text: "-  PROMETHEUS: Metric aggregator and store" },
-      { type: "text", text: "-  GRAFANA: Configurable Dashboard and Metric Filter" },
+      { type: "textlist", text: ["-  PROMETHEUS: Metric aggregator and store", "-  GRAFANA: Configurable Dashboard and Metric Filter"]},
       { type: "text", text: "Both of these services run on the `Monitor` node. Prometheus polls nodes on a 3 second interval via `/metric` endpoints defined on each node. Each node is responsible to aggregate its own metrics and expose these values for prometheus. \n\n Grafana is what powers the `Metrics` page. Grafana automatically binds to the Prometheus data store allowing quick construction of visualizations." },
       { type: "text", text: "The configuration stack runs on the `Manager` node providing the ability to modify configuration of the various nodes in the system. All configuration happens through the  `Dashboard` page through the modification of config file on each node which define the behavior of each node. An example configuration file for an attacking machine is shown below." },
       {
@@ -389,28 +409,26 @@ const SAMPLE_CONTENT_PAGES: Record<Exclude<PageKey, "variables">, ContentPageDat
       { type: "text", text: "The target node is very simple and defines a number of endpoints modeling common types of endpoints. This including heavy CPU bound work and IO opperations. Some mitigation is also present here such as caching." },
     ]
   },
-  findings: {
-    title: "Q4 Attack Analysis",
-    breadcrumb: ["Docs", "Findings", "Attack Analysis & Findings"],
-    blocks: [
-      { id: "Analysis & Findings", type: "heading", level: 1, text: "Attack Analysis & Findings" },
-      { type: "text", text: "This report covers the 47 significant DDoS events observed during Q4 2025. Attack sophistication increased notably, with multi-vector campaigns becoming the norm rather than the exception." },
-      { type: "callout", variant: "critical", title: "Key Finding", text: "73% of Q4 attacks used carpet-bombing techniques targeting multiple /24 subnets simultaneously, up from 31% in Q3. Traditional per-IP mitigation is no longer sufficient." },
-      { type: "image", src: "https://placehold.co/900x400/1e1e2e/f43f5e?text=Attack+Volume+Timeline", alt: "Q4 attack volume timeline", caption: "Figure 1 — Attack volume timeline showing peak events and mitigation response times" },
-    //   { type: "heading", level: 2, text: "Attack Vector Distribution" },
-      { type: "text", text: "UDP reflection attacks remain dominant at 58% of total volume, but TCP-based attacks showed the highest growth rate. SYN floods with randomized options fields proved particularly challenging for stateless mitigation layers." },
-      { type: "code", language: "promql", title: "Detection Query — Carpet Bomb Pattern", code: "# Alert when multiple subnets see simultaneous traffic spikes\ncount by (subnet) (\n  rate(network_rx_bytes{job=\"edge\"}[1m]) > 1e8\n) > 5" },
-    ]
-  },
+//   findings: {
+//     title: "Q4 Attack Analysis",
+//     breadcrumb: ["Docs", "Findings", "Attack Analysis & Findings"],
+//     blocks: [
+//       { id: "Analysis & Findings", type: "heading", level: 1, text: "Attack Analysis & Findings" },
+//       { type: "text", text: "This report covers the 47 significant DDoS events observed during Q4 2025. Attack sophistication increased notably, with multi-vector campaigns becoming the norm rather than the exception." },
+//       { type: "callout", variant: "critical", title: "Key Finding", text: "73% of Q4 attacks used carpet-bombing techniques targeting multiple /24 subnets simultaneously, up from 31% in Q3. Traditional per-IP mitigation is no longer sufficient." },
+//       { type: "image", src: "https://placehold.co/900x400/1e1e2e/f43f5e?text=Attack+Volume+Timeline", alt: "Q4 attack volume timeline", caption: "Figure 1 — Attack volume timeline showing peak events and mitigation response times" },
+//     //   { type: "heading", level: 2, text: "Attack Vector Distribution" },
+//       { type: "text", text: "UDP reflection attacks remain dominant at 58% of total volume, but TCP-based attacks showed the highest growth rate. SYN floods with randomized options fields proved particularly challenging for stateless mitigation layers." },
+//       { type: "code", language: "promql", title: "Detection Query — Carpet Bomb Pattern", code: "# Alert when multiple subnets see simultaneous traffic spikes\ncount by (subnet) (\n  rate(network_rx_bytes{job=\"edge\"}[1m]) > 1e8\n) > 5" },
+//     ]
+//   },
   howto: {
     title: "Helpful information and guides",
     breadcrumb: ["Docs", "How-To"],
     blocks: [
       { id: "Content", type: "heading", level: 1, text: "Content" },
       { id: "Content", type: "heading", level: 3, text: "The How-To page covers the following information:" },
-      { type: "text", text: "-  Modifing Node Configuration" },
-      { type: "text", text: "-  Using the Metrics Dashboard" },
-      { type: "text", text: "-  Local Development Configuration" },
+      { type: "textlist", text: ["-  Modifing Node Configuration", "-  Using the Metrics Dashboard", "-  Local Development Configuration"]},
       { id: "Content", type: "heading", level: 1, text: "Modifying Node Configuration" },
       { type: "callout", variant: "info", title: "When to Apply", text: "Apply these tunings proactively on any system handling >100k concurrent connections, or reactively when netfilter_conntrack_drop starts incrementing." },
     //   { type: "heading", level: 2, text: "Step 1 — Assess Current State" },
@@ -421,6 +439,87 @@ const SAMPLE_CONTENT_PAGES: Record<Exclude<PageKey, "variables">, ContentPageDat
     //   { type: "heading", level: 2, text: "Step 3 — Reduce Timeouts" },
       { type: "code", language: "bash", title: "Aggressive Timeout Tuning", code: "# Reduce established timeout from 5 days to 1 hour\nsysctl -w net.netfilter.nf_conntrack_tcp_timeout_established=3600\n\n# Reduce SYN_RECV timeout from 60s to 10s\nsysctl -w net.netfilter.nf_conntrack_tcp_timeout_syn_recv=10\n\n# Reduce TIME_WAIT from 120s to 30s\nsysctl -w net.netfilter.nf_conntrack_tcp_timeout_time_wait=30" },
       { type: "video", src: "#", poster: "https://placehold.co/900x500/1e1e2e/60a5fa?text=Conntrack+Tuning+Demo", title: "Live Demo — Conntrack Tuning Under Load", duration: "8:21" },
+    ]
+  }, 
+  httpflood: {
+    title: "HTTP Flood Attack & Analysis",
+    breadcrumb: ['Docs', 'Attacks & Analysis', "HTTP Flood"],
+    blocks: [
+        { id: "Content", type: "heading", level: 1, text: "HTTP Flood Attack & Analysis"},
+        { type: "text", text: "The following page is our analysis and metrics across related nodes during a simulation of a HTTP Flood attack. See Docs -> Architecture -> HTTP Flood - Layer 7 for more information on this type of attack."}, 
+        { id: "Content", type: "heading", level: 2, text: "HTTP Flood - Attack Video"},
+        { type: "text", text: "We recommend reading all content below before watching the video. This will make the video more interpretable."},
+        { type: "video", src: HTTPFloodVideo, poster: "https://placehold.co/900x500/1e1e2e/60a5fa?text=HTTP+Flood+Simulation", duration: "8:16", title: "HTTP Flood Simulation"},
+        { id: "Content", type: "heading", level: 2, text: "Inital Setup & Node Configuration"},
+        { type: "text", text: "The simulation uses the following nodes: "},
+        { type: "textlist", text: ["-    attacker1", "-    Proxy", "-    target1"]},
+        { type: "text", text: "`attacker1` is the source of the HTTP Flood attack forwarding the HTTP requests to the proxy server. This is done with a HTTP load testing tool `wrk2`. The first portion of the attack includes NO proxy mitigation. This means all requests made from the attacking machine reach the target endpoint."},
+        { id: "Content", type: "heading", level: 3, text: "Attacker1 Configuration"},
+        { type: "text", text: "The values listed below are the important configuration values on the attacking machine."},
+        { type: "textlist", text: ['- Request Rate: 160', '- Connections: 20', '- Paths: /', '- Path Ratios: 1']},
+        { type: 'text', text: "Request Rate controls how the number of HTTP request sent by `wrk2` per second. Connections specifies the number of connections made with the target server to send requests. Paths determines the the endpoints on the target machine which requests are sent to. Path Ratios determines the what percent of HTTP requests go to each path. In this case all requests hit `target1:8000/`. These configuration values can be seen in the configuration section on the dashboard."},
+        { type: 'image', src: HTTPFloodNRLConfigImg, alt: "HTTP Flood `attacker1` configuration values  for the inital non-ratelimited attack", caption: "HTTP Flood `attacker1` configuration values  for the inital non-ratelimited attack" },
+        { id: "Content", type: "heading", level: 3, text: "Proxy Configuration"},
+        { type: 'text', text: "The following values are important to note on the `proxy` machine. NOTE: while limits are set they are too high allowing all attack requests through."},
+        { type: 'textlist', text: ["- Rate RPS: 250", "- Max Connections: 40", "- Burst: 300"]},
+        { type: 'text', text: "Rate RPS controls the the maximum allowed requests per second for a single IP. Burst defines the size of the rate limit overflow queue for requests over this ratelimit. Max Connections defines the number of open connections a single IP can have before connections are rejected."},
+        { type: "callout", variant: "info", title: "Nginx - Rate Limits & Burst Information", text: "In the default setup, Rate RPS is a HARD limit, meaing NGINX will forward a packet every 0.004 seconds. Request over this rate will be appended to the overflow queue to be processed at the 0.004 second rate. In our case we use the option `nodelay`. This allows NGINX to process requests without queueing as long as long as the total burst size is not exceded. Once 300 requests exceed the rate limit those requests are dropped."}, 
+        { type: "code", language: "nginx.conf", code: `http {
+  limit_req_zone $binary_remote_addr zone=req_limit:10m rate=250r/s;
+  limit_req_status 429;
+
+  limit_conn_zone $binary_remote_addr zone=conn_limit:10m;
+  limit_conn_status 503;
+
+  server {
+    listen 8000;
+
+    location / {
+      limit_conn conn_limit 40;
+      limit_req zone=req_limit burst=300 nodelay;
+
+      proxy_pass http://target_upstream;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $scheme;
+    }
+  }
+}`    }, 
+      { type: 'image', src: HTTPFloodNRLProxyConigImg, alt: "HTTP Flood `proxy` configuration values  for the inital non-ratelimited attack", caption: "HTTP Flood `proxy` configuration values for the inital non-ratelimited attack" },
+      { id: "Content", type: "heading", level: 2, text: "Second Attack - Rate Limit Node Configuration"},
+      { type: "text", text: "During the second attack shown proxy mitigations are implimented. The proxy rate limit, max connections, and burst values are modified to the following values. All other configuration values on the attacker and target machines remain the same. This means the scale of attack is the exact same between the two runs."},
+      { type: 'textlist', text: ["- Rate RPS: 115", "- Max Connections: 15", "- Burst: 200"]},
+      { id: "Content", type: "heading", level: 2, text: "Metrics and Analysis"},
+      { type: "text", text: "As expected we seen CPU utilization playing a large role in the HTTP Flood attack. HTTP Floods attack the application layer meaning much of the stress on the system is on the CPU. During the inital attack, when no rate limiting is present, we see the target machine's CPU percentage maxed at or near 100% utilization. Furthermore, 55% is system, 40% is user, 5% is softirq, the rest being iowait, irq, and steal."}, 
+      { type: "text", text: "Most of the utilization is from user and system spaces. As many requests reach the FastAPI application this means the computer must read in all requests from the network, pass the requests to the user space for FastAPI, FastAPI processes and creates a response, finally the response is passed back to the system for network transmission. These steps at a high rate cause CPU utilization to spike creating a CPU bottleneck in response rate."}, 
+      { type: "text", text: "In the second attack rate request rate is limited. Lowering the amount and rate of HTTP requests the target needs to handle. This leads to a lower CPU utlization on the machine."},
+      { type: "image", src: HTTPFloodCPUUsageImg, alt: "Figure 1 - HTTP Flood CPU Utilization", caption: "Figure 1 - HTTP Flood CPU Utilization"},
+      { type: "text", text: "Looking at HTTP related statistics we see more effects of rate limiting. HTTP Status and Response averages drop when rate limiting is applied compared to the intial attack: ~150 RPS to ~115 RPS. While the total number of responses is lower, response consistency greatly increases. The 90th Quant Duration Rate Panel shows rate of requests who response times are above the 90th quantile. During max load the amount of high latency requests is large, after rate limiting no requests break the 90th quantile in response time. This can also be seen in the raw HTTP response graphs. The total variation in rate for both bytes and status decreases during the second phase. The last Nginx panel shows that while packets are filtered, not forwarded to the target machine, Nginx still received the full 160 packets per second. "}, 
+      {type: "callout", title: "HTTP Statistics - FastAPI Workers", variant: "warning", text: "HTTP statistics are averages per FastAPI worker, the machine uses 5 workers, meaning metrics should be multiplied by 5 to estimate totals."}, 
+      { type: "image", src: HTTPFloodHTTPImg, alt: "Figure 2 - HTTP Flood HTTP and Nginx Statistics", caption: "Figure 2 - HTTP Flood HTTP and Nginx Statistics"},
+      { type: "image", src: HTTPFloodNetworkImg, alt: "Figure 3 - Networking and Interfaces", caption: "Figure 3- Networking and Interfaces"},
+      { type: "text", text: "Network byte transfer rates, Figure 3, show a similar story. There are two important things to note here. First, looking at the Network Packet Rate panel, specifically `attacker1 recv` and `attacker1 sent`. We see in the first attack the rate of packets out is intially equal to packets received. Then, packets received by attacker1 begin to drop off. This shows the target dropping packets due to the CPU bottleneck. In the second attack we see the attacker sent and recevied packet rates are nearly identical as all HTTP request are responded to. The second metric to note is the spike in transmition over eth0 on target1 at the end of the first attack, this is seen on the Net Transmit Rate panel. This spike can be seen in various other panels shown but is most pronounced here. The reason for the spike is due to freed CPU time as packets are no longer being received on the target machine. This allows the CPU to handle packets in queue leading to the spike in transmission."}, 
+      { type: "image", src: HTTPFloodInteruptsImg, caption: "Figure 4 - CPU Scheduling Pressure", alt: "Figure 4 - CPU Scheduling Pressure"}, 
+      { type: "callout", variant: "info2", title: "Variables", text: "See the variables page for more information on the panels not discussed."},
+      { type: "text", text: "While we have focused mostly on the target machine the rate limiting also has an effect on the proxy machine. From the inital CPU% panel we see a small ~4% jump in CPU usage, but the biggest differences are shown in CPU scheduling statistics."},
+      { id: "Content", type: "heading", level: 3, text: "TCP & Memory Statistics"},
+      { type: "text", text: "In Figure 4 we see in all panels that CPU contention decreases for the target machine while the opposite is true for the proxy. We see interrupts, context switches, IO pressure, and page faults increase when rate limiting is occuring. This is due to rate limits being reached which causes more reads/writes from memory, appending to access logs, and creation of rate limited HTTP response packets. This is also supported in Figure 5 outlining memory stats. "},
+      { type: "image", src: HTTPFloodMemoryImg, caption: "Figure 5 - Memory Usage", alt: "Figure 4 - Memory usage"}, 
+      { type: "callout", variant: "info", title: "Figure 5 - Legend", text: "In the `TCP Mem` panel the legend naming is cutoff. Green is the proxy, orange is the target, and pink is the attacker"},
+      { type: "text", text: "The following figure shows TCP statistics. These stats have little affect in terms of the system bottle neck and correlate with all that has been already said, so we will skip elaboration."},
+      { type: "image", src: HTTPFloodTCP, caption: "Figure 6 - TCP Statistics", alt: "Figure 6 - TCP Statistics"}
+
+
+
+
+    ]
+  },
+  synflood: {
+    title: "TCP SYN Flood Attack & Analysis",
+    breadcrumb: ['Docs', 'Attacks & Analysis', "TCP SYN Flood"],
+    blocks: [
+
     ]
   }
 };
@@ -440,7 +539,9 @@ const SIDEBAR_NAV: SidebarNavSection[] = [
     { label: "All Variables", page: "variables" },
   ]},
   { label: "Attacks and Findings", icon: <ActivityIcon />, children: [
-    { label: "Analysis & Findings", page: "findings" },
+    // { label: "Analysis & Findings", page: "findings" },
+    { label: "HTTP Flood", page: "httpflood"},
+    { label: "TCP SYN Flood", page: "synflood"}
   ]},
   { label: "How-To Guides", icon: <BookIcon />, children: [
     { label: "How-To", page: "howto" },
@@ -475,11 +576,13 @@ const HEADING_SIZES: Record<1 | 2 | 3, string> = {
 const PAGE_LABELS: Record<PageKey, string> = {
   variables: "Variables",
   architecture: "Architecture",
-  findings: "Findings",
+//   findings: "Findings",
   howto: "How-To",
+  httpflood: "HTTP Flood Attack & Analysis",
+  synflood: "TCP SYN Flood Attack & Analysis"
 };
 
-const ALL_PAGE_KEYS: PageKey[] = ["architecture", "variables", "findings", "howto"];
+const ALL_PAGE_KEYS: PageKey[] = ["architecture", "variables", "howto", "httpflood", "synflood"]; //"findings",
 
 
 // ═══════════════════════════════════════════════════════════════
@@ -513,6 +616,18 @@ function TextBlockComponent({ text }: TextBlockProps): ReactElement {
     </p>
   );
 }
+
+function TextListBlockComponent({ text }: TextListBlockProps): ReactElement {
+    return (
+        <div className="pl-8">
+            {text.map((line) => (
+                <p className="text-zinc-300 leading-relaxed text-[15px] py-0">
+                    {line}
+                </p>
+            ))}
+        </div>
+    );
+  }
 
 function CodeBlockComponent({ language, title, code }: CodeBlockProps): ReactElement {
   const [copied, setCopied] = useState<boolean>(false);
@@ -569,40 +684,76 @@ function ImageBlockComponent({ src, alt, caption }: ImageBlockProps): ReactEleme
 }
 
 function VideoBlockComponent({ src, poster, title, duration }: VideoBlockProps): ReactElement {
-  const [playing, setPlaying] = useState<boolean>(false);
-
-  return (
-    <figure className="my-6">
-      <div
-        className="rounded-lg overflow-hidden border border-zinc-700/60 bg-zinc-950 relative group cursor-pointer"
-        onClick={() => setPlaying(!playing)}
-      >
-        {!playing ? (
-          <>
-            <img src={poster} alt={title ?? "Video thumbnail"} className="w-full h-auto opacity-80 group-hover:opacity-100 transition-opacity" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-16 h-16 rounded-full bg-zinc-900/90 border border-zinc-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <PlayIcon />
+    const [playing, setPlaying] = useState<boolean>(false);
+    const videoRef = useRef<HTMLVideoElement>(null);
+  
+    const handlePlay = (): void => {
+      setPlaying(true);
+      // Small delay to let the video element mount before calling play
+      setTimeout(() => {
+        videoRef.current?.play();
+      }, 50);
+    };
+  
+    const handlePause = (): void => {
+      setPlaying(false);
+      videoRef.current?.pause();
+    };
+  
+    return (
+      <figure className="my-6">
+        <div className="rounded-lg overflow-hidden border border-zinc-700/60 bg-zinc-950 relative group">
+          {!playing ? (
+            <div className="relative cursor-pointer" onClick={handlePlay}>
+              {poster ? (
+                <img
+                  src={poster}
+                  alt={title ?? "Video thumbnail"}
+                  className="w-full h-auto opacity-80 group-hover:opacity-100 transition-opacity"
+                />
+              ) : (
+                <div className="w-full aspect-video bg-zinc-900" />
+              )}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-full bg-zinc-900/90 border border-zinc-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <PlayIcon />
+                </div>
               </div>
+              {duration && (
+                <span className="absolute bottom-3 right-3 bg-zinc-900/90 text-zinc-300 text-xs font-mono px-2 py-1 rounded">
+                  {duration}
+                </span>
+              )}
             </div>
-            {duration && (
-              <span className="absolute bottom-3 right-3 bg-zinc-900/90 text-zinc-300 text-xs font-mono px-2 py-1 rounded">
-                {duration}
-              </span>
-            )}
-          </>
-        ) : (
-          <div className="w-full aspect-video bg-zinc-900 flex items-center justify-center text-zinc-500 text-sm">
-            Video player would render here — src: {src}
-          </div>
+          ) : (
+            <div className="relative">
+              <video
+                ref={videoRef}
+                src={src}
+                controls
+                className="w-full aspect-video bg-zinc-900"
+                onEnded={handlePause}
+                onPause={() => {
+                  if (videoRef.current?.ended) {
+                    setPlaying(false);
+                  }
+                }}
+              />
+              <button
+                onClick={handlePause}
+                className="absolute top-3 right-3 z-10 bg-zinc-900/80 border border-zinc-700/60 rounded-md px-2 py-1 text-zinc-400 text-xs hover:text-zinc-200 hover:bg-zinc-800 transition-colors"
+              >
+                Collapse
+              </button>
+            </div>
+          )}
+        </div>
+        {title && (
+          <figcaption className="mt-2 text-center text-xs text-zinc-500">{title}</figcaption>
         )}
-      </div>
-      {title && (
-        <figcaption className="mt-2 text-center text-xs text-zinc-500">{title}</figcaption>
-      )}
-    </figure>
-  );
-}
+      </figure>
+    );
+  }
 
 // --- Block Renderer (exhaustive switch on discriminated union) ---
 
@@ -612,6 +763,8 @@ function renderBlock(block: ContentBlock, index: number): ReactElement | null {
       return <HeadingBlockComponent key={index} id={block.id} level={block.level} text={block.text} />;
     case "text":
       return <TextBlockComponent key={index} text={block.text} />;
+    case "textlist":
+      return <TextListBlockComponent key={index} text={block.text} />;
     case "code":
       return <CodeBlockComponent key={index} language={block.language} title={block.title} code={block.code} />;
     case "callout":

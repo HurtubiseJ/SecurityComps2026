@@ -8,6 +8,7 @@ services:
       - "9090:9090"
     volumes:
       - ./local/prometheus:/etc/prometheus
+      - /Users/johnhurtubise/Desktop/CompsContent/prom_data:/prometheus
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
     restart: always
