@@ -30,3 +30,6 @@ scrape_configs:
       - targets: ['target1_node_exporter:9100']
         labels:
           node: "target1-node-exporter"
+      - targets: ['target2:8000']
+        labels: 
+          node: "target2"

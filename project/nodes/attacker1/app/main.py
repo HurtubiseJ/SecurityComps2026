@@ -105,9 +105,8 @@ class Config(BaseModel):
     port: str
     monitor: Monitor
     custom_config: AttackConfig
-# ============================================================================
+
 # Prometheus Metrics
-# ============================================================================
 
 ATTACK_REQUESTS_SENT = Counter(
     "attack_requests_sent_total",
@@ -137,9 +136,7 @@ ATTACK_STATUS = Gauge(
     "Attack status (0=idle, 1=running, 2=stopped)"
 )
 
-# ============================================================================
 # Attack State Management
-# ============================================================================
 
 attack_processes: List[Dict] = []  # List of running wrk2 process info
 attack_status = "idle"              # idle | running | stopped
@@ -149,9 +146,7 @@ attack_lock = threading.Lock()      # Thread safety for state changes
 registry = Registry()
 registry.registerFastAPIApp(app=app)
 
-# ============================================================================
 # Attack Configuration
-# ============================================================================
 
 def get_attack_config() -> Dict:
     """
@@ -191,9 +186,7 @@ def get_attack_config() -> Dict:
 # wrk -t4 -c2000 -d60s -R5000 http://target:8000/api/feed
 
 
-# ============================================================================
 # wrk2 Command Builder
-# ============================================================================
 
 def build_wrk2_command(config: Dict, path: str, path_rate_rps: int) -> List[str]:
     """
@@ -238,9 +231,7 @@ def build_wrk2_command(config: Dict, path: str, path_rate_rps: int) -> List[str]
     cmd.append(target_url)
     return cmd
 
-# ============================================================================
 # Attack Control Functions
-# ============================================================================
 
 def start_attack() -> Dict:
     """
@@ -361,9 +352,7 @@ def stop_attack() -> Dict:
             "message": f"Attack Stopped, processes stopped {stopped_count}"
         }
 
-# ============================================================================
 # API Endpoints
-# ============================================================================
 
 @app.get("/health")
 async def health():
@@ -431,13 +420,6 @@ async def get_attack_status():
             "total_processes": len(attack_processes), 
             "state": attack_status
         }
-
-
-# @app.get("/metrics")
-# def metrics():
-#     """Prometheus metrics endpoint."""
-#     return generate_latest()
-
 
 @app.get("/")
 async def root():

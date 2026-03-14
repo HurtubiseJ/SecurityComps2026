@@ -1,18 +1,23 @@
 {
     "id": "<uuid>",
     "enabled": true,
+    "name": "target2",
     "forward_host": "10.0.0.1",
     "forward_port": "8002",
-    "monitoring": {
+    "monitor": {
         "enabled": true,
-        "metrics": [
-            "attack_requests_sent_total",
-            "attack_packets_sent_total",
-            "attack_requests_per_second",
-            "attack_bytes_sent_total"
-        ]
+        "interval": null,
+        "metrics": {
+          "cpu": true,
+          "disk": true,
+          "network": true,
+          "fastapi": true,
+          "memory": true, 
+          "sys_cpu": true,
+          "sys_network": true,
+          "sys_memory": true
+        }
     },
-
 
     "custom_config": {
 

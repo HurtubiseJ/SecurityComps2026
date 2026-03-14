@@ -18,13 +18,15 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - target2_network
+      - ddos-shared
 
-  app:
-    build: .
-    container_name: target2_app
+  target2:
+    build: 
+      context: ../../
+      dockerfile: nodes/target2/Dockerfile
+    container_name: target2
     ports:
-      - "8002:8002"
+      - "8006:8000"
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
@@ -35,7 +37,7 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - target2_network
+      - ddos-shared
     volumes:
       - ./app:/app/app
       - ./MASTER_CONFIG.json:/app/MASTER_CONFIG.json
@@ -44,6 +46,6 @@ volumes:
   postgres_data:
 
 networks:
-  target2_network:
-    driver: bridge
+  ddos-shared:
+    external: true 
 

@@ -1,33 +1,3 @@
-// import SideNav from "../components/Docs/SideNav"
-// import DocsContent from "../components/Docs/DocsContent"
-// import LandingPage from "../components/Docs/pages/Landing"
-
-// import { useState } from "react"
-// import VariablesPage from "../components/Docs/pages/VariablesPage"
-
-
-// const pages = {
-//     "landing": <LandingPage />,
-//     "variables": <VariablesPage />
-// }
-
-
-// export default function Docs() {
-
-//     const [selectedPage, setSelectedPage] = useState<String>("landing");
-
-//     // @ts-ignore
-//     const currentPage = pages[selectedPage]
-//     console.log(selectedPage, currentPage)
-
-//     return (
-//         <div className="h-screen w-screen flex flex-row bg-zinc-900 text-zinc-100 overflow-hidden">
-//             <SideNav setSelectedPage={setSelectedPage} />
-
-//             <DocsContent Page={currentPage} />
-//         </div>
-//     )
-// }
 import { useState, useRef, type ReactElement, type JSX } from "react";
 import { Link } from "react-router-dom";
 
@@ -42,13 +12,13 @@ import HTTPFloodMemoryImg from "../assets/HTTPFlood-Memory.png"
 import HTTPFloodNetworkImg from "../assets/HTTPFlood-NetworkRates2.png"
 import HTTPFloodTCP from "../assets/HTTPFlood-TCPStats.png"
 
+import SYNFLoodNetRate from "../assets/SYN-NetRate.png";
+import SYNTCPErrs from "../assets/SYN-TCPErrs.png";
+import SYNFloodCPU from "../assets/SYN-CPU.png";
+import SYNConntrack from "../assets/SYN-Conntrack.png"
 import HTTPFloodVideo from "../assets/httpflood1.mp4"
-
-// ═══════════════════════════════════════════════════════════════
-// TYPE DEFINITIONS
-// ═══════════════════════════════════════════════════════════════
-
-// --- Variable System ---
+import SYNTCPAccept from "../assets/SYN-TCPAccept.png";
+import SYNSockets from "../assets/SYN-TCPInuse.png"
 
 type VariableCategory = "All" | "TCP" | "UDP" | "Network" | "Netfilter" | "Memory" | "CPU" | "Conntrack";
 type VariableType = "counter" | "gauge" | "histogram" | "summary";
@@ -61,8 +31,6 @@ interface Variable {
   description: string;
   example: string;
 }
-
-// --- Content Block Discriminated Union ---
 
 interface HeadingBlock {
   id: string;
@@ -196,9 +164,7 @@ interface CalloutStyleConfig {
 }
 
 
-// ═══════════════════════════════════════════════════════════════
 // ICON COMPONENTS
-// ═══════════════════════════════════════════════════════════════
 
 const SearchIcon = (): ReactElement => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -293,9 +259,7 @@ const XIcon = (): ReactElement => (
 );
 
 
-// ═══════════════════════════════════════════════════════════════
-// SAMPLE DATA — Variables (DDoS system metrics)
-// ═══════════════════════════════════════════════════════════════
+// Variables (DDoS system metrics)
 
 const VARIABLE_CATEGORIES: VariableCategory[] = [
   "All", "TCP", "UDP", "Network", "Netfilter", "Memory", "CPU", "Conntrack"
@@ -325,9 +289,7 @@ const SAMPLE_VARIABLES: Variable[] = [
 ];
 
 
-// ═══════════════════════════════════════════════════════════════
-// SAMPLE DATA — Content Pages
-// ═══════════════════════════════════════════════════════════════
+// Content Pages
 
 const SAMPLE_CONTENT_PAGES: Record<Exclude<PageKey, "variables">, ContentPageData> = {
   architecture: {
@@ -406,39 +368,25 @@ const SAMPLE_CONTENT_PAGES: Record<Exclude<PageKey, "variables">, ContentPageDat
       { id: "Mitigation Layer", type: "heading", level: 2, text: "Mitigation Layer - Target & Proxy" },
       { type: "text", text: "Lastly we have the Mitigation layer including the Target and Proxy nodes. In the intest of replicating real world architecture we included a reverse proxy infront of the FastAPI application on the target node. The reverse proxy, or proxy node, runs NGINX which forwards packets to the target node and impliments many of the mitigations discussed in the project. Modification of NGINX behavior can be done through the dashboard which exposes NGINX configuration values." },
       { type: "callout", variant: "critical", title: "Restart Required", text: "In order to apply changes to NGINX running on the proxy node you MUST both click `Save Config` then `Restart`. Without restarting, changes made to the NGinx configuration will not apply." },
-      { type: "text", text: "The target node is very simple and defines a number of endpoints modeling common types of endpoints. This including heavy CPU bound work and IO opperations. Some mitigation is also present here such as caching." },
+      { type: "text", text: "The target node is very simple and defines a number of endpoints modeling common types of endpoints. This including heavy CPU bound work and IO opperations. Some mitigation is also present here such as caching. Behavior is defined by A. changing the endpoint the attacker forwards requests to, or B. modifying the target machines configuration files." },
     ]
   },
-//   findings: {
-//     title: "Q4 Attack Analysis",
-//     breadcrumb: ["Docs", "Findings", "Attack Analysis & Findings"],
-//     blocks: [
-//       { id: "Analysis & Findings", type: "heading", level: 1, text: "Attack Analysis & Findings" },
-//       { type: "text", text: "This report covers the 47 significant DDoS events observed during Q4 2025. Attack sophistication increased notably, with multi-vector campaigns becoming the norm rather than the exception." },
-//       { type: "callout", variant: "critical", title: "Key Finding", text: "73% of Q4 attacks used carpet-bombing techniques targeting multiple /24 subnets simultaneously, up from 31% in Q3. Traditional per-IP mitigation is no longer sufficient." },
-//       { type: "image", src: "https://placehold.co/900x400/1e1e2e/f43f5e?text=Attack+Volume+Timeline", alt: "Q4 attack volume timeline", caption: "Figure 1 — Attack volume timeline showing peak events and mitigation response times" },
-//     //   { type: "heading", level: 2, text: "Attack Vector Distribution" },
-//       { type: "text", text: "UDP reflection attacks remain dominant at 58% of total volume, but TCP-based attacks showed the highest growth rate. SYN floods with randomized options fields proved particularly challenging for stateless mitigation layers." },
-//       { type: "code", language: "promql", title: "Detection Query — Carpet Bomb Pattern", code: "# Alert when multiple subnets see simultaneous traffic spikes\ncount by (subnet) (\n  rate(network_rx_bytes{job=\"edge\"}[1m]) > 1e8\n) > 5" },
-//     ]
-//   },
   howto: {
-    title: "Helpful information and guides",
+    title: "How to Run the Project Locally",
     breadcrumb: ["Docs", "How-To"],
     blocks: [
-      { id: "Content", type: "heading", level: 1, text: "Content" },
-      { id: "Content", type: "heading", level: 3, text: "The How-To page covers the following information:" },
-      { type: "textlist", text: ["-  Modifing Node Configuration", "-  Using the Metrics Dashboard", "-  Local Development Configuration"]},
-      { id: "Content", type: "heading", level: 1, text: "Modifying Node Configuration" },
-      { type: "callout", variant: "info", title: "When to Apply", text: "Apply these tunings proactively on any system handling >100k concurrent connections, or reactively when netfilter_conntrack_drop starts incrementing." },
-    //   { type: "heading", level: 2, text: "Step 1 — Assess Current State" },
-      { type: "code", language: "bash", title: "Check Conntrack Utilization", code: "# Current entries vs maximum\necho \"$(cat /proc/sys/net/netfilter/nf_conntrack_count) / $(cat /proc/sys/net/netfilter/nf_conntrack_max)\"\n\n# Watch in real-time\nwatch -n1 'cat /proc/sys/net/netfilter/nf_conntrack_count'" },
-    //   { type: "heading", level: 2, text: "Step 2 — Increase Table Size" },
-      { type: "code", language: "bash", title: "Expand Conntrack Table", code: "# Double the conntrack table (default is often 262144)\nsysctl -w net.netfilter.nf_conntrack_max=524288\n\n# Increase hash table buckets (should be ~max/4)\necho 131072 > /sys/module/nf_conntrack/parameters/hashsize" },
-      { type: "callout", variant: "warning", title: "Memory Impact", text: "Each conntrack entry uses ~300 bytes. Doubling the table from 262k to 524k entries adds ~75MB of kernel memory. Verify available memory before applying." },
-    //   { type: "heading", level: 2, text: "Step 3 — Reduce Timeouts" },
-      { type: "code", language: "bash", title: "Aggressive Timeout Tuning", code: "# Reduce established timeout from 5 days to 1 hour\nsysctl -w net.netfilter.nf_conntrack_tcp_timeout_established=3600\n\n# Reduce SYN_RECV timeout from 60s to 10s\nsysctl -w net.netfilter.nf_conntrack_tcp_timeout_syn_recv=10\n\n# Reduce TIME_WAIT from 120s to 30s\nsysctl -w net.netfilter.nf_conntrack_tcp_timeout_time_wait=30" },
-      { type: "video", src: "#", poster: "https://placehold.co/900x500/1e1e2e/60a5fa?text=Conntrack+Tuning+Demo", title: "Live Demo — Conntrack Tuning Under Load", duration: "8:21" },
+      { id: "Content", type: "heading", level: 1, text: "How To - Running Locally" },
+      { type: "text", text: "The only prerequisite needed is docker desktop. Once installed open the project and change directory into `/project`."},
+      { type: "callout", title: "Hosted Page VS Running Locally", variant: "critical", text: "If you are viewing this through docker.io in a browser (anything other than localhost), then only static content, such as these docs pages will work. Viewing the dashboard and or metrics endpoint will NOT work. You must first run the project locally, then full functionality including these docs pages will be available."},
+      { type: "callout", title: "Docker Settings - Resources", variant: "warning", text: "Inside each specific node's docker-compose.yml file you will see a 'cpuset' field. This pins each containers CPU usage to specific CPU usage. By default these use values ranging from 0-7 using 8 CPU cores. If 8 cores are not available to docker you may get errors build or running the project. Either go to docker desktop settings and increase the usable resources, or two, modify the compose files to select valid CPUs."},
+      { type: "text", text: "Once in the project folder you will be able to start all the docker containers. The containers activated are defined in `project/docker-compose.yaml`. If you would like to dissable or add different nodes, modify this file."},
+      { type: "text", text: "To start the project locally, run the following command at /project. Note, this can take a few minutes to build the first time."},
+      { type: "code", language: "bash", code: "docker compose up --build"},
+      { type: "text", text: "Once build, navigate to http://localhost:5173/ to view the dashboard. That's it! When viewing metrics, click the `metrics` button in the left drawer. On the first page you should be able to see a `Local Dashboard` link. Click this to view the prebuilt the real-time metrics dashboard."},
+      { id: "Content", type: "heading", level: 1, text: "How To - View and Modify Metrics" },
+      { type: "text", text: "While you are able to use the default dashboard, you are able to modify the look and metrics shown on the dashboard. This may require login. If so use Username: admin, and Password: admin. Very secure! The current dashboard configuration uses a json file source. You can view the original source in /project/nodes/monitor/local/grafana/dashboards, the two files in this folder are the two different dashboards loaded on build. If you make an edit you will need to click 'save' in grafana, then copy and paste the new dashboard in the corresponding file above. This will persist your changes."},
+      { type: "text", text: "If you add or modify a node, you can change the prometheus scraping behavior in /monitor/prometheus/prometheus.yaml. Look up prometheus documentation for more. In general, having extranious polls to metrics endpoints are harmless and won't affect behavior, so no need to modify this file when disabling a node."},
+
     ]
   }, 
   httpflood: {
@@ -508,26 +456,51 @@ const SAMPLE_CONTENT_PAGES: Record<Exclude<PageKey, "variables">, ContentPageDat
       { type: "image", src: HTTPFloodMemoryImg, caption: "Figure 5 - Memory Usage", alt: "Figure 4 - Memory usage"}, 
       { type: "callout", variant: "info", title: "Figure 5 - Legend", text: "In the `TCP Mem` panel the legend naming is cutoff. Green is the proxy, orange is the target, and pink is the attacker"},
       { type: "text", text: "The following figure shows TCP statistics. These stats have little affect in terms of the system bottle neck and correlate with all that has been already said, so we will skip elaboration."},
-      { type: "image", src: HTTPFloodTCP, caption: "Figure 6 - TCP Statistics", alt: "Figure 6 - TCP Statistics"}
-
-
-
+      { type: "image", src: HTTPFloodTCP, caption: "Figure 6 - TCP Statistics", alt: "Figure 6 - TCP Statistics"},
 
     ]
   },
-  synflood: {
-    title: "TCP SYN Flood Attack & Analysis",
-    breadcrumb: ['Docs', 'Attacks & Analysis', "TCP SYN Flood"],
-    blocks: [
-
-    ]
+    synflood: {
+        title: "TCP SYN Flood Attack & Analysis",
+        breadcrumb: ['Docs', 'Attacks & Analysis', "TCP SYN Flood"],
+        blocks: [
+            { id: "Content", type: "heading", level: 1, text: "SYN Flood Attack & Analysis"},
+            { type: "text", text: "This was the most interesting analysis our team was able to complete, though not without a number of headaches. This analysis is not focused on mitigation, but instead on the effect of our architecture on the behavior of the attack and its unexpected outcomes."},
+            { type: "callout", variant: "info", title: "Architecture Modifications", text: "The architecture setup during this test differs from the other tests. Only two machines are used: Attacker2 and Target1. Attacker2 appears in the graphs as Attacker1 due to problems discussed later. Target1 appears as Target1-alt because the node is running on a separate Raspberry Pi, not on the original cluster Pi it was assigned to. This was done to allow modification of Linux networking configuration between attacks."},
+            { type: "callout", variant: "warning", title: "SYN Cookies - Linux Networking", text: "The most important configuration note for this test is that SYN Cookies are disabled (net.ipv4.tcp_syncookies=0). This means all SYN packets are handled in the default manner — SYN packets create conntrack entries and returned SYN-ACK packets do not contain a cookie. With syncookies disabled, this behavior is consistent even under high networking memory pressure. See the variables page for more information."},
+            { type: "text", text: "The attack was set up as follows. Hping3 was used to send a steady rate of TCP SYN packets to the target machine on port 8000. The rate was set to u600, meaning one packet is sent every 600 microseconds, totaling between 1600 and 2000 SYN packets per second. No mitigation was employed during this test — the graphs represent the full duration of the attack."},
+            { type: "text", text: "Initially the behavior observed was entirely consistent with expectations. However, after looking deeper into the Linux networking statistics, we began to see measurements inconsistent with a standard SYN flood failure. If only CPU metrics are considered, the behavior is entirely expected."},
+            { type: "image", src: SYNFloodCPU, caption: "Figure 1 - SYN Flood CPU Statistics", alt: "Figure 1 - SYN Flood CPU Statistics"},
+            { type: "text", text: "The graph shows a period of relative stability. The target's CPU utilization sits very low, around 15%, for approximately 6 minutes at the beginning of the attack. At the same time, the attacker's CPU sits relatively stable around 40–45%. This is expected — TCP SYN packet handling is heavily optimized and handled at the kernel level, avoiding unnecessary translations. Additionally, the target was running on a Pi with a significant hardware advantage: nearly double the CPU clock speed, double the L1 and L2 cache, an L3 cache absent on the cluster Pis, and 16 GB of RAM compared to 8 GB. Given this, the initial CPU utilization levels are consistent with expected SYN flood behavior."},
+            { type: "text", text: "After 6 minutes, at 12:02:30 on the graph, this balance breaks sharply. The target's CPU utilization spikes suddenly and severely. Throughout the remainder of the attack, the target's metrics drop out as the high load prevents the local monitoring packages from extracting and exposing metrics to the Prometheus scraper. Notably, while not visible in the graph, CPU utilization on the target as viewed via HTOP showed 80% utilization across all 4 cores. In other tests using higher SYN packet rates, 100% utilization was observed during the same failure period."},
+            { type: "text", text: "Figure 2 shows the network packet rates over the same period. The results are consistent — a high rate of incoming and outgoing packets is visible while the target is stable on both machines. Once the target fails, packet rates drop to zero with the exception of small spikes. This makes sense as the target kernel can no longer handle networking due to memory and CPU pressure."},
+            { type: "image", src: SYNFLoodNetRate, caption: "Figure 2 - SYN Flood Network Rates", alt: "Figure 2 - SYN Flood Network Rates"},
+            { type: "text", text: "If only CPU utilization and network rates were considered, the analysis would continue similarly to the HTTP Flood analysis. However, subsequent metrics tell a different story."},
+            { type: "text", text: "The TCP figures below provide the first clues into unexpected behavior. Metrics such as TCP listen overflows, TCP timeouts, and TCP out resets are all expected. Listen overflows occur when the SYN queue or accept queue becomes full. The size of these queues is directly related to the net.ipv4.tcp_max_syn_backlog and net.core.somaxconn kernel values. In this case both the target and attacker had large queue sizes, but overflows still occurred on the target — meaning incoming SYN packets were dropped. [SEE ABORT_ON_OVERFLOW NOTE]. Timeouts occur after roughly 2 minutes when the server has not received a response from the client. In this case the attacker never sends an ACK after receiving the SYN-ACK packets. Out resets occur when the remote party drops or resets the connection for any reason."},
+            { type: "text", text: "All of this behavior stems from memory pressure on the host's TCP queues and the nature of a SYN flood. Listen overflows occur when the SYN queue or accept queue becomes full. The size of these queues is directly related to the net.ipv4.tcp_max_syn_backlog and net.core.somaxconn kernel values. In this case both the target and attacker had large queue sizes, but overflows still occurred on the target. With net.ipv4.tcp_abort_on_overflow set to 1, the kernel responds to overflowing SYN packets with a RST, actively rejecting new connections rather than silently dropping them. Timeouts occur after roughly 2 minutes when the server has not received a response from the client — in this case the attacker never sends an ACK after receiving SYN-ACK packets. Out resets occur when the remote party drops or resets the connection for any reason."},
+            { type: "image", src: SYNTCPErrs, caption: "Figure 3 - SYN Flood TCP Errors", alt: "Figure 3 - SYN Flood TCP Errors"},
+            { type: "text", text: "Other metrics shown reveal some inconsistencies. To understand these, it is important to understand how Hping3 behaves. By default, Hping3 uses raw sockets to send TCP SYN packets. Normal applications use a TCP socket tracked by the host kernel. When using a raw socket, Hping3 bypasses a number of host-level connection tracking mechanisms, though packets still pass through the NIC and are visible to iptables and ebtables. The consequence is that received SYN-ACK packets from the target have no corresponding connection on the host, so the SYN-ACK is rejected by the attacking host."},
+            { type: "text", text: "In Figure 3, TCP retransmissions and SYN retransmissions show a different story. We would expect to see zero values for the attacking machine — all packets sent using Hping3 should be fire-and-forget, meaning there is no case where the attacking machine should retransmit or reply to target responses. The non-zero values for these metrics indicate a problem with the attack setup."},
+            { type: "text", text: "Similarly, Figure 4 displays the number of conntrack entries on each machine. The use of raw sockets by Hping3 sits below the netfilter layer, meaning packets sent through the raw socket should not appear in conntrack. Instead, a steady number of conntrack entries are created on the attacker. Even more interestingly, the number of these entries explodes around the time the target system fails. The consistent pressure on the target machine is also visible, with conntrack entries maxed for nearly the entire duration of the attack. The difference in maximum values between machines is simply due to different max memory configurations."},
+            { type: "image", src: SYNConntrack, caption: "Figure 4 - SYN Flood Conntrack Values", alt: "Figure 4 - SYN Flood Conntrack Values"},
+            { type: "callout", variant: "info", title: "Figure 4 - Target Conntrack Values", text: "In the figure above, target conntrack values are lost. Using a stable source, the conntrack values for the target machine showed a decreasing step pattern down to the lower values visible."},
+            { type: "text", text: "So what is actually happening? The root cause is Docker virtualization and Docker networking. While Docker was primarily used locally to simulate the full network environment and assist development, it was also used on some Raspberry Pis to gain access to tooling without root privileges. In the case of the attacker, this was done to install Hping3. Docker was not strictly required but was the easiest path to get it running on the physical system. In subsequent testing, Docker will be removed. By running within Docker, Hping3 operates inside the Docker engine's virtual environment, which modifies packet tracking behavior and leads to these extraneous results."},
+            { type: "text", text: "When running on the host directly, Hping3 avoids host kernel conntrack entries. But when running inside Docker this is not the case. Raw socket packets originate within the container and pass through the Docker bridge to the host system. This handoff causes the host machine to create a conntrack entry for the SYN packet, explaining the climbing attacker conntrack entries. However, even when tracked by the host, return SYN-ACKs should still be rejected due to the absence of a matching socket — and this holds true during the stable period of the attack, where no TCP accepts are observed on either machine. This is shown in Figure 5."},
+            { type: "image", src: SYNTCPAccept, caption: "Figure 5 - SYN Flood TCP Accepts", alt: "Figure 5 - SYN Flood TCP Accepts"},
+            { type: "text", text: "Initially, even when partially tracked, all SYN-ACKs are rejected and no connections are formed. But at the point of target failure, a large spike in accepted connections occurs coinciding with the CPU spike and network failure on the target. So why do connections suddenly start completing?"},
+            { type: "text", text: "The key is how Docker conntrack entries change the handling of returning SYN-ACKs. Because Docker created conntrack entries for the outbound SYN packets, when SYN-ACKs arrive back at the attacker they are matched to existing conntrack entries and are not marked INVALID by netfilter. This means they are passed normally to the host kernel's network stack. The host kernel has no socket for this connection, so it generates a RST|ACK response. Crucially, this RST|ACK contains a valid acknowledgment number — the target's ISN plus one — which the target's kernel interprets as a legitimate final ACK. The target briefly promotes the connection from the SYN queue to the accept queue before the RST flag causes it to be torn down immediately after."},
+            { type: "text", text: "Under normal steady-state conditions this RST|ACK cycle happens continuously but too quickly to register as a sustained spike — each connection is accepted and immediately reset. At the point of target system failure, however, the target kernel is overwhelmed and cannot process the RST flag quickly enough. Thousands of queued RST|ACK packets are processed as ACKs first, each one briefly completing a handshake before the RST is processed. This batched promotion of connections from the SYN queue to the accept queue is what produces the sudden spike observed in TCP accepts. The resulting memory load from tracking thousands of these transient full connections is the most likely cause of overall system failure."},
+            { type: "image", src: SYNSockets, caption: "Figure 6 - SYN Flood Socket Statistics", alt: "Figure 6 - SYN Flood Socket Statistics"},
+            { type: "text", text: "The TCP-related errors in the figure below are once again consistent with expected SYN flood behavior."},
+            { type: "image", src: SYNTCPErrs, caption: "Figure 7 - SYN Flood TCP Errors", alt: "Figure 7 - SYN Flood TCP Errors"},
+        ]    
   }
 };
 
 const SIDEBAR_NAV: SidebarNavSection[] = [
   { label: "Getting Started", icon: <BookIcon />, children: [
     { label: "Introduction", page: "architecture" },
-    { label: "Quick Start", page: "howto" },
+    { label: "Run Locally", page: "howto" },
   ]},
   { label: "Architecture", icon: <LayersIcon />, children: [
     { label: "Overview", page: "architecture" },
@@ -549,10 +522,7 @@ const SIDEBAR_NAV: SidebarNavSection[] = [
 ];
 
 
-// ═══════════════════════════════════════════════════════════════
 // TYPE COLOR MAPS
-// ═══════════════════════════════════════════════════════════════
-
 const VARIABLE_TYPE_COLORS: Record<VariableType, string> = {
   counter: "text-emerald-400 bg-emerald-400/10 border-emerald-400/20",
   gauge: "text-sky-400 bg-sky-400/10 border-sky-400/20",
@@ -576,7 +546,6 @@ const HEADING_SIZES: Record<1 | 2 | 3, string> = {
 const PAGE_LABELS: Record<PageKey, string> = {
   variables: "Variables",
   architecture: "Architecture",
-//   findings: "Findings",
   howto: "How-To",
   httpflood: "HTTP Flood Attack & Analysis",
   synflood: "TCP SYN Flood Attack & Analysis"
@@ -585,10 +554,7 @@ const PAGE_LABELS: Record<PageKey, string> = {
 const ALL_PAGE_KEYS: PageKey[] = ["architecture", "variables", "howto", "httpflood", "synflood"]; //"findings",
 
 
-// ═══════════════════════════════════════════════════════════════
 // REUSABLE CONTENT BLOCK COMPONENTS
-// ═══════════════════════════════════════════════════════════════
-
 function HeadingBlockComponent({id, level, text }: HeadingBlockProps): ReactElement {
 //   const id: string = text.toLowerCase().replace(/[^a-z0-9]+/g, "-");
   const [hovered, setHovered] = useState<boolean>(false);
@@ -782,9 +748,7 @@ function renderBlock(block: ContentBlock, index: number): ReactElement | null {
 }
 
 
-// ═══════════════════════════════════════════════════════════════
 // VARIABLES PAGE
-// ═══════════════════════════════════════════════════════════════
 
 function VariablesPage(): ReactElement {
   const [search, setSearch] = useState<string>("");
@@ -906,9 +870,7 @@ function VariablesPage(): ReactElement {
 }
 
 
-// ═══════════════════════════════════════════════════════════════
 // CONTENT PAGE
-// ═══════════════════════════════════════════════════════════════
 
 function ContentPage({ pageKey }: ContentPageProps): ReactElement {
   const page: ContentPageData | undefined = SAMPLE_CONTENT_PAGES[pageKey];
@@ -954,9 +916,7 @@ function ContentPage({ pageKey }: ContentPageProps): ReactElement {
 }
 
 
-// ═══════════════════════════════════════════════════════════════
 // SIDEBAR
-// ═══════════════════════════════════════════════════════════════
 
 function Sidebar({ currentPage, setCurrentPage, isOpen, setIsOpen }: SidebarProps): ReactElement {
   const [expanded, setExpanded] = useState<Record<number, boolean>>({
@@ -1045,10 +1005,7 @@ function Sidebar({ currentPage, setCurrentPage, isOpen, setIsOpen }: SidebarProp
 }
 
 
-// ═══════════════════════════════════════════════════════════════
 // MAIN APP
-// ═══════════════════════════════════════════════════════════════
-
 export default function DocsApp(): ReactElement {
   const [currentPage, setCurrentPage] = useState<PageKey>("variables");
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
@@ -1058,7 +1015,6 @@ export default function DocsApp(): ReactElement {
       className="h-screen w-screen flex bg-zinc-900 text-zinc-100 overflow-hidden"
       style={{ fontFamily: "'IBM Plex Sans', 'SF Pro Text', -apple-system, sans-serif" }}
     >
-      {/* Sidebar overlay on mobile */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-20 bg-black/50 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}

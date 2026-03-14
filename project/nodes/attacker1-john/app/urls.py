@@ -49,18 +49,6 @@ class startOptions(BaseModel):
 
 router = APIRouter()
 
-def _load_config():
-    with open(Path(os.getenv("CONFIG_FILE_PATH"), "../MASTER_CONFIG.json")) as f:
-        config = json.load(f)
-
-    if not config:
-        raise RuntimeError("Unable to load config")
-    
-    return config
-
-# config = _load_config() 
-# duration = config.duration_seconds
-
 
 @router.get("/status")
 async def status():

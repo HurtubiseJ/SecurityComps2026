@@ -1,4 +1,3 @@
-// Configs
 export type ManagerConfig = {};
 
 export type ProxyConfig = {};

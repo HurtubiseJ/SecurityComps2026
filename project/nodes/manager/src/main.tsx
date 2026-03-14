@@ -6,8 +6,8 @@ import App from './App.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter>
-        <App />
+    <BrowserRouter basename={import.meta.env.VITE_LOCAL === 'true' ? '/' : '/SecurityComps2026'}>
+    <App />
     </BrowserRouter>
   </StrictMode>,
 )

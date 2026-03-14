@@ -1,14 +1,26 @@
-from fastapi import FastAPI, Request, HTTPException, BackgroundTasks
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, PlainTextResponse, JSONResponse
 from prometheus_client import Counter, Histogram, Gauge, generate_latest
 from pathlib import Path
 import json
 import time
-import asyncio
-from typing import List, Dict, Any
 from .database import get_pool, init_db, close_pool
+from node_monitor import Registry
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+registry = Registry()
+registry.registerFastAPIApp(app=app)
 
 MASTER_CONFIG_PATH = Path(__file__).resolve().parent.parent / "MASTER_CONFIG.json"
 
@@ -89,6 +101,10 @@ async def show_config():
 def metrics():
     """Prometheus metrics endpoint"""
     return generate_latest()
+
+@app.get("/status")
+def status():
+    return {"status": "ok", "state": "running"}
 
 # Database search endpoint
 @app.get("/api/search/{query}")
