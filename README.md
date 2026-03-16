@@ -14,7 +14,7 @@ This repository contains the work for our **Security Comps (Winter 2026)** proje
 
 Our project focuses on building a **DDoS mitigation testing environment** that allows us to simulate distributed denial-of-service attacks and evaluate how different defense techniques perform in practice.
 
-Denial of Service (DoS) attacks occur when a system is overwhelmed with malicious traffic, preventing legitimate users from accessing services. Our system recreates this scenario in a controlled environment so we can observe both the **attacker perspective and the defensive mechanisms used to mitigate attacks**. :contentReference[oaicite:0]{index=0}
+Denial of Service (DoS) attacks occur when a system is overwhelmed with malicious traffic, preventing legitimate users from accessing services. Our system recreates this scenario in a controlled environment so we can observe both the **attacker perspective and the defensive mechanisms used to mitigate attacks**.
 
 The goal of this project is to better understand how different layers of defense interact, including:
 
