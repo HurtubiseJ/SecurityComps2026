@@ -90,7 +90,7 @@ interface ContentPageData {
   blocks: ContentBlock[];
 }
 
-type PageKey = "variables" | "architecture" | "howto" | "httpflood" | "synflood"; // | "findings";
+type PageKey = "variables" | "architecture" | "proxy" | "howto" | "httpflood" | "synflood"; // | "findings";
 
 interface SidebarNavChild {
   label: string;
@@ -371,6 +371,111 @@ const SAMPLE_CONTENT_PAGES: Record<Exclude<PageKey, "variables">, ContentPageDat
       { type: "text", text: "The target node is very simple and defines a number of endpoints modeling common types of endpoints. This including heavy CPU bound work and IO opperations. Some mitigation is also present here such as caching. Behavior is defined by A. changing the endpoint the attacker forwards requests to, or B. modifying the target machines configuration files." },
     ]
   },
+  proxy: {
+    title: "Proxy Node",
+    breadcrumb: ["Docs", "Architecture", "Proxy Node"],
+    blocks: [
+      { id: "Proxy Node", type: "heading", level: 1, text: "Proxy Node - Simple Overview" },
+      { type: "text", text: "The proxy is the front door of the system. Attack traffic hits the proxy first, then allowed traffic is forwarded to target1." },
+      { type: "callout", variant: "info", title: "Traffic Path", text: "Attacker -> Proxy (NGINX) -> Target." },
+
+      { id: "What Runs on Proxy", type: "heading", level: 2, text: "What Runs on the Proxy Node" },
+      { type: "text", text: "Three services run here: NGINX proxy, proxy-fastapi control API, and nginx-exporter for metrics." },
+      {
+        type: "code",
+        language: "text",
+        title: "Proxy Services",
+        code: `proxy: main NGINX reverse proxy
+proxy-fastapi: config/status/restart API
+nginx-exporter: exports NGINX metrics for Prometheus`
+      },
+
+      { id: "Main Mitigations", type: "heading", level: 2, text: "Main Mitigations (Layer 7)" },
+      { type: "text", text: "NGINX enforces request-rate and connection limits per source IP. Over-limit requests return 429 or 503." },
+      {
+        type: "code",
+        language: "nginx",
+        title: "NGINX Policy (Current Defaults)",
+        code: `limit_req_zone $binary_remote_addr zone=req_limit:10m rate=4500r/s;
+limit_req_status 429;
+limit_conn_zone $binary_remote_addr zone=conn_limit:10m;
+limit_conn_status 503;
+
+location / {
+  limit_conn conn_limit 10000;
+  limit_req zone=req_limit burst=4000 nodelay;
+  proxy_pass http://target1:8000;
+}`
+      },
+      { type: "text", text: "Timeouts are also configured to reduce slow-connection abuse: connect 10s, read 30s, send 30s." },
+      { id: "Technique Breakdown", type: "heading", level: 3, text: "Mitigation Technique Breakdown" },
+      { type: "text", text: "Rate Limiting (`limit_req`): Caps requests per IP over time. Helps control HTTP flood volume." },
+      { type: "text", text: "Connection Limiting (`limit_conn`): Caps open connections per IP. Helps with connection-exhaustion and Slowloris-style behavior." },
+      { type: "text", text: "Burst Queue (`burst`): Allows short request spikes while still enforcing long-term rate policy." },
+      { type: "text", text: "Proxy Timeouts: Closes stalled upstream operations so resources are not held indefinitely." },
+      { type: "callout", variant: "info2", title: "Expected Behavior", text: "429 = rate exceeded, 503 = connection saturation." },
+
+      { id: "TCP Hardening", type: "heading", level: 2, text: "Kernel TCP Hardening (Layer 3/4)" },
+      { type: "text", text: "Proxy compose enables Linux TCP hardening settings for SYN pressure and backlog handling." },
+      {
+        type: "code",
+        language: "yaml",
+        title: "Proxy Sysctls",
+        code: `sysctls:
+  - net.ipv4.tcp_max_syn_backlog=4096
+  - net.ipv4.tcp_syncookies=1
+  - net.ipv4.tcp_synack_retries=2
+  - net.core.somaxconn=4096`
+      },
+      { type: "text", text: "SYN Backlog: raises queue capacity for half-open handshakes." },
+      { type: "text", text: "SYN Cookies: protects resources under SYN flood pressure." },
+      { type: "text", text: "SYN-ACK Retries: lowers retries so dead half-open connections clear faster." },
+      { type: "text", text: "somaxconn: raises pending socket backlog capacity." },
+
+      { id: "Control Plane", type: "heading", level: 2, text: "Control API and Config" },
+      { type: "text", text: "Proxy behavior is driven by `MASTER_CONFIG.json` and managed through the proxy-fastapi endpoints." },
+      {
+        type: "code",
+        language: "text",
+        title: "Important Endpoints",
+        code: `/config
+/status
+/health
+/restart
+/metrics`
+      },
+      { type: "callout", variant: "warning", title: "Apply Flow", text: "After config updates, click Save Config and then Restart so NGINX picks up the changes." },
+
+      { id: "Observability", type: "heading", level: 2, text: "Monitoring and Metrics" },
+      { type: "text", text: "NGINX `stub_status` is scraped by nginx-exporter, then collected by Prometheus and shown in Grafana." },
+      { type: "code", language: "text", title: "Monitoring Path", code: `stub_status -> nginx-exporter -> Prometheus -> Grafana` },
+      { type: "text", text: "Key proxy metrics: request rate, active connections, accepted vs handled, and overload behavior." },
+
+      { id: "Run Modes", type: "heading", level: 2, text: "Run Modes and Files" },
+      {
+        type: "code",
+        language: "text",
+        title: "Proxy Compose Variants",
+        code: `docker-compose.pn.yaml   -> defense-enabled local profile
+docker-compose.nrl.yaml  -> no-rate-limit comparison profile
+docker-compose.pi.yaml   -> Raspberry Pi profile`
+      },
+      { type: "text", text: "Use defense-enabled vs no-rate-limit runs to compare mitigation impact under the same attack setup." },
+
+      { id: "Quick Checks", type: "heading", level: 2, text: "Quick Proxy Checks" },
+      {
+        type: "code",
+        language: "bash",
+        title: "Sanity Checks",
+        code: `curl http://localhost:8004/proxy-health
+curl http://localhost:8004/stub_status
+curl http://localhost:8040/health`
+      },
+
+      { id: "Known Limits", type: "heading", level: 2, text: "Known Limits" },
+      { type: "callout", variant: "critical", title: "Limitations", text: "Per-IP controls are weaker against highly distributed botnets. This proxy is one important layer, not the entire defense." },
+    ]
+  },
   howto: {
     title: "How to Run the Project Locally",
     breadcrumb: ["Docs", "How-To"],
@@ -508,6 +613,11 @@ const SIDEBAR_NAV: SidebarNavSection[] = [
     { label: "Attack Layer", page: "architecture" },
     { label: "Mitigation Layer", page: "architecture" },
   ]},
+  { label: "Proxy", icon: <LayersIcon />, children: [
+    { label: "Proxy Node", page: "proxy" },
+    { label: "Mitigation Controls", page: "proxy" },
+    { label: "Monitoring Path", page: "proxy" },
+  ]},
   { label: "Variables Reference", icon: <TerminalIcon />, children: [
     { label: "All Variables", page: "variables" },
   ]},
@@ -546,12 +656,13 @@ const HEADING_SIZES: Record<1 | 2 | 3, string> = {
 const PAGE_LABELS: Record<PageKey, string> = {
   variables: "Variables",
   architecture: "Architecture",
+  proxy: "Proxy",
   howto: "How-To",
   httpflood: "HTTP Flood Attack & Analysis",
   synflood: "TCP SYN Flood Attack & Analysis"
 };
 
-const ALL_PAGE_KEYS: PageKey[] = ["architecture", "variables", "howto", "httpflood", "synflood"]; //"findings",
+const ALL_PAGE_KEYS: PageKey[] = ["architecture", "proxy", "variables", "howto", "httpflood", "synflood"]; //"findings",
 
 
 // REUSABLE CONTENT BLOCK COMPONENTS
