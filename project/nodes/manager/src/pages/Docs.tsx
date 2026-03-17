@@ -920,12 +920,10 @@ function VariablesPage(): ReactElement {
         ))}
       </div>
 
-      {/* Results Count */}
       <p className="text-xs text-zinc-600 mb-3">
         {filtered.length} variable{filtered.length !== 1 ? "s" : ""} found
       </p>
 
-      {/* Variable Cards */}
       <div className="flex flex-col gap-2">
         {filtered.map((v: Variable) => {
           const isOpen: boolean = expandedVar === v.name;
